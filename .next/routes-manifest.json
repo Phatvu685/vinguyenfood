@@ -1,0 +1,104 @@
+{
+  "version": 3,
+  "pages404": true,
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/san-pham/[id]",
+      "regex": "^/san\\-pham/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/san\\-pham/(?<nxtPid>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/admin",
+      "regex": "^/admin(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin(?:/)?$"
+    },
+    {
+      "page": "/san-pham",
+      "regex": "^/san\\-pham(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/san\\-pham(?:/)?$"
+    },
+    {
+      "page": "/san-pham/vigen-food",
+      "regex": "^/san\\-pham/vigen\\-food(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/san\\-pham/vigen\\-food(?:/)?$"
+    },
+    {
+      "page": "/thanh-toan",
+      "regex": "^/thanh\\-toan(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/thanh\\-toan(?:/)?$"
+    },
+    {
+      "page": "/tin-tuc",
+      "regex": "^/tin\\-tuc(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tin\\-tuc(?:/)?$"
+    },
+    {
+      "page": "/user",
+      "regex": "^/user(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/user(?:/)?$"
+    },
+    {
+      "page": "/ve-chung-toi",
+      "regex": "^/ve\\-chung\\-toi(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/ve\\-chung\\-toi(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSuffix": ".prefetch.rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments"
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}

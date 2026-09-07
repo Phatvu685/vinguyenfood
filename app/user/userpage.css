@@ -1,0 +1,41 @@
+/* ==========================================================================
+   USER ACCOUNT PAGE STYLES (Giao diện Trang Tài khoản Khách hàng)
+   Dành riêng cho tệp app/user/page.tsx (Đơn hàng, Thông tin, Voucher)
+   ========================================================================== */
+
+.user-page {
+    min-height: 100vh; /* Chiều cao tối thiểu full màn hình */
+    background: radial-gradient(circle at 50% 0%, rgba(157, 151, 77, .18), transparent 36%), linear-gradient(180deg, #10251a, #183523 60%, #0e2117); /* Nền chuyển màu xanh đậm đồng quê */
+    color: var(--white, #f8f6ee); /* Màu chữ trắng ngà sang trọng */
+    font-family: Inter, sans-serif; /* Phông chữ mặc định Inter */
+    animation: page-fade .65s ease both; /* Hiệu ứng hiển thị mượt cho trang */
+}
+
+.user-container {
+    width: var(--site-shell-width, 96%); /* Độ rộng tổng thể 96% */
+    margin: 32px auto; /* Căn giữa, lề trên dưới 32px */
+    display: grid; /* Bố cục lưới Grid */
+    grid-template-columns: 260px 1fr; /* Chia 2 cột: Sidebar 260px và Nội dung chính 1fr */
+    gap: 28px; /* Khoảng cách giữa 2 cột 28px */
+}
+
+.user-sidebar {
+    padding: 24px 18px; /* Khoảng đệm trong thanh điều hướng phụ 24px 18px */
+    border-radius: 18px; /* Bo góc vòm 18px */
+    border: 1px solid rgba(216, 180, 90, .35); /* Viền màu vàng mờ */
+    background: rgba(17, 34, 24, .7); /* Nền xanh lục mờ hiệu ứng kính */
+}
+
+.user-content {
+    padding: 28px; /* Khoảng đệm trong khung nội dung 28px */
+    border-radius: 18px; /* Bo góc 18px */
+    border: 1px solid rgba(216, 180, 90, .35); /* Viền màu vàng mờ sang trọng */
+    background: rgba(17, 34, 24, .7); /* Nền xanh mờ kính bóng */
+}
+
+@media (max-width: 840px) {
+    .user-container {
+        grid-template-columns: 1fr; /* Chuyển thành 1 cột trên màn hình di động */
+    }
+}
+

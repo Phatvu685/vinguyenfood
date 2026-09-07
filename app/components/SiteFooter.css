@@ -1,0 +1,201 @@
+/* ==========================================================================
+   SITE FOOTER STYLES (Giao diện Chân trang Footer)
+   Dùng chung cho tất cả các trang trên Website Vigen Food / Gạo Ngon
+   ========================================================================== */
+
+/* ── 1. KHUNG FOOTER CHÍNH (MAIN FOOTER CONTAINER) ── */
+.site-footer {
+    width: var(--site-shell-width, 96%); /* Chiều rộng khung footer 96% */
+    margin: 70px auto 0; /* Cách lề trên 70px, căn giữa */
+    border: 1px solid rgba(216, 180, 90, .45); /* Viền vàng ánh kim nhạt */
+    border-bottom: 0; /* Bỏ viền đáy tiếp giáp */
+    border-radius: var(--site-panel-radius, 25px) var(--site-panel-radius, 25px) 0 0; /* Bo tròn 2 góc đỉnh trên 25px */
+    background: rgba(8, 24, 15, .96); /* Nền sẫm xanh đêm rêu */
+    color: var(--white, #f8f6ee); /* Màu chữ trắng kem */
+    overflow: hidden; /* Cắt góc tràn */
+}
+
+.site-footer-main {
+    padding: 38px 4.5% 32px; /* Đệm trong footer 38px 4.5% 32px */
+    display: grid; /* Bố cục lưới Grid */
+    grid-template-columns: 1.5fr 1fr 1fr 1fr 1.3fr; /* Chia 5 cột tỷ lệ chuẩn */
+    gap: 32px; /* Khoảng cách giữa các cột 32px */
+    border-bottom: 1px solid rgba(216, 180, 90, .22); /* Viền gạch đáy mờ */
+}
+
+.site-footer-brand,
+.site-footer-column,
+.site-footer-newsletter {
+    min-width: 0; /* Chiều rộng co giãn linh hoạt */
+}
+
+/* ── 2. BRAND LOGO & MẠNG XÃ HỘI (BRAND & SOCIALS) ── */
+.site-footer-logo {
+    display: flex; /* Bố cục Flexbox */
+    align-items: center; /* Căn giữa chiều dọc */
+    text-decoration: none; /* Bỏ gạch chân link */
+    color: inherit; /* Giữ màu chữ nguyên bản */
+}
+
+.site-footer-logo-mark {
+    width: 44px; /* Rộng 44px */
+    height: 44px; /* Cao 44px */
+    border-radius: 50%; /* Bo tròn hình cầu */
+    background: radial-gradient(circle, rgba(205, 170, 74, .4), rgba(17, 38, 24, .9)); /* Nền tỏa tròn óng ánh */
+    display: flex; /* Flexbox */
+    align-items: center; /* Căn giữa icon */
+    justify-content: center; /* Căn giữa icon */
+    font-size: 20px; /* Kích thước icon 20px */
+}
+
+.site-footer-logo strong {
+    font: 600 22px "Cormorant Garamond", serif; /* Phông chữ tên thương hiệu */
+    letter-spacing: .4px; /* Khoảng cách ký tự 0.4px */
+    margin-left: 8px; /* Khoảng cách trái 8px */
+}
+
+.site-footer-logo small {
+    font: italic 12px "Cormorant Garamond", serif; /* Phông khẩu hiệu nghiêng */
+    color: rgba(255, 255, 255, .65); /* Chữ màu mờ 65% */
+    display: block; /* Hiển thị dạng khối */
+}
+
+.site-footer-brand > p,
+.site-footer-newsletter > p {
+    margin-top: 12px; /* Lề trên 12px */
+    color: rgba(255, 255, 255, .72); /* Chữ mô tả màu mờ 72% */
+    font-size: 13px; /* Cỡ chữ 13px */
+    line-height: 1.55; /* Chiều cao dòng 1.55 */
+}
+
+.site-footer-brand > p {
+    max-width: 220px; /* Độ rộng tối đa dòng giới thiệu 220px */
+}
+
+.site-footer-socials {
+    margin-top: 16px; /* Lề trên 16px */
+    display: flex; /* Bố cục hàng ngang Flexbox */
+    gap: 10px; /* Khoảng cách giữa các nút 10px */
+}
+
+.site-footer-socials a {
+    width: 32px; /* Rộng 32px */
+    height: 32px; /* Cao 32px */
+    border-radius: 50%; /* Bo tròn hình tròn */
+    border: 1px solid rgba(216, 180, 90, .35); /* Viền mờ */
+    color: var(--gold2, #efd889); /* Màu icon vàng kim */
+    background: rgba(255, 255, 255, .03); /* Nền mờ 3% */
+    display: flex; /* Flexbox */
+    align-items: center; /* Căn giữa */
+    justify-content: center; /* Căn giữa */
+    font-size: 12px; /* Kích thước 12px */
+    text-decoration: none; /* Bỏ gạch chân */
+    transition: all .25s ease; /* Hiệu ứng mịn 0.25s */
+}
+
+.site-footer-socials a:hover {
+    border-color: var(--gold2, #efd889); /* Đổi màu viền sáng vàng khi rê chuột */
+    background: rgba(216, 180, 90, .18); /* Nền rực ánh kim */
+    transform: translateY(-2px); /* Nhích nút lên 2px */
+}
+
+/* ── 3. CÁC CỘT LIÊN KẾT & THÔNG TIN (FOOTER NAV COLUMNS) ── */
+.site-footer h3 {
+    color: var(--gold2, #efd889);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+}
+
+.site-footer-column a,
+.site-footer-column span {
+    display: block;
+    margin-top: 8px;
+    color: rgba(255, 255, 255, .75);
+    font-size: 13px;
+    text-decoration: none;
+    transition: color .25s ease;
+}
+
+.site-footer-column a:hover {
+    color: var(--gold2, #efd889);
+}
+
+/* ── 4. FORM ĐĂNG KÝ NHẬN TIN (NEWSLETTER FORM) ── */
+.site-footer-newsletter form {
+    margin-top: 14px;
+    display: flex;
+    gap: 8px;
+}
+
+.site-footer-newsletter input {
+    flex: 1;
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid rgba(216, 180, 90, .4);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .05);
+    color: var(--white, #f8f6ee);
+    font-size: 12px;
+    outline: none;
+}
+
+.site-footer-newsletter input::placeholder {
+    color: rgba(255, 255, 255, .56);
+}
+
+.site-footer-newsletter button {
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--gold2, #efd889);
+    border-radius: 8px;
+    background: var(--gold, #d8b45a);
+    color: #10251a;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .2s ease;
+}
+
+.site-footer-newsletter button:hover {
+    transform: scale(1.05);
+}
+
+/* ── 5. THANH BẢN QUYỀN CHÂN TRANG (BOTTOM COPYRIGHT) ── */
+.site-footer-bottom {
+    padding: 16px 4.5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: rgba(255, 255, 255, .58);
+}
+
+.site-footer-bottom b {
+    color: #e56b5d;
+}
+
+/* ── 6. RESPONSIVE DI ĐỘNG & MÀN HÌNH NHỎ ── */
+@media (max-width: 900px) {
+    .site-footer {
+        width: calc(100% - 24px);
+        margin-top: 45px;
+        border-radius: 16px 16px 0 0;
+    }
+
+    .site-footer-main {
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+
+    .site-footer-brand,
+    .site-footer-newsletter {
+        grid-column: 1 / -1;
+    }
+
+    .site-footer-bottom {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+    }
+}

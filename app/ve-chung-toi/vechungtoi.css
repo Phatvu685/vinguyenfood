@@ -1,0 +1,34 @@
+/* ==========================================================================
+   ABOUT US PAGE STYLES (Giao diện Trang Về chúng tôi / Câu chuyện Vigen Food)
+   Dành riêng cho tệp app/ve-chung-toi/page.tsx
+   ========================================================================== */
+
+.about-page {
+    min-height: 100vh; /* Chiều cao tối thiểu full màn hình */
+    background: radial-gradient(circle at 50% 0%, rgba(157, 151, 77, .18), transparent 36%), linear-gradient(180deg, #10251a, #183523 60%, #0e2117); /* Nền dải màu xanh thiên nhiên đậm nét */
+    color: var(--white, #f8f6ee); /* Màu chữ trắng ngà sang trọng */
+    font-family: Inter, sans-serif; /* Phông chữ mặc định Inter */
+    animation: page-fade .65s ease both; /* Hiệu ứng hiển thị mượt cho trang */
+}
+
+.about-hero {
+    width: var(--site-shell-width, 96%); /* Độ rộng banner 96% */
+    margin: 28px auto 0; /* Căn giữa banner, lề trên 28px */
+    padding: 55px 6%; /* Khoảng đệm trong banner */
+    border-radius: var(--site-panel-radius, 25px); /* Bo góc banner 25px */
+    border: 1px solid rgba(216, 180, 90, .4); /* Viền vàng nhạt mờ */
+    background: linear-gradient(90deg, rgba(6, 28, 17, .92), rgba(18, 55, 32, .52)), url("/images/rice-landscape.png") center/cover; /* Nền ảnh phong cảnh lúa nước kết hợp gradient */
+}
+
+.about-hero h1 {
+    font: 600 52px "Cormorant Garamond", serif; /* Kiểu chữ tiêu đề lớn nghệ thuật */
+    color: var(--gold2, #efd889); /* Màu chữ vàng hoàng gia */
+}
+
+.about-content {
+    width: var(--site-shell-width, 96%); /* Chiều rộng khung nội dung 96% */
+    margin: 45px auto; /* Lề trên dưới 45px, căn giữa */
+    display: grid; /* Bố cục lưới Grid */
+    gap: 36px; /* Khoảng cách giữa các phần nội dung 36px */
+}
+

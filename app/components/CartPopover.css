@@ -1,0 +1,265 @@
+/* ==========================================================================
+   CART POPOVER STYLES (Giao diện Giỏ hàng Thả xuống / Popover Dropdown)
+   Dùng chung cho xem nhanh giỏ hàng trên Header
+   ========================================================================== */
+
+/* ── 1. KHUNG DROPDOWN GIỎ HÀNG ── */
+.cart-dropdown,
+.landing-cart-popover.cart-dropdown {
+    position: fixed; /* Cố định vị trí popover giỏ hàng khi cuộn */
+    z-index: 110; /* Đưa popover đè lên trên cả thanh header */
+    top: 90px; /* Cách mép trên màn hình 90px */
+    right: 5%; /* Cách lề phải 5% */
+    width: min(380px, calc(100vw - 32px)); /* Độ rộng tối đa 380px */
+    padding: 22px; /* Đệm trong khung giỏ 22px */
+    border: 1px solid rgba(239, 216, 137, .5); /* Viền màu vàng kim nhạt */
+    border-radius: 16px; /* Bo góc 16px */
+    color: var(--white, #f8f6ee); /* Màu chữ trắng kem */
+    background: linear-gradient(145deg, rgba(24, 59, 39, .98), rgba(9, 31, 19, .98)); /* Nền dải màu xanh rêu sang trọng */
+    box-shadow: 0 20px 50px rgba(0, 0, 0, .42), inset 0 1px rgba(255, 255, 255, .08); /* Đổ bóng sâu tạo độ cao */
+    animation: cart-drop-in .22s ease-out both; /* Hiệu ứng thả xuống mịn 0.22 giây */
+}
+
+@keyframes cart-drop-in {
+    from {
+        opacity: 0; /* Ẩn mờ */
+        transform: translateY(-8px) scale(.98); /* Nhích nhẹ lên trên và thu nhỏ */
+    }
+    to {
+        opacity: 1; /* Hiện rõ */
+        transform: translateY(0) scale(1); /* Thả về vị trí chuẩn */
+    }
+}
+
+@media (max-width: 900px) {
+    .cart-dropdown,
+    .landing-cart-popover.cart-dropdown {
+        top: 82px;
+        right: 12px;
+        width: min(380px, calc(100vw - 24px));
+        max-height: calc(100dvh - 96px);
+        overflow-y: auto;
+    }
+}
+
+/* ── 2. TIÊU ĐỀ KHUNG GIỎ HÀNG ── */
+.cart-dropdown-heading {
+    display: flex; /* Bố cục Flexbox */
+    align-items: flex-start; /* Dóng hàng đỉnh trên */
+    justify-content: space-between; /* Phân chia hai đầu */
+    padding-bottom: 15px; /* Đệm dưới 15px */
+    border-bottom: 1px solid rgba(239, 216, 137, .18); /* Đường gạch phân cách mờ */
+}
+
+.cart-dropdown-heading h2 {
+    margin-top: 4px; /* Lề trên 4px */
+    font: 600 27px "Cormorant Garamond", serif; /* Phông tiêu đề Cormorant */
+}
+
+.cart-dropdown-heading button {
+    width: 25px; /* Rộng 25px */
+    height: 25px; /* Cao 25px */
+    border: 1px solid rgba(239, 216, 137, .35); /* Viền hình tròn mờ */
+    border-radius: 50%; /* Bo tròn hình cầu */
+    color: var(--gold2, #efd889); /* Biểu tượng màu vàng kim */
+    background: transparent; /* Nền trong suốt */
+    font-size: 18px; /* Cỡ chữ dấu ✕ 18px */
+    line-height: 1; /* Chiều cao dòng 1 */
+    cursor: pointer; /* Con trỏ nhấp chọn */
+}
+
+/* ── 3. TRẠNG THÁI GIỎ HÀNG TRỐNG ── */
+.cart-empty {
+    padding: 26px 8px 10px; /* Đệm khung rỗng */
+    text-align: center; /* Căn giữa toàn bộ chữ */
+}
+
+.cart-empty > span {
+    display: grid; /* Bố cục Grid */
+    width: 50px; /* Rộng 50px */
+    height: 50px; /* Cao 50px */
+    margin: 0 auto 12px; /* Căn giữa icon và cách đáy 12px */
+    place-items: center; /* Căn giữa icon */
+    border: 1px solid rgba(239, 216, 137, .4); /* Viền tròn mờ */
+    border-radius: 50%; /* Bo tròn */
+    background: rgba(216, 180, 90, .1); /* Nền vàng mờ nhẹ 10% */
+    font-size: 21px; /* Cỡ icon 21px */
+}
+
+.cart-empty strong {
+    display: block; /* Hiển thị khối độc lập */
+    font: 600 21px "Cormorant Garamond", serif; /* Phông chữ tiêu đề rỗng */
+}
+
+.cart-empty p {
+    margin-top: 6px; /* Lề trên 6px */
+    color: rgba(255, 255, 255, .58); /* Chữ màu mờ 58% */
+    font-size: 11px; /* Cỡ chữ 11px */
+    line-height: 1.5; /* Chiều cao dòng 1.5 */
+}
+
+.cart-empty a {
+    display: inline-block; /* Hiển thị dạng khối nội dòng */
+    margin-top: 17px; /* Lề trên 17px */
+    color: var(--gold2, #efd889); /* Màu chữ vàng kim */
+    font-size: 12px; /* Cỡ chữ 12px */
+    text-decoration: none; /* Bỏ gạch chân */
+}
+
+/* ── 4. DANH SÁCH SẢN PHẨM TRONG GIỎ ── */
+.cart-items {
+    max-height: 260px; /* Chiều cao cuộn tối đa 260px */
+    overflow-y: auto;
+    margin-top: 10px;
+    padding-right: 4px;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-top: 12px;
+    padding: 11px;
+    border: 1px solid rgba(239, 216, 137, .18);
+    border-radius: 8px;
+    background: rgba(7, 24, 14, .35);
+    position: relative;
+}
+
+.cart-item-image {
+    width: 45px;
+    height: 50px;
+    border-radius: 5px;
+    overflow: hidden;
+    background: #eaf0d9;
+}
+
+.cart-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.cart-item-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cart-item-content strong {
+    font: 600 16px "Cormorant Garamond", serif;
+}
+
+.cart-item-content small {
+    color: rgba(255, 255, 255, .55);
+    font-size: 11px;
+}
+
+.cart-item-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 4px;
+}
+
+.cart-quantity {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid rgba(216, 180, 90, .3);
+    border-radius: 4px;
+    padding: 2px 6px;
+}
+
+.cart-quantity button {
+    background: transparent;
+    border: 0;
+    color: var(--gold2, #efd889);
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.cart-quantity span {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.cart-remove {
+    border: 0;
+    background: transparent;
+    color: rgba(255, 107, 107, .8);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 4px;
+}
+
+.cart-remove:hover {
+    color: #ff6b6b;
+}
+
+/* ── 5. TỔNG TIỀN & NÚT THANH TOÁN ── */
+.cart-summary {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(239, 216, 137, .18);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 12px;
+}
+
+.cart-summary div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.cart-grand-total {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gold2, #efd889);
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px dashed rgba(239, 216, 137, .2);
+}
+
+.cart-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.cart-actions a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all .2s ease;
+}
+
+.cart-actions a:first-child {
+    border: 1px solid rgba(216, 180, 90, .4);
+    color: var(--gold2, #efd889);
+    background: transparent;
+}
+
+.cart-actions a:last-child {
+    border: 1px solid var(--gold2, #efd889);
+    color: #10251a;
+    background: var(--gold2, #efd889);
+}
+
+/* ── 6. RESPONSIVE DI ĐỘNG ── */
+@media (max-width: 520px) {
+    .landing-cart-popover.cart-dropdown {
+        top: 84px;
+        right: 15px;
+        left: 15px;
+        width: auto;
+    }
+}

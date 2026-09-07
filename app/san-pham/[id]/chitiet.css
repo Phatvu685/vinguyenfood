@@ -1,0 +1,88 @@
+/* ==========================================================================
+   PRODUCT DETAIL PAGE STYLES (Giao diện Trang Chi tiết Sản phẩm)
+   Dành riêng cho tệp app/san-pham/[id]/page.tsx
+   ========================================================================== */
+
+/* ── 1. KHUNG NỀN TRANG CHI TIẾT SẢN PHẨM ── */
+.product-detail-page {
+    min-height: 100vh; /* Chiều cao tối thiểu toàn bộ màn hình */
+    background: radial-gradient(circle at 50% 0%, rgba(157, 151, 77, .18), transparent 40%), linear-gradient(180deg, #10251a, #183523 60%, #0e2117); /* Nền chuyển màu xanh đậm đồng quê */
+    color: var(--white, #f8f6ee); /* Màu chữ trắng ngà sang trọng */
+    font-family: Inter, sans-serif; /* Phông chữ mặc định Inter */
+    animation: page-fade .65s ease both; /* Hiệu ứng xuất hiện mượt cho trang */
+}
+
+/* ── 2. LAYOUT CHI TIẾT SẢN PHẨM (GRID 2 CỘT) ── */
+.pdp-container {
+    width: var(--site-shell-width, 96%); /* Độ rộng khung chứa 96% */
+    margin: 36px auto; /* Căn giữa khung, lề trên dưới 36px */
+    display: grid; /* Bố cục lưới CSS Grid */
+    grid-template-columns: 45% 55%; /* Chia 2 cột: Ảnh 45% và Thông tin 55% */
+    gap: 40px; /* Khoảng cách giữa 2 cột 40px */
+    padding: 36px; /* Khoảng đệm bên trong 36px */
+    border: 1px solid rgba(216, 180, 90, .4); /* Viền màu vàng mờ */
+    border-radius: var(--site-panel-radius, 25px); /* Bo tròn khung 25px */
+    background: rgba(17, 34, 24, .65); /* Nền mờ hiệu ứng kính thủy tinh */
+    backdrop-filter: blur(15px); /* Làm mờ phần nền phía sau */
+}
+
+.pdp-gallery {
+    position: relative; /* Định vị tương đối cho phần chứa ảnh */
+    aspect-ratio: 1/1; /* Tỷ lệ khung ảnh vuông 1:1 */
+    border-radius: 16px; /* Bo góc ảnh 16px */
+    overflow: hidden; /* Cắt phần ảnh tràn khỏi góc bo */
+    background: radial-gradient(ellipse at center, rgba(213, 183, 83, .25), rgba(13, 42, 23, .1) 60%); /* Nền hiệu ứng hào quang cho sản phẩm */
+    border: 1px solid rgba(216, 180, 90, .3); /* Viền màu vàng nhạt bao quanh ảnh */
+    display: flex; /* Dùng Flexbox căn ảnh giữa khung */
+    align-items: center; /* Căn giữa theo chiều dọc */
+    justify-content: center; /* Căn giữa theo chiều ngang */
+}
+
+.pdp-gallery img {
+    max-width: 90%; /* Chiều rộng ảnh tối đa 90% */
+    max-height: 90%; /* Chiều cao ảnh tối đa 90% */
+    object-fit: contain; /* Giữ nguyên tỷ lệ bao trọn khung */
+    filter: drop-shadow(0 20px 24px rgba(0, 0, 0, .45)); /* Tạo bóng nổi bật cho bao gạo */
+}
+
+.pdp-info {
+    display: flex; /* Bố cục Flexbox xếp các mục thông tin */
+    flex-direction: column; /* Sắp xếp theo hàng dọc */
+}
+
+.pdp-title {
+    font: 600 42px "Cormorant Garamond", serif; /* Kiểu chữ tên sản phẩm sang trọng */
+    color: var(--gold2, #efd889); /* Màu chữ vàng ánh kim */
+    line-height: 1.1; /* Chiều cao dòng 1.1 */
+}
+
+.pdp-price {
+    margin-top: 16px; /* Lề trên giá 16px */
+    font-size: 32px; /* Kích thước chữ giá 32px */
+    font-weight: 700; /* In đậm chữ giá */
+    color: var(--gold2, #efd889); /* Màu chữ vàng hoàng gia */
+    font-family: "Cormorant Garamond", serif; /* Phông chữ serif nghệ thuật */
+}
+
+.pdp-description {
+    margin-top: 18px; /* Khoảng cách trên mô tả 18px */
+    color: rgba(255, 255, 255, .78); /* Màu chữ mô tả mờ nhẹ */
+    font-size: 14px; /* Cỡ chữ mô tả 14px */
+    line-height: 1.65; /* Chiều cao dòng đọc dễ chịu 1.65 */
+}
+
+.pdp-actions {
+    margin-top: 28px; /* Lề trên khu vực nút bấm 28px */
+    display: flex; /* Dùng Flexbox cho các nút mua hàng */
+    gap: 14px; /* Khoảng cách giữa các nút 14px */
+    align-items: center; /* Căn giữa các nút theo dòng ngang */
+}
+
+/* ── 3. RESPONSIVE DI ĐỘNG ── */
+@media (max-width: 860px) {
+    .pdp-container {
+        grid-template-columns: 1fr; /* Chuyển thành 1 cột xếp dọc trên màn hình nhỏ */
+        padding: 20px; /* Giảm khoảng đệm xuống 20px */
+    }
+}
+

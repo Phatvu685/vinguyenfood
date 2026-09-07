@@ -1,0 +1,306 @@
+/* ==========================================================================
+   AUTH MODAL STYLES (Modal Đăng nhập / Đăng ký / Quên mật khẩu)
+   Dùng cho Popup xác thực tài khoản thành viên Vigen Food
+   ========================================================================== */
+
+/* ── 1. LỚP NỀN MỜ PHỦ TOÀN MÀN HÌNH (MODAL OVERLAY) ── */
+.auth-overlay {
+    position: fixed; /* Cố định lớp phủ toàn màn hình */
+    z-index: 100; /* Đưa lớp phủ lên trên cùng mọi thành phần */
+    inset: 0; /* Phủ kín 4 mép màn hình */
+    display: grid; /* Bố cục dạng lưới Grid */
+    place-items: center; /* Dóng modal ra chính giữa màn hình */
+    padding: 24px; /* Đệm an toàn cách mép 24px */
+    background: rgba(4, 13, 8, .74); /* Nền tối màu xanh đen mờ 74% */
+    backdrop-filter: blur(12px); /* Hiệu ứng mờ hậu cảnh glassmorphism */
+    -webkit-backdrop-filter: blur(12px); /* Tương thích với Safari iOS */
+    animation: auth-fade-in .25s ease both; /* Hiệu ứng mờ hiện 0.25s */
+}
+
+@keyframes auth-fade-in {
+    from { opacity: 0; } /* Khởi đầu ẩn mờ */
+    to { opacity: 1; } /* Kết thúc hiển thị rõ */
+}
+
+/* ── 2. KHUNG MODAL ĐĂNG NHẬP / ĐĂNG KÝ (AUTH CONTAINER) ── */
+.auth-modal {
+    position: relative; /* Vị trí tương đối cho nút đóng */
+    width: min(940px, 100%); /* Chiều rộng tối đa 940px hoặc 100% di động */
+    min-height: 565px; /* Chiều cao tối thiểu 565px */
+    display: grid; /* Bố cục Lưới Grid chia cột */
+    grid-template-columns: 42% 58%; /* Cột trái 42% (banner), cột phải 58% (form) */
+    overflow: hidden; /* Cắt góc tràn viền bo */
+    border: 1px solid rgba(232, 209, 130, .52); /* Viền màu vàng kim nhạt */
+    border-radius: 24px; /* Bo góc modal 24px */
+    color: #f8f6ee; /* Màu chữ trắng kem */
+    background: rgba(16, 37, 26, .68); /* Nền xanh rêu kính mờ */
+    backdrop-filter: blur(22px) saturate(1.15); /* Làm mờ kính sương và rực màu */
+    -webkit-backdrop-filter: blur(22px) saturate(1.15); /* Hỗ trợ Safari */
+    box-shadow: 0 34px 90px rgba(0, 0, 0, .42), 0 0 0 8px rgba(220, 190, 95, .04), inset 0 1px rgba(255, 255, 255, .08); /* Đổ bóng sâu đa tầng cao cấp */
+    animation: auth-rise .35s cubic-bezier(.2, .85, .3, 1) both; /* Hiệu ứng trượt nảy nhẹ khi xuất hiện */
+}
+
+@media (max-width: 600px), (max-height: 700px) {
+    .auth-modal {
+        max-height: calc(100dvh - 32px);
+        overflow-y: auto;
+    }
+}
+
+@keyframes auth-rise {
+    from {
+        opacity: 0; /* Ẩn mờ */
+        transform: translateY(18px) scale(.98); /* Nhích xuống 18px và thu nhỏ 98% */
+    }
+    to {
+        opacity: 1; /* Hiện rõ */
+        transform: translateY(0) scale(1); /* Về vị trí chuẩn */
+    }
+}
+
+/* ── 3. KHU VỰC QUẢNG BÁ BÊN TRÁI (LEFT BANNER SHOWCASE) ── */
+.auth-showcase {
+    position: relative; /* Vị trí tương đối làm chuẩn cho lớp phủ */
+    display: flex; /* Bố cục Flexbox */
+    flex-direction: column; /* Xếp dọc */
+    justify-content: flex-end; /* Dóng nội dung xuống đáy banner */
+    min-height: 100%; /* Cao 100% cột */
+    padding: 42px 38px; /* Đệm trong banner 42px 38px */
+    overflow: hidden; /* Cắt góc */
+    background: linear-gradient(180deg, rgba(7, 30, 17, .12), rgba(5, 21, 12, .88)), url("/images/rice-landscape.png") center/cover; /* Nền ảnh đồng lúa sẫm màu */
+}
+
+.auth-showcase:before {
+    content: ""; /* Thẻ giả tạo dải sáng trang trí */
+    position: absolute; /* Vị trí tuyệt đối phủ lên banner */
+    inset: 0; /* Phủ 4 góc */
+    border-right: 1px solid rgba(239, 215, 137, .28); /* Viền vi phân cách mờ */
+    background: linear-gradient(130deg, rgba(11, 47, 26, .4), transparent 52%); /* Dải màu chéo nghệ thuật */
+}
+
+.auth-showcase-grain {
+    position: absolute; /* Vị trí tuyệt đối */
+    top: 30px; /* Cách mép trên 30px */
+    right: 35px; /* Cách mép phải 35px */
+    color: #f0d779; /* Màu vàng hạt lúa */
+    font-size: 32px; /* Kích thước 32px */
+    opacity: .9; /* Độ mờ 90% */
+}
+
+.auth-showcase-copy,
+.auth-showcase-perks {
+    position: relative; /* Vị trí tương đối */
+    z-index: 1; /* Đảm bảo nằm trên ảnh nền */
+}
+
+.auth-showcase-copy > span {
+    color: #e8ce73; /* Màu chữ vàng nhạt */
+    font-size: 10px; /* Cỡ chữ 10px */
+    font-weight: 700; /* In đậm */
+    letter-spacing: 2px; /* Khoảng cách ký tự 2px */
+}
+
+.auth-showcase h2 {
+    margin: 15px 0 14px; /* Lề trên 15px, dưới 14px */
+    font: 500 clamp(39px, 4vw, 52px)/.92 "Cormorant Garamond", serif; /* Phông chữ Cormorant nghệ thuật */
+    letter-spacing: -.6px; /* Co nhẹ khoảng cách chữ */
+}
+
+.auth-showcase h2 em {
+    color: #efd889;
+    font-family: "Dancing Script", cursive;
+    font-style: normal;
+    font-weight: 500;
+}
+
+.auth-showcase-copy p {
+    max-width: 240px;
+    color: rgba(255, 255, 255, .75);
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.auth-showcase-perks {
+    margin-top: 35px;
+    padding-top: 20px;
+    display: grid;
+    gap: 10px;
+    border-top: 1px solid rgba(255, 242, 190, .25);
+}
+
+.auth-showcase-perks span {
+    color: #e2c770;
+    font: 13px "Cormorant Garamond", serif;
+}
+
+.auth-showcase-perks b {
+    margin-left: 9px;
+    color: #fffdf4;
+    font: 500 12px Inter, sans-serif;
+}
+
+/* ── 4. KHU VỰC FORM ĐĂNG NHẬP / ĐĂNG KÝ BÊN PHẢI (FORM CONTENT) ── */
+.auth-content {
+    padding: 52px 64px 36px;
+    background: radial-gradient(circle at 92% 5%, rgba(214, 178, 79, .16), transparent 27%), linear-gradient(145deg, rgba(24, 53, 35, .62), rgba(16, 37, 26, .48));
+    backdrop-filter: blur(18px) saturate(1.1);
+    -webkit-backdrop-filter: blur(18px) saturate(1.1);
+}
+
+.auth-close {
+    position: absolute;
+    z-index: 3;
+    top: 18px;
+    right: 20px;
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(255, 244, 195, .34);
+    border-radius: 50%;
+    color: #f8f3dc;
+    background: rgba(7, 25, 14, .42);
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform .2s, background .2s;
+}
+
+.auth-close:hover {
+    transform: rotate(90deg);
+    background: rgba(216, 180, 90, .2);
+}
+
+.auth-heading h2 {
+    margin-top: 11px;
+    font: 600 37px/1 "Cormorant Garamond", serif;
+}
+
+.auth-heading p {
+    max-width: 380px;
+    margin-top: 10px;
+    color: rgba(255, 255, 255, .68);
+    font-size: 12px;
+    line-height: 1.65;
+}
+
+/* Tab chuyên đổi Đăng nhập / Đăng ký */
+.auth-tabs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    margin: 28px 0 23px;
+    padding: 4px;
+    border: 1px solid rgba(238, 216, 145, .2);
+    border-radius: 11px;
+    background: rgba(5, 22, 12, .32);
+}
+
+.auth-tabs button {
+    height: 39px;
+    border: 0;
+    border-radius: 8px;
+    color: rgba(255, 255, 255, .6);
+    background: transparent;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .7px;
+    cursor: pointer;
+    transition: color .2s, background .2s, box-shadow .2s;
+}
+
+.auth-tabs button.active {
+    color: #17291d;
+    background: #ecda9c;
+    box-shadow: 0 5px 12px rgba(0, 0, 0, .2);
+}
+
+/* Form Nhập dữ liệu */
+.auth-form {
+    display: grid;
+    gap: 15px;
+}
+
+.auth-form > label {
+    display: grid;
+    gap: 7px;
+    color: #f4efdc;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .25px;
+}
+
+.auth-input {
+    height: 47px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    border: 1px solid rgba(240, 221, 153, .28);
+    border-radius: 9px;
+    background: rgba(4, 21, 11, .32);
+    transition: border-color .2s, box-shadow .2s, background .2s;
+}
+
+.auth-input:focus-within {
+    border-color: #e1bf61;
+    background: rgba(4, 21, 11, .48);
+    box-shadow: 0 0 0 3px rgba(216, 180, 90, .11);
+}
+
+.auth-input input {
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+    padding: 0 10px;
+    border: 0;
+    outline: 0;
+    color: #fffdf4;
+    background: transparent;
+    font: 13px Inter, sans-serif;
+}
+
+.auth-input input::placeholder {
+    color: rgba(255, 255, 255, .38);
+}
+
+.auth-error {
+    padding: 9px 11px;
+    border: 1px solid rgba(232, 146, 119, .45);
+    border-radius: 7px;
+    color: #ffd5c5;
+    background: rgba(142, 47, 26, .2);
+    font-size: 11px;
+}
+
+.auth-submit {
+    width: 100%;
+    height: 48px;
+    margin-top: 3px;
+    border: 1px solid #f0d986;
+    border-radius: 9px;
+    color: #17291d;
+    background: linear-gradient(105deg, #ead486, #f4e6ae);
+    box-shadow: 0 9px 20px rgba(0, 0, 0, .2);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s, filter .2s;
+}
+
+.auth-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 13px 24px rgba(0, 0, 0, .28);
+    filter: brightness(1.04);
+}
+
+/* ── 5. RESPONSIVE MÀN HÌNH NHỎ (MOBILE LAYOUT) ── */
+@media (max-width: 840px) {
+    .auth-modal {
+        grid-template-columns: 1fr;
+    }
+    .auth-showcase {
+        display: none;
+    }
+    .auth-content {
+        padding: 40px 24px 28px;
+    }
+}

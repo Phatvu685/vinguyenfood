@@ -1,0 +1,12 @@
+{
+  "/_not-found/page": "/_not-found",
+  "/admin/page": "/admin",
+  "/page": "/",
+  "/san-pham/[id]/page": "/san-pham/[id]",
+  "/san-pham/page": "/san-pham",
+  "/san-pham/vigen-food/page": "/san-pham/vigen-food",
+  "/thanh-toan/page": "/thanh-toan",
+  "/tin-tuc/page": "/tin-tuc",
+  "/user/page": "/user",
+  "/ve-chung-toi/page": "/ve-chung-toi"
+}

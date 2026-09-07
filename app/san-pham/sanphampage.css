@@ -1,0 +1,249 @@
+/* ==========================================================================
+   PRODUCTS CATALOG PAGE STYLES (Giao diện Trang Danh mục Sản phẩm)
+   Dành riêng cho tệp app/san-pham/page.tsx (Tìm kiếm, Bộ lọc & Khung sản phẩm)
+   ========================================================================== */
+
+/* ── 1. KHUNG NỀN TRANG SẢN PHẨM ── */
+.catalog-page {
+    min-height: 100vh; /* Chiều cao tối thiểu full màn hình */
+    background: radial-gradient(circle at 50% 0%, rgba(157, 151, 77, .2), transparent 34%), linear-gradient(180deg, #142d1e, #1d432b 60%, #12291b); /* Nền dải màu xanh lá và vàng nhạt */
+    color: var(--white, #f8f6ee); /* Màu chữ trắng ngà */
+    font-family: Inter, sans-serif; /* Phông chữ mặc định Inter */
+    animation: page-fade .65s ease both; /* Hiệu ứng hiển thị mượt cho trang */
+}
+
+/* ── 2. BANNER THỜI THƯỢNG (HERO CATALOG BANNER) ── */
+.catalog-hero {
+    width: 90%; /* Chiều rộng banner 90% */
+    min-height: 300px; /* Chiều cao tối thiểu 300px */
+    margin: 34px auto 0; /* Căn giữa banner, lề trên 34px */
+    padding: 48px 7%; /* Khoảng đệm trong banner */
+    display: flex; /* Sử dụng Flexbox sắp xếp nội dung */
+    align-items: center; /* Căn giữa theo chiều dọc */
+    justify-content: space-between; /* Giữ khoảng cách giữa 2 đầu */
+    color: #f7f4e8; /* Màu chữ sáng ngà */
+    background: linear-gradient(90deg, rgba(5, 20, 11, .88), rgba(20, 60, 32, .38)), url("/images/rice-landscape.png") center/cover; /* Ảnh nền đồng lúa kèm lớp phủ tối */
+    border: 1px solid rgba(218, 184, 91, .3); /* Viền vàng nhạt bóng */
+    box-shadow: 0 20px 50px rgba(0, 0, 0, .2); /* Đổ bóng nổi bật */
+    border-radius: 16px; /* Bo tròn góc banner */
+}
+
+.catalog-hero h1 {
+    margin-top: 8px; /* Lề trên tiêu đề */
+    font: 600 54px/.86 "Cormorant Garamond", serif; /* Phông chữ serif sang trọng */
+    letter-spacing: 1px; /* Khoảng cách chữ 1px */
+}
+
+.catalog-hero h1 em {
+    color: #e4c66e; /* Màu vàng hoàng gia */
+    font: 54px "Dancing Script", cursive; /* Phông chữ viết tay lãng mạn */
+}
+
+.catalog-hero p {
+    max-width: 450px; /* Chiều rộng tối đa mô tả */
+    margin-top: 22px; /* Lề trên 22px */
+    color: rgba(255, 255, 255, .78); /* Chữ trắng mờ nhẹ */
+    font-size: 13px; /* Kích thước chữ 13px */
+    line-height: 1.6; /* Khoảng cách dòng 1.6 */
+}
+
+.catalog-hero-mark {
+    align-self: flex-end; /* Căn xuống góc dưới */
+    color: #dfc578; /* Màu chữ vàng nhạt */
+    font: 48px "Cormorant Garamond", serif; /* Kiểu phông sang trọng */
+    text-align: right; /* Căn phải nội dung */
+}
+
+.catalog-hero-mark small {
+    font: 10px Inter; /* Kiểu chữ Inter 10px */
+    line-height: 1.5; /* Dòng cao 1.5 */
+    letter-spacing: 1px; /* Khoảng cách ký tự 1px */
+}
+
+/* ── 3. KHU VỰC THAO TÁC, TÌM KIẾM & BỘ LỌC ── */
+.catalog-content {
+    width: 94%; /* Độ rộng khu vực nội dung 94% */
+    margin: 48px auto; /* Lề trên dưới 48px, căn giữa */
+}
+
+.catalog-heading {
+    display: flex; /* Dùng Flexbox cho tiêu đề */
+    align-items: flex-end; /* Căn chân chữ bằng nhau */
+    justify-content: space-between; /* Đẩy nội dung ra 2 bên */
+}
+
+.catalog-heading h2 {
+    margin-top: 5px; /* Lề trên 5px */
+    font: 600 38px "Cormorant Garamond", serif; /* Phông chữ tiêu đề lớn */
+    letter-spacing: .3px; /* Khoảng cách ký tự .3px */
+}
+
+.catalog-heading p {
+    color: rgba(255, 255, 255, .58); /* Chữ mô tả mờ */
+    font-size: 12px; /* Cỡ chữ 12px */
+}
+
+.catalog-tools {
+    margin-top: 28px; /* Khoảng cách trên 28px */
+    padding: 15px 0; /* Khoảng đệm trên dưới 15px */
+    display: flex; /* Khung công cụ flexbox */
+    align-items: center; /* Căn giữa chiều dọc */
+    justify-content: space-between; /* Phân bổ 2 đầu */
+    border-top: 1px solid rgba(221, 211, 163, .22); /* Đường viền ngang trên */
+    border-bottom: 1px solid rgba(221, 211, 163, .22); /* Đường viền ngang dưới */
+    flex-wrap: wrap; /* Tự động xuống dòng khi màn hình nhỏ */
+    gap: 16px; /* Khoảng cách giữa các công cụ 16px */
+}
+
+/* Tabs phân loại danh mục sản phẩm */
+.category-tabs {
+    display: flex; /* Dùng Flexbox cho các tab */
+    width: fit-content; /* Độ rộng vừa với nội dung */
+    max-width: 100%; /* Chiều rộng tối đa 100% */
+    gap: 7px; /* Khoảng cách giữa các tab 7px */
+    flex-wrap: wrap; /* Xuống dòng khi thiếu khoảng trống */
+    align-items: center; /* Căn giữa chiều dọc */
+    padding: 5px; /* Khoảng đệm bao quanh tab 5px */
+    border: 1px solid rgba(216, 180, 90, .42); /* Viền bao ngoài tab */
+    border-radius: 14px; /* Bo góc vòm nút tab */
+    background: rgba(255, 255, 255, .035); /* Nền mờ kính nhẹ */
+}
+
+.category-tabs button {
+    padding: 9px 14px; /* Khoảng đệm nút tab */
+    border: 1px solid rgba(224, 190, 91, .42); /* Viền nút tab */
+    border-radius: 20px; /* Bo tròn viền nút */
+    color: rgba(255, 255, 255, .68); /* Màu chữ tab chưa chọn */
+    background: transparent; /* Nền trong suốt */
+    font-size: 12px; /* Kích thước phông chữ 12px */
+    cursor: pointer; /* Hiển thị con trỏ bàn tay */
+    transition: all .2s ease; /* Hiệu ứng mượt khi hover */
+}
+
+.category-tabs button.selected {
+    border-color: #b99443; /* Viền màu vàng đượm */
+    color: #17291d; /* Chữ màu xanh đậm sang trọng */
+    background: #e8dba8; /* Nền màu vàng kem nhạt */
+    font-weight: 700; /* In đậm chữ tab đang chọn */
+}
+
+/* Khung tìm kiếm & Sắp xếp sản phẩm */
+.catalog-actions {
+    display: flex; /* Khung thao tác dùng Flexbox */
+    gap: 10px; /* Khoảng cách giữa ô tìm kiếm và bộ lọc */
+    align-items: center; /* Căn giữa theo hàng ngang */
+}
+
+.catalog-search {
+    width: 230px; /* Chiều rộng ô tìm kiếm 230px */
+    height: 40px; /* Chiều cao ô 40px */
+    padding: 0 13px; /* Khoảng đệm bên trong 13px */
+    display: flex; /* Dùng Flexbox căn chỉnh icon và input */
+    align-items: center; /* Căn giữa chiều dọc */
+    gap: 7px; /* Khoảng cách giữa icon và chữ */
+    border: 1px solid rgba(216, 180, 90, .48); /* Viền mờ màu vàng */
+    border-radius: 12px; /* Bo tròn góc 12px */
+    background: rgba(255, 255, 255, .035); /* Nền mờ mỏng */
+}
+
+.catalog-search input {
+    width: 100%; /* Ô nhập chiếm full chiều rộng */
+    border: 0; /* Xóa bỏ đường viền mặc định */
+    outline: 0; /* Xóa đường viền focus mặc định */
+    color: var(--white, #f8f6ee); /* Màu chữ nhập trắng ngà */
+    background: transparent; /* Nền ô nhập trong suốt */
+    font-size: 12px; /* Kích thước chữ 12px */
+}
+
+.catalog-search input::placeholder {
+    color: rgba(255, 255, 255, .5); /* Màu chữ gợi ý mờ */
+}
+
+.catalog-actions select {
+    padding: 8px 12px; /* Khoảng đệm danh sách chọn */
+    border: 1px solid rgba(221, 211, 163, .3); /* Viền danh sách chọn */
+    border-radius: 8px; /* Bo góc 8px */
+    color: var(--white, #f8f6ee); /* Màu chữ trắng ngà */
+    background: rgba(8, 24, 14, .38); /* Nền xanh tối mờ */
+    font-size: 12px; /* Cỡ chữ 12px */
+    outline: none; /* Xóa nét viền khi chọn */
+}
+
+.catalog-actions select option {
+    color: #17291d; /* Màu chữ tùy chọn tối */
+    background: #f8f6ee; /* Nền tùy chọn sáng ngà */
+}
+
+/* ── 4. LƯỚI HIỂN THỊ SẢN PHẨM (CATALOG GRID) ── */
+.catalog-grid {
+    margin-top: 25px; /* Khoảng cách trên 25px */
+    display: grid; /* Sử dụng bố cục Lưới CSS Grid */
+    grid-template-columns: repeat(4, minmax(0, 1fr)); /* Chia 4 cột đều nhau */
+    gap: 18px; /* Khoảng cách giữa các ô sản phẩm 18px */
+}
+
+.catalog-empty {
+    padding: 70px 0; /* Khoảng đệm trên dưới khi trống 70px */
+    text-align: center; /* Căn giữa văn bản thông báo */
+    color: rgba(255, 255, 255, .6); /* Màu chữ thông báo mờ */
+    grid-column: 1 / -1; /* Trải dài full các cột grid */
+}
+
+/* ── 5. CAM KẾT CHẤT LƯỢNG HẠT GẠO (PROMISE SECTION) ── */
+.catalog-promise {
+    width: 90%; /* Độ rộng khối cam kết 90% */
+    margin: 40px auto 60px; /* Lề căn giữa, trên 40px, dưới 60px */
+    padding: 45px 8%; /* Khoảng đệm trong khối 45px 8% */
+    display: flex; /* Sử dụng Flexbox căn chỉnh */
+    align-items: center; /* Căn giữa chiều dọc */
+    gap: 28px; /* Khoảng cách các thành phần 28px */
+    color: #f5f1df; /* Màu chữ sáng ngà */
+    background: #1a3a27; /* Nền xanh lục bảo đậm */
+    border-radius: 18px; /* Bo góc 18px */
+    border: 1px solid rgba(216, 180, 90, .3); /* Viền màu vàng ánh kim mờ */
+}
+
+.promise-icon {
+    color: #dec16a; /* Màu biểu tượng vàng kim */
+    font-size: 28px; /* Kích thước biểu tượng 28px */
+}
+
+.catalog-promise h2 {
+    margin-top: 6px; /* Lề trên 6px */
+    font: 600 34px/.9 "Cormorant Garamond", serif; /* Phông tiêu đề nét serif */
+}
+
+.catalog-promise h2 em {
+    font-size: 36px; /* Kích thước chữ nhấn 36px */
+    color: #dec16a; /* Màu vàng ánh kim */
+    font-family: "Dancing Script", cursive; /* Kiểu chữ viết tay mềm mại */
+}
+
+.catalog-promise p {
+    max-width: 370px; /* Chiều rộng chữ tối đa 370px */
+    margin-left: auto; /* Đẩy chữ về bên phải */
+    color: rgba(255, 255, 255, .7); /* Màu chữ trắng mờ nhẹ */
+    font-size: 12px; /* Kích thước chữ 12px */
+    line-height: 1.6; /* Chiều cao dòng 1.6 */
+}
+
+/* ── 6. RESPONSIVE GIAO DIỆN ── */
+@media (max-width: 900px) {
+    .catalog-grid {
+        grid-template-columns: repeat(2, 1fr); /* Chuyển thành 2 cột trên máy tính bảng */
+    }
+}
+
+@media (max-width: 600px) {
+    .catalog-grid {
+        grid-template-columns: 1fr; /* Chuyển thành 1 cột trên điện thoại */
+    }
+    .catalog-hero h1 {
+        font-size: 40px; /* Giảm cỡ chữ tiêu đề hero */
+    }
+    .catalog-tools {
+        flex-direction: column; /* Xếp dọc các công cụ bộ lọc */
+        align-items: stretch; /* Mở rộng chiều ngang công cụ */
+    }
+}
+
