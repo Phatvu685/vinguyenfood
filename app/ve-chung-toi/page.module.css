@@ -1,0 +1,2 @@
+:global(.about-page).pageRoot { min-height: 100vh; }
+:global(.about-page).pageRoot :global(.about-hero) { contain: layout paint; }

@@ -1,0 +1,2 @@
+:global(.catalog-page).pageRoot { min-height: 100vh; }
+:global(.catalog-page).pageRoot :global(.catalog-card) { contain: layout paint; }

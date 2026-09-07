@@ -1,0 +1,2 @@
+Thay các asset ảnh thật theo tên trong README.md.
+Các đường dẫn ảnh trong page.tsx đã được chuẩn bị sẵn.

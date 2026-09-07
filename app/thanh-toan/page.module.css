@@ -1,0 +1,2 @@
+:global(.checkout-page).pageRoot { min-height: 100vh; }
+:global(.checkout-page).pageRoot :global(.checkout-stage) { contain: layout paint; }

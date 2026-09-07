@@ -1,0 +1,2 @@
+:global(.site).pageRoot { min-height: 100vh; }
+:global(.site).pageRoot :global(.products-section) { contain: layout paint; }

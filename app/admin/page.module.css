@@ -1,0 +1,1535 @@
+:global(.admin-page).adminPage {
+  min-height: 100vh;
+  height: auto;
+  background:
+    linear-gradient(rgba(3, 28, 18, .82), rgba(3, 28, 18, .82)),
+    url("/images/rice-landscape.png") center / cover fixed;
+}
+
+.adminPage :global(.admin-sidebar),
+.adminPage :global(.admin-topbar),
+.adminPage :global(.admin-stat),
+.adminPage :global(.admin-panel) {
+  border-color: rgba(229, 198, 102, .28);
+  background-color: rgba(7, 44, 27, .58);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.adminPage :global(.admin-stat strong),
+.adminPage :global(.admin-panel h2),
+.adminPage :global(.admin-page-heading h1) {
+  color: #f5d978;
+}
+
+.adminPage :global(.admin-primary) {
+  border-color: rgba(229, 198, 102, .72);
+  color: #173b28;
+  background: #edc95b;
+}
+
+.adminPage :global(.admin-primary:hover) {
+  background: #f6dc83;
+  box-shadow: 0 0 14px rgba(229, 198, 102, .16);
+}
+
+.adminPage :global(.admin-form-overlay) {
+  background: rgba(2, 16, 10, .68);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.adminPage :global(.admin-editor) {
+  border-color: rgba(229, 198, 102, .5);
+  background: rgba(7, 43, 27, .9);
+}
+
+.adminPage :global(.admin-panel:has(.admin-form-overlay)) {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.adminPage :global(.category-hero) {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(229, 198, 102, .42);
+  background:
+    radial-gradient(circle at 78% 20%, rgba(229, 198, 102, .16), transparent 23%),
+    linear-gradient(115deg, rgba(8, 54, 32, .9), rgba(4, 28, 18, .76));
+}
+
+.adminPage :global(.category-hero::before) {
+  position: absolute;
+  right: 245px;
+  bottom: -75px;
+  width: 210px;
+  height: 210px;
+  border: 1px solid rgba(229, 198, 102, .18);
+  border-radius: 50%;
+  content: "";
+  box-shadow: 0 0 0 18px rgba(229, 198, 102, .035), 0 0 0 36px rgba(229, 198, 102, .025);
+}
+
+.adminPage :global(.category-hero > div),
+.adminPage :global(.category-hero > button) {
+  position: relative;
+  z-index: 1;
+}
+
+.adminPage :global(.category-hero-summary) {
+  display: grid;
+  gap: 2px;
+  min-width: 112px;
+  margin-left: auto;
+  padding: 9px 15px;
+  border-left: 1px solid rgba(229, 198, 102, .28);
+}
+
+.adminPage :global(.category-hero-summary strong) {
+  color: #f5d978;
+  font: 600 25px/1 "Cormorant Garamond", serif;
+}
+
+.adminPage :global(.category-hero-summary span) {
+  color: rgba(255, 255, 255, .55);
+  font-size: 9px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.adminPage :global(.admin-finance-heading) {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.adminPage :global(.admin-finance-heading h2) {
+  margin: 7px 0 4px;
+  color: #fff5d5;
+  font: 600 30px "Cormorant Garamond";
+}
+
+.adminPage :global(.admin-finance-heading p) {
+  margin: 0;
+  color: rgba(255, 255, 255, .62);
+  font-size: 12px;
+}
+
+.adminPage :global(.admin-finance-summary) {
+  display: grid;
+  grid-template-columns: minmax(170px, 1fr) 150px minmax(390px, 1.6fr);
+  align-items: center;
+  gap: 22px;
+  margin-bottom: 20px;
+  padding: 18px 20px;
+}
+
+.adminPage :global(.admin-finance-summary h3) {
+  margin: 5px 0 0;
+  color: #fff5d5;
+  font-size: 19px;
+}
+
+.adminPage :global(.admin-finance-summary select),
+.adminPage :global(.finance-filters select) {
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid rgba(229, 198, 102, .28);
+  border-radius: 5px;
+  color: #e5c666;
+  background: rgba(2, 25, 15, .7);
+}
+
+.adminPage :global(.admin-finance-summary select option),
+.adminPage :global(.finance-filters select option) {
+  color: #e5c666;
+  background: #082b1b;
+}
+
+.adminPage :global(.admin-finance-summary-value) {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.adminPage :global(.admin-finance-summary-value div) {
+  display: grid;
+  gap: 4px;
+  min-height: 58px;
+  padding: 10px 13px;
+  border: 1px solid rgba(229, 198, 102, .2);
+  border-radius: 0;
+  background: rgba(2, 25, 15, .35);
+}
+
+.adminPage :global(.admin-finance-summary-value small) {
+  color: rgba(255, 255, 255, .5);
+  font-size: 9px;
+  letter-spacing: .08em;
+}
+
+.adminPage :global(.admin-finance-summary-value strong) {
+  color: #f5d978;
+  font-size: 18px;
+}
+
+.adminPage :global(.finance-income) { color: #8bd3a5 !important; }
+.adminPage :global(.finance-expense) { color: #f09a82 !important; }
+.adminPage :global(.finance-negative) { color: #f09a82 !important; }
+.adminPage :global(.finance-profit) { color: #8bd3a5 !important; }
+
+.adminPage :global(.finance-payment-button) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
+.adminPage :global(.finance-payment-button.paid) {
+  color: #8bd3a5;
+  background: rgba(139, 211, 165, 0.15);
+  border: 1px solid rgba(139, 211, 165, 0.35);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.adminPage :global(.finance-payment-button.paid:hover) {
+  background: rgba(139, 211, 165, 0.28);
+  border-color: rgba(139, 211, 165, 0.55);
+  transform: translateY(-1px);
+}
+
+.adminPage :global(.finance-payment-button.unpaid) {
+  color: #f09a82;
+  background: rgba(240, 154, 130, 0.15);
+  border: 1px solid rgba(240, 154, 130, 0.35);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.adminPage :global(.finance-payment-button.unpaid:hover) {
+  background: rgba(240, 154, 130, 0.28);
+  border-color: rgba(240, 154, 130, 0.55);
+  transform: translateY(-1px);
+}
+
+.adminPage :global(.finance-status-badge) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #e5c666;
+  background: rgba(229, 198, 102, 0.14);
+  border: 1px solid rgba(229, 198, 102, 0.32);
+  white-space: nowrap;
+}
+
+.adminPage :global(.admin-finance-stats) {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.adminPage :global(.admin-finance-summary + .admin-finance-stats) { margin-bottom: 20px; }
+.adminPage :global(.admin-finance-summary .admin-finance-summary-value) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.adminPage :global(.finance-custom-dates) { display: flex; flex-basis: 100%; justify-content: flex-end; gap: 8px; }
+.adminPage :global(.finance-custom-dates input) { min-height: 36px; padding: 0 10px; border: 1px solid rgba(229, 198, 102, .28); border-radius: 5px; color: #e5c666; background: rgba(2, 25, 15, .7); }
+.adminPage :global(.finance-quick-stats) { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; margin-bottom: 20px; padding: 0; overflow: hidden; }
+.adminPage :global(.finance-quick-stats > div) { display: grid; gap: 5px; min-height: 72px; padding: 14px 16px; border-right: 1px solid rgba(229, 198, 102, .18); }
+.adminPage :global(.finance-quick-stats > div:last-child) { border-right: 0; }
+.adminPage :global(.finance-quick-stats small) { color: rgba(255, 255, 255, .5); font-size: 9px; }
+.adminPage :global(.finance-quick-stats strong) { color: #fff5d5; font-size: 15px; }
+.adminPage :global(.finance-quick-stats button) { width: max-content; padding: 0; border: 0; color: #9bda85; background: transparent; font-size: 9px; cursor: pointer; }
+.adminPage :global(.finance-table) { width: 100%; min-width: 0; overflow-x: auto; }
+.adminPage :global(.finance-table-head), .adminPage :global(.finance-row) { display: grid; grid-template-columns: minmax(70px, .8fr) minmax(140px, 1.6fr) minmax(80px, 1fr) minmax(80px, 1fr) minmax(72px, .9fr) minmax(62px, .8fr) minmax(95px, 1.15fr) minmax(72px, .9fr) minmax(92px, 1.15fr); align-items: center; gap: 12px; width: 100%; min-width: 0; }
+.adminPage :global(.finance-row .admin-row-actions) { gap: 4px; flex-wrap: nowrap; }
+.adminPage :global(.finance-table-head) { padding: 10px 0; color: rgba(255, 255, 255, .45); font-size: 10px; }
+.adminPage :global(.finance-row) { padding: 10px 0; border-top: 1px solid rgba(229, 198, 102, .28); color: rgba(255, 255, 255, .72); font-size: 11px; }
+.adminPage :global(.finance-row strong), .adminPage :global(.finance-row b) { font-size: 11px; }
+.adminPage :global(.finance-row small) { display: block; margin-top: 3px; color: rgba(255, 255, 255, .42); font-size: 10px; }
+@media (max-width: 768px) {
+  .adminPage :global(.finance-table-head), .adminPage :global(.finance-row) { min-width: 750px; }
+}
+.adminPage :global(.finance-pagination) { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 4px; padding-top: 14px; border-top: 1px solid rgba(229, 198, 102, .28); color: rgba(255, 255, 255, .5); font-size: 10px; }
+.adminPage :global(.finance-pagination > div) { display: flex; align-items: center; gap: 8px; }
+.adminPage :global(.finance-pagination button), .adminPage :global(.finance-pagination select) { min-height: 30px; padding: 0 9px; border: 1px solid rgba(229, 198, 102, .28); border-radius: 4px; color: #e5c666; background: rgba(2, 25, 15, .7); cursor: pointer; }
+.adminPage :global(.finance-pagination button:disabled) { cursor: not-allowed; opacity: .4; }
+.adminPage :global(.admin-finance-heading) { min-height: 70px; align-items: center; margin-bottom: 18px; flex-wrap: wrap; }
+.adminPage :global(.admin-finance-heading .finance-heading-spacer) { flex: 1; }
+.adminPage :global(.admin-finance-heading .admin-primary) { flex: 0 0 auto; }
+.adminPage :global(.admin-finance-description) { margin: 4px 0 0; color: rgba(255, 255, 255, .62); font-size: 12px; }
+.adminPage :global(.finance-period-controls) { display: flex; align-items: center; gap: 0; padding: 3px; border: 1px solid rgba(229, 198, 102, .2); border-radius: 6px; background: rgba(2, 25, 15, .38); }
+.adminPage :global(.finance-period-controls button) { min-height: 32px; padding: 0 12px; border: 0; border-radius: 4px; color: rgba(255, 255, 255, .62); background: transparent; font-size: 10px; cursor: pointer; white-space: nowrap; }
+.adminPage :global(.finance-period-controls button:hover), .adminPage :global(.finance-period-controls button.active) { color: #173b28; background: #edc95b; }
+.adminPage :global(.admin-finance-stats) { gap: 12px; margin-bottom: 18px; }
+.adminPage :global(.admin-finance-stats .admin-stat) { min-height: 104px; padding: 16px; }
+.adminPage :global(.admin-finance-stats .admin-stat-icon) { flex: 0 0 38px; width: 38px; height: 38px; }
+.adminPage :global(.admin-finance-stats .admin-stat strong) { margin: 5px 0 2px; font-size: 18px; }
+.adminPage :global(.admin-finance-stats .admin-stat small) { font-size: 9px; }
+.adminPage :global(.admin-inventory-stats) { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.adminPage :global(.admin-inventory-stats .admin-stat) { min-height: 76px; padding: 13px 16px; }
+.adminPage :global(.admin-inventory-stats .admin-stat-icon) { display: none; }
+.adminPage :global(.admin-inventory-stats .admin-stat strong) { margin-top: 7px; font-size: 25px; }
+.adminPage :global(.admin-finance-stats + .admin-finance-summary) { grid-template-columns: 220px 1fr; min-height: 116px; }
+.adminPage :global(.admin-finance-stats + .admin-finance-summary-value) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.adminPage :global(.admin-finance-stats + .admin-finance-summary .admin-finance-summary-value) { align-self: stretch; }
+.adminPage :global(.admin-finance-stats + .admin-finance-summary .admin-finance-summary-value div) { min-height: 76px; align-content: center; }
+.adminPage :global(.finance-summary-toggle) { min-height: 36px; padding: 0 12px; border: 1px solid rgba(229, 198, 102, .35); border-radius: 5px; color: #e5c666; background: rgba(2, 25, 15, .55); font-size: 10px; cursor: pointer; }
+.adminPage :global(.admin-finance-table-panel) { overflow: hidden; }
+.adminPage :global(.admin-finance-table-panel .admin-table-head) { align-items: center; margin-bottom: 14px; }
+.adminPage :global(.admin-finance-table-panel .admin-table-head strong) { font-size: 13px; }
+.adminPage :global(.admin-finance-table-panel .admin-table-head span) { display: block; margin-top: 5px; }
+.adminPage :global(.admin-finance-table-panel .admin-product-filters) { align-items: center; padding: 10px; border: 1px solid rgba(229, 198, 102, .14); border-radius: 6px; background: rgba(2, 25, 15, .25); }
+.adminPage :global(.admin-finance-table-panel .admin-product-filters .admin-search) { max-width: 360px; }
+.adminPage :global(.finance-form-section) { margin-bottom: 16px; padding: 14px; border: 1px solid rgba(229, 198, 102, .18); border-radius: 7px; background: rgba(2, 25, 15, .2); }
+.adminPage :global(.finance-form-section-title) { display: block; margin-bottom: 11px; color: #e5c666; font-size: 10px; font-weight: 700; letter-spacing: .08em; }
+.adminPage :global(.finance-type-options) { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.adminPage :global(.finance-type-options button) { min-height: 38px; padding: 7px 8px; border: 1px solid rgba(229, 198, 102, .28); border-radius: 5px; color: rgba(255, 255, 255, .72); background: rgba(255, 255, 255, .03); font-size: 11px; cursor: pointer; }
+.adminPage :global(.finance-type-options button:hover), .adminPage :global(.finance-type-options button.active) { border-color: #e5c666; color: #173b28; background: #edc95b; }
+.adminPage :global(.finance-form-error) { margin: -3px 0 14px; padding: 9px 11px; border: 1px solid rgba(242, 109, 109, .45); border-radius: 5px; color: #f8c7c7; background: rgba(242, 109, 109, .1); font-size: 11px; line-height: 1.45; }
+.adminPage :global(.finance-money-hint) { display: block; margin-top: 5px; color: #9bda85; font-size: 10px; }
+.adminPage :global(.finance-impact-preview) { display: grid; gap: 5px; margin-top: 3px; padding: 12px 14px; border-left: 3px solid #e5c666; color: rgba(255, 255, 255, .75); background: rgba(229, 198, 102, .08); font-size: 11px; }
+.adminPage :global(.finance-impact-preview strong) { color: #e5c666; font-size: 10px; letter-spacing: .06em; text-transform: uppercase; }
+.adminPage :global(.vg-modal-md .finance-form-section .vg-form-grid) { gap: 11px 13px; }
+.adminPage :global(.admin-finance-table-panel) { margin-top: 0; }
+
+.adminPage :global(.admin-finance-heading) { min-height: 76px; align-items: center; margin-bottom: 20px; padding: 16px 18px; border: 1px solid rgba(229,198,102,.18); border-radius: 12px; background: rgba(7,44,27,.42); }
+.adminPage :global(.finance-title-block h2) { margin: 5px 0 2px; color: #fff5d5; font: 600 28px "Cormorant Garamond"; }
+.adminPage :global(.finance-title-block p) { margin: 0; color: rgba(255,255,255,.58); font-size: 12px; }
+.adminPage :global(.admin-finance-heading .finance-period-controls) { margin-left: auto; }
+.adminPage :global(.admin-finance-heading .admin-primary) { white-space: nowrap; }
+.adminPage :global(.admin-finance-heading .finance-summary-toggle) { white-space: nowrap; }
+.adminPage :global(.admin-finance-stats) { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.adminPage :global(.admin-finance-stats .admin-stat) { min-height: 112px; border-radius: 12px; }
+.adminPage :global(.admin-finance-stats .admin-stat-icon) { display: grid; place-items: center; color: #173b28; background: #e5c666; font-size: 14px; font-weight: 700; }
+.adminPage :global(.admin-finance-stats .admin-stat strong) { font-size: 20px; }
+.adminPage :global(.admin-finance-summary) { border-radius: 12px; }
+.adminPage :global(.admin-finance-summary-value div) { border-radius: 10px; }
+.adminPage :global(.admin-finance-table-panel) { border-radius: 12px; }
+.adminPage :global(.admin-finance-table-panel .admin-product-filters) { border-radius: 10px; }
+.adminPage :global(.finance-table) { margin-top: 16px; border: 1px solid rgba(229,198,102,.18); border-radius: 10px; background: rgba(2,25,15,.2); }
+.adminPage :global(.finance-table-head), .adminPage :global(.finance-row) { grid-template-columns: minmax(80px, .85fr) minmax(155px, 1.6fr) minmax(90px, 1fr) minmax(100px, 1fr) minmax(82px, .9fr) minmax(70px, .8fr) minmax(105px, 1.15fr) minmax(88px, .9fr) minmax(116px, 1.15fr); gap: 14px; }
+.adminPage :global(.finance-table-head) { padding: 13px 14px; background: rgba(115,164,125,.14); font-size: 10px; }
+.adminPage :global(.finance-row) { min-height: 66px; padding: 10px 14px; font-size: 12px; transition: background .2s ease; }
+.adminPage :global(.finance-row:hover) { background: rgba(229,198,102,.06); }
+.adminPage :global(.finance-row strong), .adminPage :global(.finance-row b) { font-size: 12px; }
+.adminPage :global(.finance-row small) { font-size: 10px; }
+.adminPage :global(.finance-pagination) { margin-top: 0; padding: 15px 2px 0; }
+@media (max-width: 1100px) {
+  .adminPage :global(.admin-finance-heading) { align-items: flex-start; flex-wrap: wrap; }
+  .adminPage :global(.finance-title-block) { flex: 1 1 100%; }
+  .adminPage :global(.admin-finance-heading .finance-period-controls) { margin-left: 0; }
+}
+
+.adminPage :global(.admin-inventory-heading) {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.adminPage :global(.admin-inventory-heading h2) {
+  margin: 7px 0 4px;
+  color: #fff5d5;
+  font: 600 30px "Cormorant Garamond";
+}
+
+.adminPage :global(.admin-inventory-heading p) {
+  margin: 0;
+  color: rgba(255, 255, 255, .62);
+  font-size: 12px;
+}
+
+.adminPage :global(.admin-promotion-heading) {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.adminPage :global(.admin-promotion-heading h2) {
+  margin: 7px 0 4px;
+  color: #fff5d5;
+  font: 600 30px "Cormorant Garamond";
+}
+
+.adminPage :global(.admin-promotion-heading p) {
+  margin: 0;
+  color: rgba(255, 255, 255, .62);
+  font-size: 12px;
+}
+
+.adminPage :global(.promotion-search) { width: 190px; margin: 0; }
+.adminPage :global(.promotion-table) { overflow-x: auto; margin-top: 14px; border: 1px solid rgba(116, 164, 126, .2); }
+.adminPage :global(.promotion-table-head),
+.adminPage :global(.promotion-row) { display: grid; grid-template-columns: minmax(210px, 1.8fr) 120px minmax(150px, 1.2fr) 170px 100px 105px; min-width: 900px; align-items: center; }
+.adminPage :global(.promotion-table-head) { padding: 12px 14px; color: #e5c666; background: rgba(115, 164, 125, .16); font-size: 10px; font-weight: 700; }
+.adminPage :global(.promotion-row) { min-height: 70px; padding: 8px 14px; border-top: 1px solid rgba(116, 164, 126, .16); color: rgba(246, 239, 212, .82); font-size: 11px; }
+.adminPage :global(.promotion-row strong), .adminPage :global(.promotion-row small) { display: block; }
+.adminPage :global(.promotion-row > div > strong) { color: #f5d978; }
+.adminPage :global(.promotion-row small) { margin-top: 4px; color: rgba(229, 198, 102, .58); font-size: 9px; }
+.adminPage :global(.promotion-row em) { font-style: normal; font-weight: 700; }
+.adminPage :global(.promo-active) { color: #8bd3a5; }
+.adminPage :global(.promo-paused) { color: #f09a82; }
+.adminPage :global(.promotion-code-toggle) { display: flex; align-items: center; gap: 8px; min-height: 38px; padding: 0 12px; border: 1px solid rgba(229, 198, 102, .2); color: rgba(229, 198, 102, .75); background: rgba(2, 25, 15, .3); font-size: 11px; cursor: pointer; }
+.adminPage :global(.promotion-code-toggle input) { accent-color: #e5c666; }
+.adminPage :global(.promotion-price-preview) { grid-column: 1 / -1; display: grid; gap: 7px; padding: 14px 16px; border: 1px solid rgba(229, 198, 102, .35); border-radius: 0; background: rgba(229, 198, 102, .08); }
+.adminPage :global(.promotion-price-preview > div) { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: rgba(229, 198, 102, .7); font-size: 11px; }
+.adminPage :global(.promotion-price-preview strong) { color: #f5d978; font-size: 24px; }
+.adminPage :global(.promotion-price-preview small) { color: rgba(229, 198, 102, .62); font-size: 10px; }
+
+.adminPage :global(.admin-inventory-products),
+.adminPage :global(.admin-inventory-table) {
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.adminPage :global(.admin-inventory-products .admin-table-head > div) {
+  display: grid;
+  gap: 4px;
+}
+
+.adminPage :global(.admin-inventory-products > .admin-table-head) {
+  align-items: center;
+}
+
+.adminPage :global(.inventory-product-filters) {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.adminPage :global(.inventory-product-filters .admin-search) {
+  width: 170px;
+  min-width: 170px;
+  height: 36px;
+  margin: 0;
+}
+
+.adminPage :global(.inventory-product-filters select) {
+  width: 170px;
+  min-width: 170px;
+  height: 36px;
+  box-sizing: border-box;
+}
+
+.adminPage :global(.inventory-product-filters .admin-search) {
+  border-color: rgba(229, 198, 102, .28);
+  background: rgba(2, 25, 15, .5);
+}
+
+.adminPage :global(.inventory-product-filters .admin-search input) {
+  color: #e5c666;
+}
+
+.adminPage :global(.inventory-product-filters .admin-search input::placeholder) {
+  color: rgba(229, 198, 102, .5);
+}
+
+.adminPage :global(.inventory-product-filters select:focus),
+.adminPage :global(.inventory-product-filters .admin-search:focus-within) {
+  border-color: rgba(229, 198, 102, .72);
+  box-shadow: 0 0 0 2px rgba(229, 198, 102, .1);
+  outline: none;
+}
+
+.adminPage :global(.inventory-product-controls) { display: flex; align-items: flex-end; gap: 8px; }
+.adminPage :global(.inventory-heading-actions) { display: flex; align-items: center; gap: 8px; }
+.adminPage :global(.inventory-collapse-button) { min-height: 36px; padding: 0 11px; border: 1px solid rgba(229, 198, 102, .38); border-radius: 5px; color: #e5c666; background: rgba(2, 25, 15, .5); font-size: 10px; cursor: pointer; white-space: nowrap; }
+.adminPage :global(.inventory-collapse-button:hover) { background: rgba(229, 198, 102, .14); }
+.adminPage :global(.admin-inventory-products .inventory-product-controls) { display: none !important; }
+
+.adminPage :global(.inventory-product-grid) {
+  overflow-x: auto;
+  margin-top: 14px;
+  border: 1px solid rgba(229, 198, 102, .2);
+}
+
+.adminPage :global(.inventory-product-list-head),
+.adminPage :global(.inventory-product-card) {
+  display: grid;
+  grid-template-columns: minmax(220px, 2fr) .7fr .9fr 1fr 1.2fr 1.1fr minmax(145px, 1.7fr) 88px;
+  min-width: 940px;
+  width: 100%;
+  gap: 8px;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.adminPage :global(.admin-inventory-products .admin-table-head strong) { font-size: 15px; }
+.adminPage :global(.admin-inventory-products .admin-table-head span) { font-size: 12px; }
+.adminPage :global(.inventory-product-list-head) {
+  padding: 10px;
+  color: #e5c666;
+  background: rgba(115, 164, 125, .16);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.adminPage :global(.inventory-product-card) {
+  min-height: 52px;
+  padding: 7px 10px;
+  border-bottom: 1px solid rgba(229, 198, 102, .14);
+  background: rgba(2, 25, 15, .3);
+}
+.adminPage :global(.inventory-product-card:last-child) { border-bottom: 0; }
+
+.adminPage :global(.inventory-product-card strong),
+.adminPage :global(.inventory-product-card span) { display: block; }
+.adminPage :global(.inventory-product-card strong) { color: #f5d978; font-size: 13px; }
+.adminPage :global(.inventory-product-card small) { color: rgba(229, 198, 102, .62); font-size: 11px; }
+.adminPage :global(.inventory-product-card > b) { color: #f5d978; font-size: 14px; text-align: right; }
+.adminPage :global(.inventory-product-card > b:nth-child(3)) { min-width: 90px; text-align: left; white-space: nowrap; }
+.adminPage :global(.inventory-product-card > span:nth-child(2)),
+.adminPage :global(.inventory-product-card > span:nth-child(3)) { min-width: 0; white-space: nowrap; }
+.adminPage :global(.inventory-product-card > b small) { font-size: 9px; font-weight: 400; }
+.adminPage :global(.inventory-product-card > span) { color: rgba(229, 198, 102, .62); font-size: 12px; }
+.adminPage :global(.inventory-product-actions) { display: flex; justify-self: center; gap: 5px; }
+.adminPage :global(.inventory-product-actions button) { display: grid; width: 25px; height: 25px; place-items: center; padding: 0; border: 1px solid rgba(229, 198, 102, .42); border-radius: 4px; color: #e5c666; background: transparent; font-size: 13px; line-height: 1; cursor: pointer; }
+.adminPage :global(.inventory-product-actions button:hover) { color: #10271d; background: #e5c666; }
+.adminPage :global(.inventory-product-actions .inventory-product-delete) { border-color: rgba(240, 154, 130, .5); color: #f09a82; }
+.adminPage :global(.inventory-product-actions .inventory-product-delete:hover) { color: #10271d; background: #f09a82; }
+.adminPage :global(.admin-inventory-products .inventory-product-delete) { display: grid; }
+.adminPage :global(.inventory-products-compact .inventory-product-card) { grid-template-columns: minmax(220px, 1fr) 80px 80px auto; min-width: 520px; min-height: 38px; padding-block: 4px; }
+.adminPage :global(.inventory-products-compact .inventory-product-card small),
+.adminPage :global(.inventory-products-compact .inventory-product-card > span) { display: none; }
+.adminPage :global(.inventory-products-compact .inventory-product-card > span:nth-of-type(2)),
+.adminPage :global(.inventory-products-compact .inventory-product-card > span:nth-of-type(3)) { display: none; }
+
+.adminPage :global(.inventory-summary) {
+  margin-bottom: 20px;
+  padding: 16px 18px;
+}
+
+.adminPage :global(.inventory-summary-title) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 13px;
+  border-bottom: 1px solid rgba(229, 198, 102, .16);
+}
+
+.adminPage :global(.inventory-summary-title h3) {
+  margin: 5px 0 0;
+  color: #f5d978;
+  font-size: 18px;
+}
+
+.adminPage :global(.inventory-summary-title select) {
+  width: 150px;
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid rgba(229, 198, 102, .38);
+  border-radius: 5px;
+  color: #e5c666;
+  background: #0b2e1d;
+}
+.adminPage :global(.inventory-period-controls) { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.adminPage :global(.inventory-period-controls input) { width: 145px; min-height: 36px; box-sizing: border-box; padding: 0 10px; border: 1px solid rgba(229, 198, 102, .38); border-radius: 5px; color: #e5c666; background: #0b2e1d; font-size: 10px; }
+
+.adminPage :global(.inventory-summary-values) {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 13px;
+}
+
+.adminPage :global(.inventory-summary-values > div) {
+  display: grid;
+  gap: 4px;
+  min-height: 54px;
+  padding: 9px 12px;
+  border: 1px solid rgba(229, 198, 102, .2);
+  border-radius: 0;
+  background: rgba(2, 25, 15, .3);
+}
+
+.adminPage :global(.inventory-summary-values small) { color: rgba(229, 198, 102, .62); font-size: 9px; letter-spacing: .08em; }
+.adminPage :global(.inventory-summary-values strong) { font-size: 19px; }
+.adminPage :global(.inventory-summary-values span) { color: rgba(229, 198, 102, .5); font-size: 10px; }
+
+
+.adminPage :global(.inventory-table) { overflow-x: auto; margin-top: 14px; border: 1px solid rgba(116, 164, 126, .2); }
+.adminPage :global(.inventory-table-head),
+.adminPage :global(.inventory-row) { display: grid; grid-template-columns: minmax(125px, 1.1fr) minmax(180px, 1.7fr) 1fr .65fr .95fr .95fr 1.15fr 112px; min-width: 980px; width: 100%; gap: 8px; align-items: center; }
+.adminPage :global(.inventory-table-head) { padding: 9px 12px; color: #e5c666; background: rgba(115, 164, 125, .16); font-size: 10px; font-weight: 700; }
+.adminPage :global(.inventory-row) { min-height: 52px; padding: 5px 12px; border-top: 1px solid rgba(116, 164, 126, .16); color: rgba(246, 239, 212, .82); font-size: 11px; }
+.adminPage :global(.inventory-row strong), .adminPage :global(.inventory-row small), .adminPage :global(.inventory-row em) { display: block; }
+.adminPage :global(.inventory-row strong) { color: #fff5d5; }
+.adminPage :global(.inventory-row small) { margin-top: 2px; color: rgba(255, 255, 255, .42); font-size: 9px; }
+.adminPage :global(.inventory-row em) { font-style: normal; font-weight: 700; }
+.adminPage :global(.inventory-row > b) { color: #f5d978; font-size: 15px; }
+.adminPage :global(.inventory-row .admin-row-actions) { justify-self: center; gap: 4px; }
+.adminPage :global(.inventory-row .admin-row-actions button) { width: 24px; height: 24px; font-size: 12px; }
+.adminPage :global(.admin-inventory-table .inventory-filters > select:nth-of-type(2)),
+.adminPage :global(.admin-inventory-table .inventory-filters > select:nth-of-type(3)),
+.adminPage :global(.admin-inventory-table .inventory-filters > select:nth-of-type(4)) { display: none; }
+
+.adminPage :global(.admin-inventory-heading) { min-height: 78px; align-items: center; padding: 16px 18px; border: 1px solid rgba(229,198,102,.18); border-radius: 12px; background: rgba(7,44,27,.42); }
+.adminPage :global(.admin-inventory-heading h2) { margin: 5px 0 3px; font-size: 28px; }
+.adminPage :global(.admin-inventory-heading p) { font-size: 12px; }
+.adminPage :global(.inventory-heading-actions) { gap: 10px; }
+.adminPage :global(.inventory-heading-actions .admin-primary) { min-height: 38px; border-radius: 8px; font-size: 12px; white-space: nowrap; }
+.adminPage :global(.admin-inventory-stats) { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 20px; }
+.adminPage :global(.admin-inventory-stats .admin-stat) { min-height: 112px; padding: 16px; border-radius: 12px; }
+.adminPage :global(.admin-inventory-stats .admin-stat-icon) { display: grid; place-items: center; color: #173b28; background: #e5c666; font-size: 14px; font-weight: 700; }
+.adminPage :global(.admin-inventory-stats .admin-stat strong) { font-size: 20px; }
+.adminPage :global(.inventory-summary) { border-radius: 12px; }
+.adminPage :global(.inventory-summary-title) { align-items: center; }
+.adminPage :global(.inventory-summary-title h3) { font-size: 20px; }
+.adminPage :global(.inventory-summary-values) { gap: 12px; }
+.adminPage :global(.inventory-summary-values > div) { border-radius: 10px; }
+.adminPage :global(.admin-inventory-products), .adminPage :global(.admin-inventory-table) { border-radius: 12px; }
+.adminPage :global(.admin-inventory-products > .admin-table-head), .adminPage :global(.admin-inventory-table > .admin-table-head) { margin-bottom: 16px; }
+.adminPage :global(.admin-inventory-products .admin-table-head strong), .adminPage :global(.admin-inventory-table .admin-table-head strong) { font-size: 16px; }
+.adminPage :global(.admin-inventory-products .admin-table-head span), .adminPage :global(.admin-inventory-table .admin-table-head span) { font-size: 12px; }
+.adminPage :global(.inventory-product-grid), .adminPage :global(.inventory-table) { margin-top: 16px; border-radius: 10px; background: rgba(2,25,15,.2); }
+.adminPage :global(.inventory-product-list-head), .adminPage :global(.inventory-table-head) { padding: 13px 14px; font-size: 10px; }
+.adminPage :global(.inventory-product-card) { min-height: 72px; padding: 11px 14px; font-size: 12px; transition: background .2s ease; }
+.adminPage :global(.inventory-product-card:hover), .adminPage :global(.inventory-row:hover) { background: rgba(229,198,102,.06); }
+.adminPage :global(.inventory-product-card strong) { font-size: 13px; }
+.adminPage :global(.inventory-product-card > b) { font-size: 14px; }
+.adminPage :global(.inventory-row) { min-height: 68px; padding: 10px 14px; font-size: 12px; }
+.adminPage :global(.inventory-row strong), .adminPage :global(.inventory-row b) { font-size: 12px; }
+.adminPage :global(.inventory-row small) { font-size: 10px; }
+.adminPage :global(.inventory-row .admin-row-actions) { gap: 6px; }
+.adminPage :global(.inventory-row .admin-row-actions button) { width: 38px; height: 38px; border-radius: 10px; font-size: 18px; }
+@media (max-width: 900px) {
+  .adminPage :global(.admin-inventory-stats) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 1050px) {
+  .adminPage :global(.inventory-product-grid) { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 850px) {
+  .adminPage :global(.admin-inventory-stats) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .adminPage :global(.admin-promotion-heading) { align-items: flex-start; flex-direction: column; }
+  .adminPage :global(.admin-promotion-heading .admin-primary) { align-self: stretch; text-align: center; }
+  .adminPage :global(.promotion-search) { width: auto; max-width: none; }
+  .adminPage :global(.admin-inventory-heading) { align-items: flex-start; flex-direction: column; }
+  .adminPage :global(.admin-inventory-heading .admin-primary) { align-self: stretch; text-align: center; }
+  .adminPage :global(.inventory-heading-actions) { width: 100%; flex-direction: column; }
+  .adminPage :global(.inventory-heading-actions .admin-primary) { width: 100%; text-align: center; }
+  .adminPage :global(.admin-inventory-products > .admin-table-head) { align-items: flex-start; flex-direction: column; }
+  .adminPage :global(.inventory-product-controls) { width: 100%; align-items: stretch; flex-direction: column; }
+  .adminPage :global(.inventory-collapse-button) { align-self: flex-start; }
+  .adminPage :global(.inventory-product-filters) { width: 100%; flex-wrap: wrap; }
+  .adminPage :global(.inventory-product-filters .admin-search) { width: auto; min-width: 0; flex: 1 1 150px; }
+  .adminPage :global(.inventory-product-filters select) { width: auto; min-width: 0; flex: 1 1 150px; }
+  .adminPage :global(.inventory-product-grid) { grid-template-columns: 1fr; }
+  .adminPage :global(.inventory-product-card),
+  .adminPage :global(.inventory-products-compact .inventory-product-card) { grid-template-columns: 1fr auto; }
+  .adminPage :global(.inventory-product-card > span) { grid-column: 1 / -1; }
+  .adminPage :global(.inventory-summary-values) { grid-template-columns: 1fr; }
+  .adminPage :global(.admin-finance-heading) { align-items: flex-start; flex-direction: column; }
+  .adminPage :global(.admin-finance-heading .admin-primary) { align-self: stretch; text-align: center; }
+  .adminPage :global(.admin-finance-heading .finance-heading-spacer) { display: none; }
+  .adminPage :global(.finance-period-controls) { width: 100%; overflow-x: auto; }
+  .adminPage :global(.finance-period-controls button) { flex: 1 0 auto; }
+  .adminPage :global(.admin-finance-summary) { grid-template-columns: 1fr 150px; gap: 14px; }
+  .adminPage :global(.admin-finance-summary-value) { grid-column: 1 / -1; }
+  .adminPage :global(.admin-finance-summary .admin-finance-summary-value) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .adminPage :global(.admin-finance-stats) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .adminPage :global(.finance-quick-stats) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .adminPage :global(.finance-quick-stats > div:nth-child(2n)) { border-right: 0; }
+  .adminPage :global(.finance-pagination) { align-items: flex-start; flex-direction: column; }
+  .adminPage :global(.finance-type-options) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 851px) {
+  .adminPage :global(.admin-finance-heading + .admin-finance-summary) { grid-template-columns: none; }
+}
+
+@media (max-width: 850px) {
+  :global(.admin-page).adminPage {
+    background-attachment: scroll;
+  }
+}
+
+/* ===== PERMISSIONS MANAGER STYLES ===== */
+.adminPage :global(.admin-permissions-manager) {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.adminPage :global(.admin-permissions-subtabs) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid rgba(229, 198, 102, 0.2);
+  padding-bottom: 12px;
+}
+
+.adminPage :global(.admin-permissions-subtabs button) {
+  padding: 8px 16px;
+  border: 1px solid rgba(229, 198, 102, 0.25);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(2, 25, 15, 0.4);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.adminPage :global(.admin-permissions-subtabs button:hover),
+.adminPage :global(.admin-permissions-subtabs button.active) {
+  color: #173b28;
+  background: #e5c666;
+  border-color: #e5c666;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(229, 198, 102, 0.25);
+}
+
+.adminPage :global(.admin-hero-actions) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.adminPage :global(.admin-secondary-btn) {
+  padding: 9px 16px;
+  border: 1px solid rgba(229, 198, 102, 0.4);
+  border-radius: 8px;
+  color: #e5c666;
+  background: rgba(2, 25, 15, 0.6);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.adminPage :global(.admin-secondary-btn:hover) {
+  background: rgba(229, 198, 102, 0.15);
+  border-color: #e5c666;
+}
+
+.adminPage :global(#role-form > .vg-form-grid) {
+  padding: 16px;
+  border: 1px solid rgba(229, 198, 102, .16);
+  border-radius: 12px;
+  background: rgba(7, 44, 27, .36);
+}
+
+.adminPage :global(#role-form .vg-input),
+.adminPage :global(#role-form .vg-select) {
+  min-height: 42px;
+  border-color: rgba(229, 198, 102, .22);
+  border-radius: 9px;
+  background: rgba(2, 25, 15, .6);
+}
+
+.adminPage :global(#role-form .vg-input:focus),
+.adminPage :global(#role-form .vg-select:focus) {
+  border-color: rgba(229, 198, 102, .7);
+  box-shadow: 0 0 0 3px rgba(229, 198, 102, .1);
+}
+
+.adminPage :global(.vg-modal:has(#role-form)) {
+  max-width: 1060px;
+  color: #263326;
+  background: #f4f7f0;
+  border: 1px solid #d8e2d0;
+  box-shadow: 0 24px 70px rgba(38, 51, 38, .24);
+}
+
+.adminPage :global(.vg-modal:has(#role-form) .vg-modal-header) {
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid #d8e2d0;
+  background: linear-gradient(135deg, #f4f7f0, #e8f0e2);
+}
+
+.adminPage :global(.vg-modal:has(#role-form) .vg-modal-title) {
+  color: #263326;
+  font-family: "Cinzel", serif;
+  font-size: 24px;
+}
+
+.adminPage :global(.vg-modal:has(#role-form) .vg-modal-subtitle) {
+  color: #6b7868;
+}
+
+.adminPage :global(.vg-modal:has(#role-form) .vg-modal-body) {
+  padding: 24px 28px;
+  background: #f4f7f0;
+}
+
+.adminPage :global(.vg-modal:has(#role-form) .vg-modal-footer) {
+  padding: 16px 28px;
+  border-top: 1px solid #d8e2d0;
+  background: #fff;
+}
+
+.adminPage :global(.vg-modal:has(#role-form) .vg-modal-close) {
+  color: #4f6f3a;
+}
+
+.adminPage :global(#role-form > .vg-form-grid) {
+  border: 0;
+  background: #fff;
+  box-shadow: 0 6px 20px rgba(79, 111, 58, .08);
+}
+
+.adminPage :global(#role-form .vg-field-label) {
+  color: #4f6f3a;
+  font-weight: 700;
+}
+
+.adminPage :global(#role-form .vg-required) {
+  color: #b34c3d;
+}
+
+.adminPage :global(#role-form .vg-input),
+.adminPage :global(#role-form .vg-select) {
+  border-color: #d8e2d0;
+  color: #263326;
+  background: #f8fbf6;
+}
+
+.adminPage :global(.role-matrix-section) {
+  border-color: #d8e2d0;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(79, 111, 58, .08);
+}
+
+.adminPage :global(.role-matrix-title) {
+  color: #4f6f3a;
+}
+
+.adminPage :global(.role-matrix-subtext) {
+  color: #788477;
+}
+
+.adminPage :global(.matrix-preset-btn) {
+  border-color: #b8c9ac;
+  color: #4f6f3a;
+  background: #f4f7f0;
+}
+
+.adminPage :global(.matrix-preset-btn:hover) {
+  color: #fff;
+  background: #6b8e4e;
+  border-color: #6b8e4e;
+}
+
+.adminPage :global(.role-permission-cards) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.adminPage :global(.permission-card) {
+  overflow: hidden;
+  border: 1px solid #d8e2d0;
+  border-radius: 12px;
+  background: #f9fbf8;
+  box-shadow: 0 4px 14px rgba(79, 111, 58, .06);
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.adminPage :global(.permission-card.expanded) {
+  border-color: #9fb68f;
+  box-shadow: 0 8px 22px rgba(79, 111, 58, .12);
+}
+
+.adminPage :global(.permission-card-header) {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto 18px;
+  align-items: center;
+  width: 100%;
+  gap: 10px;
+  padding: 14px;
+  border: 0;
+  color: #263326;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.adminPage :global(.permission-card-icon) {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  color: #4f6f3a;
+  background: #d8e2d0;
+  font-size: 18px;
+}
+
+.adminPage :global(.permission-card-copy) {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.adminPage :global(.permission-card-copy strong) {
+  color: #263326;
+  font-size: 13px;
+}
+
+.adminPage :global(.permission-card-copy small) {
+  overflow: hidden;
+  color: #788477;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.adminPage :global(.permission-count) {
+  padding: 5px 8px;
+  border: 1px solid #d8e2d0;
+  border-radius: 999px;
+  color: #788477;
+  background: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.adminPage :global(.permission-count.has-permissions) {
+  border-color: #9fb68f;
+  color: #4f6f3a;
+  background: #e9f1e4;
+}
+
+.adminPage :global(.permission-card-chevron) {
+  color: #6b8e4e;
+  font-size: 18px;
+  transition: transform .2s ease;
+}
+
+.adminPage :global(.permission-card:not(.expanded) .permission-card-chevron) {
+  transform: rotate(-90deg);
+}
+
+.adminPage :global(.permission-card-body) {
+  display: grid;
+  gap: 8px;
+  padding: 0 14px 14px 62px;
+}
+
+.adminPage :global(.permission-checkbox) {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  padding: 9px 10px;
+  border: 1px solid #e3eadf;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease;
+}
+
+.adminPage :global(.permission-checkbox:hover),
+.adminPage :global(.permission-checkbox.checked) {
+  border-color: #9fb68f;
+  background: #f0f6ec;
+}
+
+.adminPage :global(.permission-checkbox input) {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.adminPage :global(.permission-checkbox-mark) {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid #b8c9ac;
+  border-radius: 5px;
+  color: #fff;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.adminPage :global(.permission-checkbox.checked .permission-checkbox-mark) {
+  border-color: #4f6f3a;
+  background: #4f6f3a;
+}
+
+.adminPage :global(.permission-checkbox-copy) {
+  display: grid;
+  gap: 2px;
+}
+
+.adminPage :global(.permission-checkbox-copy strong) {
+  color: #263326;
+  font-size: 11px;
+}
+
+.adminPage :global(.permission-checkbox-copy small) {
+  color: #879284;
+  font-size: 9px;
+}
+
+@media (max-width: 760px) {
+  .adminPage :global(.role-permission-cards) {
+    grid-template-columns: 1fr;
+  }
+
+  .adminPage :global(.permission-card-body) {
+    padding-left: 14px;
+  }
+}
+
+/* Staff Table */
+.adminPage :global(.admin-staff-filters) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.adminPage :global(.admin-staff-filters select) {
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid rgba(229, 198, 102, 0.28);
+  border-radius: 6px;
+  color: #e5c666;
+  background: #0b2e1d;
+  font-size: 11px;
+}
+
+.adminPage :global(.admin-staff-table) {
+  margin-top: 14px;
+  border: 1px solid rgba(229, 198, 102, 0.2);
+  border-radius: 10px;
+  background: rgba(2, 25, 15, 0.2);
+  overflow-x: auto;
+}
+
+.adminPage :global(.admin-staff-table-head),
+.adminPage :global(.admin-staff-row) {
+  display: grid;
+  grid-template-columns: minmax(160px, 1.4fr) minmax(180px, 1.6fr) minmax(130px, 1.2fr) minmax(90px, 1fr) minmax(110px, 1fr) minmax(110px, 1fr) minmax(110px, 1fr);
+  min-width: 960px;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+}
+
+.adminPage :global(.admin-staff-table-head) {
+  background: rgba(115, 164, 125, 0.16);
+  color: #e5c666;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.adminPage :global(.admin-staff-row) {
+  border-top: 1px solid rgba(229, 198, 102, 0.14);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  transition: background 0.2s;
+}
+
+.adminPage :global(.admin-staff-row:hover) {
+  background: rgba(229, 198, 102, 0.06);
+}
+
+.adminPage :global(.staff-identity) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.adminPage :global(.role-badge-pill) {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 12px;
+  border: 1px solid;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.adminPage :global(.staff-status-pill) {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid;
+  transition: all 0.2s;
+}
+
+.adminPage :global(.staff-status-pill.active) {
+  color: #8bd3a5;
+  background: rgba(139, 211, 165, 0.15);
+  border-color: rgba(139, 211, 165, 0.35);
+}
+
+.adminPage :global(.staff-status-pill.inactive) {
+  color: #f09a82;
+  background: rgba(240, 154, 130, 0.15);
+  border-color: rgba(240, 154, 130, 0.35);
+}
+
+.adminPage :global(.last-login-text) {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+}
+
+/* Roles Grid */
+.adminPage :global(.admin-roles-grid) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.adminPage :global(.admin-role-card) {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid rgba(229, 198, 102, 0.22);
+  border-radius: 12px;
+  background: rgba(7, 44, 27, 0.35);
+  transition: all 0.2s ease;
+}
+
+.adminPage :global(.admin-role-card:hover) {
+  border-color: rgba(229, 198, 102, 0.45);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+.adminPage :global(.role-card-header) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.adminPage :global(.role-title-wrap) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.adminPage :global(.role-color-dot) {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.adminPage :global(.role-title-wrap h3) {
+  margin: 0;
+  color: #fff5d5;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.adminPage :global(.system-role-tag) {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(229, 198, 102, 0.2);
+  color: #e5c666;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.adminPage :global(.role-staff-count) {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+}
+
+.adminPage :global(.role-desc) {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 12px;
+  line-height: 1.4;
+  min-height: 34px;
+}
+
+.adminPage :global(.role-perms-summary) {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border-radius: 8px;
+  background: rgba(2, 25, 15, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.adminPage :global(.perm-kicker) {
+  color: #e5c666;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.adminPage :global(.perm-tags-list) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.adminPage :global(.perm-tag-item) {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 7px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 11px;
+}
+
+.adminPage :global(.perm-tag-item small) {
+  color: rgba(229, 198, 102, 0.7);
+  font-size: 9px;
+}
+
+.adminPage :global(.role-card-footer) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.adminPage :global(.role-action-btn) {
+  background: transparent;
+  border: none;
+  color: rgba(229, 198, 102, 0.85);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+
+.adminPage :global(.role-action-btn:hover) {
+  background: rgba(229, 198, 102, 0.15);
+  color: #e5c666;
+}
+
+.adminPage :global(.role-action-btn.danger) {
+  color: rgba(255, 107, 107, 0.85);
+  margin-left: auto;
+}
+
+.adminPage :global(.role-action-btn.danger:hover) {
+  background: rgba(255, 107, 107, 0.15);
+  color: #ff6b6b;
+}
+
+/* Role Color Selector */
+.adminPage :global(.role-color-selector) {
+  display: flex;
+  align-items: center;
+}
+
+.adminPage :global(.role-color-presets) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.adminPage :global(.role-color-chip) {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.adminPage :global(.role-color-chip:hover) {
+  transform: scale(1.15);
+}
+
+.adminPage :global(.role-color-chip.active) {
+  border-color: #ffffff;
+  box-shadow: 0 0 10px rgba(229, 198, 102, 0.6);
+  transform: scale(1.15);
+}
+
+.adminPage :global(.role-color-picker-btn) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px dashed rgba(229, 198, 102, 0.4);
+  cursor: pointer;
+  font-size: 13px;
+  position: relative;
+  overflow: hidden;
+}
+
+.adminPage :global(.role-color-picker-btn input[type="color"]) {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+/* Role Matrix Section */
+.adminPage :global(.role-matrix-section) {
+  margin-top: 22px;
+  padding: 18px;
+  border: 1px solid rgba(229, 198, 102, .24);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 92% 0%, rgba(229, 198, 102, .1), transparent 28%),
+    rgba(3, 28, 18, .72);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04), 0 10px 28px rgba(0, 0, 0, .18);
+}
+
+.adminPage :global(.role-matrix-bar) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(229, 198, 102, .16);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.adminPage :global(.role-matrix-title) {
+  display: block;
+  font-family: "Cinzel", serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #e5c666;
+  letter-spacing: 0.5px;
+}
+
+.adminPage :global(.role-matrix-subtext) {
+  display: block;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 2px;
+}
+
+.adminPage :global(.role-matrix-presets) {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.adminPage :global(.matrix-preset-btn) {
+  background: rgba(229, 198, 102, .08);
+  border: 1px solid rgba(229, 198, 102, 0.25);
+  color: #e5c666;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 7px 11px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.adminPage :global(.matrix-preset-btn:hover) {
+  background: rgba(229, 198, 102, 0.18);
+  border-color: #e5c666;
+  color: #fff;
+}
+
+.adminPage :global(.matrix-preset-btn.danger) {
+  border-color: rgba(255, 107, 107, 0.3);
+  color: rgba(255, 107, 107, 0.9);
+}
+
+.adminPage :global(.matrix-preset-btn.danger:hover) {
+  background: rgba(255, 107, 107, 0.15);
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+}
+
+/* Matrix Table & Rows */
+.adminPage :global(.role-matrix-editor-table),
+.adminPage :global(.role-matrix-table) {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(229, 198, 102, 0.2);
+  border-radius: 12px;
+  background: rgba(2, 25, 15, .58);
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.adminPage :global(.role-matrix-head),
+.adminPage :global(.role-matrix-edit-row),
+.adminPage :global(.role-matrix-row) {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.6fr) repeat(3, minmax(85px, 1fr));
+  align-items: center;
+  padding: 13px 16px;
+  gap: 12px;
+}
+
+.adminPage :global(.role-matrix-head) {
+  background: linear-gradient(90deg, rgba(229, 198, 102, .16), rgba(13, 41, 28, .95) 36%);
+  border-bottom: 1px solid rgba(229, 198, 102, 0.25);
+  color: #e5c666;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.adminPage :global(.role-matrix-edit-row),
+.adminPage :global(.role-matrix-row) {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  min-height: 58px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  transition: background 0.15s ease;
+}
+
+.adminPage :global(.role-matrix-edit-row:nth-child(even)),
+.adminPage :global(.role-matrix-row:nth-child(even)) {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.adminPage :global(.role-matrix-edit-row:hover),
+.adminPage :global(.role-matrix-row:hover) {
+  background: rgba(229, 198, 102, 0.06);
+}
+
+.adminPage :global(.module-info) {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.adminPage :global(.module-icon) {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(229, 198, 102, .2);
+  border-radius: 9px;
+  background: rgba(229, 198, 102, .08);
+  font-size: 15px;
+}
+
+.adminPage :global(.module-name) {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.adminPage :global(.col-center) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Toggle Pills */
+.adminPage :global(.matrix-toggle-pill) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 12px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  min-width: 88px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .04);
+}
+
+.adminPage :global(.matrix-toggle-pill input[type="checkbox"]) {
+  display: none;
+}
+
+.adminPage :global(.matrix-toggle-pill .toggle-text) {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.adminPage :global(.matrix-toggle-pill:hover) {
+  border-color: rgba(229, 198, 102, 0.4);
+  background: rgba(229, 198, 102, 0.08);
+}
+
+.adminPage :global(.matrix-toggle-pill.active-view) {
+  background: rgba(139, 211, 165, 0.18);
+  border-color: rgba(139, 211, 165, 0.5);
+}
+
+.adminPage :global(.matrix-toggle-pill.active-view .toggle-text) {
+  color: #8bd3a5;
+}
+
+.adminPage :global(.matrix-toggle-pill.active-edit) {
+  background: rgba(229, 198, 102, 0.18);
+  border-color: rgba(229, 198, 102, 0.5);
+}
+
+.adminPage :global(.matrix-toggle-pill.active-edit .toggle-text) {
+  color: #e5c666;
+}
+
+.adminPage :global(.matrix-toggle-pill.active-delete) {
+  background: rgba(255, 107, 107, 0.18);
+  border-color: rgba(255, 107, 107, 0.5);
+}
+
+.adminPage :global(.matrix-toggle-pill.active-delete .toggle-text) {
+  color: #ff6b6b;
+}
+
+/* Detail View Em Statuses */
+.adminPage :global(.role-matrix-row em) {
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+.adminPage :global(.role-matrix-row em.checked.view) {
+  color: #8bd3a5;
+  background: rgba(139, 211, 165, 0.12);
+  border: 1px solid rgba(139, 211, 165, 0.3);
+}
+
+.adminPage :global(.role-matrix-row em.checked.edit) {
+  color: #e5c666;
+  background: rgba(229, 198, 102, 0.12);
+  border: 1px solid rgba(229, 198, 102, 0.3);
+}
+
+.adminPage :global(.role-matrix-row em.checked.delete) {
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.12);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+.adminPage :global(.role-matrix-row em.none) {
+  color: rgba(255, 255, 255, 0.25);
+}

@@ -1,0 +1,2 @@
+:global(.vigen-page).pageRoot { min-height: 100vh; }
+:global(.vigen-page).pageRoot :global(.vigen-section) { contain: layout paint; }
