@@ -1179,7 +1179,6 @@ export default function AboutPage() {
 
         <div className="hero-visual reveal">
           <div className="hero-frame">
-            <img src="/images/vigenfood.png" alt="Gạo Vigen Food" />
           </div>
           <div className="floating-card">
             <strong>100%</strong>
@@ -1272,7 +1271,7 @@ export default function AboutPage() {
         <div className="stats-grid">
           {stats.map((stat) => (
             <div key={stat.label} className="stat-card">
-              <strong data-target={stat.value} data-suffix={stat.suffix}>{0}{stat.suffix}</strong>
+              <strong suppressHydrationWarning data-target={stat.value} data-suffix={stat.suffix}>{0}{stat.suffix}</strong>
               <span>{stat.label}</span>
             </div>
           ))}

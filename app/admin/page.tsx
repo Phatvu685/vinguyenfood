@@ -13,6 +13,7 @@ import FinanceManager, { FinanceTransaction } from "./FinanceManager";
 import InventoryManager, { InventoryRecord } from "./InventoryManager";
 import PromotionManager, { Promotion } from "./PromotionManager";
 import PermissionManager from "./PermissionManager";
+import SettingsManager from "./SettingsManager";
 import AdminModal from "./components/AdminModal";
 import ConfirmModal from "./components/ConfirmModal";
 import styles from "./page.module.css";
@@ -29,7 +30,7 @@ import {
   NOTIFICATIONS_UPDATED_EVENT,
 } from "../lib/notifications";
 
-type AdminTab = "overview" | "products" | "categories" | "orders" | "customers" | "vouchers" | "finance" | "inventory" | "promotions" | "content" | "permissions";
+type AdminTab = "overview" | "products" | "categories" | "orders" | "customers" | "vouchers" | "finance" | "inventory" | "promotions" | "content" | "permissions" | "settings";
 type NoticeTone = "success" | "info" | "warning" | "error";
 type Order = { id: string; createdAt: string; status: string; customer: string; phone: string; email?: string; address?: string; province?: string; district?: string; ward?: string; note?: string; total: number; paidAmount?: number; paymentStatus?: "paid" | "unpaid"; subtotal?: number; items: number; orderType?: "retail" | "combo"; products?: { productId: number; quantity: number; purchasePrice?: number; isGift?: boolean }[]; voucherCode?: string; promotionCode?: string; promotionName?: string; giftProductId?: number; discount?: number; shipping?: number; paymentMethod?: string };
 type OrderProduct = { product: Product; quantity: number };
@@ -242,7 +243,7 @@ export default function AdminPage() {
         <a href="/" className="admin-brand"><BrandLogo compact /></a>
         <span className="admin-label">QUẢN TRỊ CỬA HÀNG</span>
         <nav className="admin-nav">
-          {(["overview", "products", "categories", "orders", "customers", "vouchers", "finance", "inventory", "promotions", "content", "permissions"] as AdminTab[]).map((item) => <button key={item} className={tab === item ? "active" : ""} onClick={() => setTab(item)}>{{ overview: "Tổng quan", products: "Sản phẩm", categories: "Danh mục", orders: "Đơn hàng", customers: "Khách hàng", vouchers: "Mã giảm giá", finance: "Dòng tiền", inventory: "Quản lý kho", promotions: "Combo & ưu đãi", content: "Nội dung", permissions: "Phân quyền" }[item]}</button>)}
+          {(["overview", "products", "categories", "orders", "customers", "vouchers", "finance", "inventory", "promotions", "content", "permissions", "settings"] as AdminTab[]).map((item) => <button key={item} className={tab === item ? "active" : ""} onClick={() => setTab(item)}>{{ overview: "Tổng quan", products: "Sản phẩm", categories: "Danh mục", orders: "Đơn hàng", customers: "Khách hàng", vouchers: "Mã giảm giá", finance: "Dòng tiền", inventory: "Quản lý kho", promotions: "Combo & ưu đãi", content: "Nội dung", permissions: "Phân quyền", settings: "Cài đặt" }[item]}</button>)}
         </nav>
         <div className="admin-sidebar-actions"><button className="admin-back" onClick={() => { localStorage.removeItem(USER_STORAGE_KEY); setAuthorized(false); }}>Đăng xuất</button><a className="admin-back" href="/">← Về website</a></div>
       </aside>
@@ -264,6 +265,7 @@ export default function AdminPage() {
                 promotions: "Combo & Ưu đãi",
                 content: "Nội dung Website",
                 permissions: "Phân quyền hệ thống",
+                settings: "Cài đặt website",
               }[tab]}
             </span>
           </div>
@@ -362,7 +364,7 @@ export default function AdminPage() {
             </div>
           </div>
         </header>
-        {tab === "overview" && <AdminDashboard revenue={revenue} orders={orders} products={products} customer={customer} onTab={setTab} />}
+        {tab === "overview" && <AdminDashboard revenue={revenue} orders={orders} products={products} customer={customer} inventoryRecords={inventoryRecords} onTab={setTab} />}
         {tab === "products" && <ProductManager products={filteredProducts} allProducts={products} categories={categories} query={query} setQuery={setQuery} categoryFilter={productCategoryFilter} setCategoryFilter={setProductCategoryFilter} editing={editing} setEditing={setEditing} saveProducts={saveProducts} deleteProduct={deleteProduct} showNotice={showNotice} />}
         {tab === "categories" && <CategoryManager categories={categories} products={products} saveCategories={saveCategories} renameProducts={(oldName, newName) => saveProducts(products.map(product => product.category === oldName ? { ...product, category: newName } : product))} showNotice={showNotice} />}
         {tab === "orders" && <OrderManager orders={orders} products={products} promotions={promotions} updateOrder={updateOrder} saveOrders={saveOrders} showNotice={showNotice} />}
@@ -373,6 +375,7 @@ export default function AdminPage() {
         {tab === "promotions" && <PromotionManager products={products} promotions={promotions} savePromotions={savePromotions} showNotice={showNotice} />}
         {tab === "content" && <ContentManager showNotice={showNotice} />}
         {tab === "permissions" && <PermissionManager showNotice={showNotice} />}
+        {tab === "settings" && <SettingsManager showNotice={showNotice} />}
         {notice && <div className={`admin-notice ${notice.tone}`}>{notice.tone === "error" ? "⚠" : notice.tone === "warning" ? "!" : "✓"} {notice.text}</div>}
       </section>
     </main>
@@ -380,27 +383,63 @@ export default function AdminPage() {
 }
 
 /* ===== DASHBOARD ===== */
-function AdminDashboard({ revenue, orders, products, customer, onTab }: { revenue: number; orders: Order[]; products: Product[]; customer: { name: string; phone: string } | null; onTab: (tab: AdminTab) => void }) {
-  const stats = [
-    ["DOANH THU", money(revenue), "↑ 12.8% so với tháng trước", "₫"],
-    ["ĐƠN HÀNG", orders.length.toLocaleString("vi-VN"), "↑ 8.2% so với tháng trước", "▣"],
-    ["SẢN PHẨM", products.length.toString(), "↑ 5.4% đang quản lý", "▤"],
-    ["KHÁCH HÀNG", customer ? "01" : "00", "↑ 16.3% tài khoản đăng ký", "♙"],
-  ];
+function AdminDashboard({ orders, products, customer, inventoryRecords, onTab }: { revenue: number; orders: Order[]; products: Product[]; customer: { name: string; phone: string } | null; inventoryRecords: InventoryRecord[]; onTab: (tab: AdminTab) => void }) {
+  const [period, setPeriod] = useState<"today" | "7days" | "30days" | "month" | "custom">("today");
+  const [customStart, setCustomStart] = useState(new Date().toISOString().slice(0, 10));
+  const [customEnd, setCustomEnd] = useState(new Date().toISOString().slice(0, 10));
+  const [month, setMonth] = useState(new Date().toISOString().slice(0, 7));
+  const [periodPickerOpen, setPeriodPickerOpen] = useState(false);
+  const now = new Date();
+  const end = new Date(now); end.setHours(23, 59, 59, 999);
+  const start = new Date(now); start.setHours(0, 0, 0, 0);
+  if (period === "7days") start.setDate(start.getDate() - 6);
+  if (period === "30days") start.setDate(start.getDate() - 29);
+  if (period === "month") { const selectedMonth = new Date(`${month}-01T00:00:00`); start.setTime(selectedMonth.getTime()); end.setTime(new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 0, 23, 59, 59, 999).getTime()); }
+  if (period === "custom") { const customStartDate = new Date(`${customStart}T00:00:00`); const customEndDate = new Date(`${customEnd}T23:59:59`); start.setTime(customStartDate.getTime()); end.setTime(customEndDate.getTime()); }
+  const periodOrders = orders.filter(order => { const date = new Date(order.createdAt); return date >= start && date <= end; });
+  const validOrders = periodOrders.filter(order => !["Đã hủy", "Đã hoàn", "Hoàn hàng", "Đã hoàn hàng"].includes(order.status));
+  const soldProducts = validOrders.reduce((sum, order) => sum + (order.products?.reduce((quantity, item) => quantity + item.quantity, 0) || order.items || 0), 0);
+  const revenue = validOrders.reduce((sum, order) => sum + order.total, 0);
+  const averageOrder = validOrders.length ? revenue / validOrders.length : 0;
+  const costs = inventoryRecords.filter(record => record.type === "import").reduce((map, record) => { const current = map.get(record.productId) || { total: 0, quantity: 0 }; map.set(record.productId, { total: current.total + record.purchasePrice * record.quantity, quantity: current.quantity + record.quantity }); return map; }, new Map<number, { total: number; quantity: number }>());
+  const profit = validOrders.reduce((sum, order) => sum + (order.total - (order.products?.reduce((cost, item) => { const averageCost = costs.get(item.productId); return cost + (averageCost ? averageCost.total / averageCost.quantity : (item.purchasePrice || 0)) * item.quantity; }, 0) || 0)), 0);
+  const cancelledRate = periodOrders.length ? periodOrders.filter(order => order.status === "Đã hủy").length / periodOrders.length * 100 : 0;
+  const returnedRate = periodOrders.length ? periodOrders.filter(order => ["Đã hoàn", "Hoàn hàng", "Đã hoàn hàng"].includes(order.status)).length / periodOrders.length * 100 : 0;
+  const periodLabel = period === "today" ? "Hôm nay" : period === "7days" ? "7 ngày qua" : period === "30days" ? "30 ngày qua" : period === "month" ? `Tháng ${month.slice(5, 7)}/${month.slice(0, 4)}` : `${customStart} - ${customEnd}`;
+  const stats = [["DOANH THU", money(revenue), "Doanh thu đơn hợp lệ", "₫"], ["ĐƠN HÀNG", validOrders.length.toLocaleString("vi-VN"), "Đơn trong kỳ", "▣"], ["SẢN PHẨM ĐÃ BÁN", soldProducts.toLocaleString("vi-VN"), "Tổng số lượng", "▤"], ["ĐƠN HÀNG TRUNG BÌNH", money(averageOrder), "Giá trị trung bình", "↗"], ["LỢI NHUẬN", money(profit), "Sau khi trừ giá vốn", "◆"], ["TỶ LỆ HỦY ĐƠN", `${cancelledRate.toFixed(1)}%`, `${periodOrders.filter(order => order.status === "Đã hủy").length} đơn bị hủy`, "×"], ["TỶ LỆ HOÀN HÀNG", `${returnedRate.toFixed(1)}%`, `${periodOrders.filter(order => ["Đã hoàn", "Hoàn hàng", "Đã hoàn hàng"].includes(order.status)).length} đơn hoàn`, "↩"]];
+  const latestOrders = periodOrders.slice(-5).reverse();
   return <>
-    <div className="admin-hero-card">
-      <div>
-        <span className="admin-kicker">TỔNG QUAN KINH DOANH</span>
-        <h2>Tổng quan cửa hàng</h2>
-        <p>Theo dõi chỉ số hiệu quả kinh doanh, doanh thu, đơn hàng và sản phẩm bán chạy.</p>
+    <div className="admin-product-heading admin-dashboard-heading"><div><span className="admin-kicker">TỔNG QUAN KINH DOANH</span><h2>Tổng quan cửa hàng</h2><p>Theo dõi hiệu quả kinh doanh theo từng khoảng thời gian.</p></div><div className="admin-dashboard-period"><button className="admin-primary" type="button" onClick={() => setPeriodPickerOpen(true)} aria-label="Chọn khoảng thời gian">{period === "today" ? "Hôm nay" : period === "7days" ? "7 ngày" : period === "30days" ? "30 ngày" : period === "month" ? `Tháng ${month.slice(5, 7)}/${month.slice(0, 4)}` : `${customStart} - ${customEnd}`}</button></div></div>
+    <AdminModal open={periodPickerOpen} onClose={() => setPeriodPickerOpen(false)} title="Chọn khoảng thời gian" subtitle="Thay đổi phạm vi thống kê cho bảng tổng quan" size="sm" footer={<><button className="vg-btn" type="button" onClick={() => setPeriodPickerOpen(false)}>Đóng</button></>}>
+      <div className="vg-form-grid">
+        <div className="vg-field vg-full">
+          <div className="admin-dashboard-modal-options">
+            {[
+              { value: "today", label: "Hôm nay" },
+              { value: "7days", label: "7 ngày" },
+              { value: "30days", label: "30 ngày" },
+              { value: "month", label: "Theo tháng" },
+              { value: "custom", label: "Tùy chọn" },
+            ].map(option => (
+              <button
+                key={option.value}
+                type="button"
+                className={period === option.value ? "admin-dashboard-modal-option active" : "admin-dashboard-modal-option"}
+                onClick={() => { setPeriod(option.value as typeof period); setPeriodPickerOpen(false); }}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        {period === "month" && <div className="vg-field vg-full"><span className="vg-field-label">Chọn tháng</span><input type="month" value={month} onChange={event => setMonth(event.target.value)} aria-label="Chọn tháng" /></div>}
+        {period === "custom" && <><div className="vg-field"><span className="vg-field-label">Từ ngày</span><input type="date" value={customStart} onChange={event => setCustomStart(event.target.value)} aria-label="Ngày bắt đầu" /></div><div className="vg-field"><span className="vg-field-label">Đến ngày</span><input type="date" value={customEnd} onChange={event => setCustomEnd(event.target.value)} aria-label="Ngày kết thúc" /></div></>}
       </div>
-    </div>
-    <div className="admin-stats">{stats.map(([label, value, note, icon]) => <div className="admin-stat" key={label}><span className="admin-stat-icon">{icon}</span><div><span>{label}</span><strong>{value}</strong><small>{note}</small></div></div>)}</div>
-    <div className="admin-dashboard-grid">
-      <section className="admin-panel admin-chart-panel"><div className="admin-panel-head"><div><span className="admin-kicker">HIỆU QUẢ KINH DOANH</span><h2>Doanh thu theo tháng</h2></div><select aria-label="Chọn năm"><option>Năm 2026</option><option>Năm 2025</option></select></div><div className="admin-line-chart"><div className="chart-grid-lines"><i /><i /><i /><i /></div><svg viewBox="0 0 720 190" role="img" aria-label="Biểu đồ doanh thu"><defs><linearGradient id="chart-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#e5c666" stopOpacity=".55" /><stop offset="1" stopColor="#e5c666" stopOpacity="0" /></linearGradient></defs><path d="M20 155 L115 125 L205 95 L285 112 L365 75 L445 102 L520 58 L595 92 L680 42 L680 175 L20 175 Z" fill="url(#chart-fill)" /><path d="M20 155 L115 125 L205 95 L285 112 L365 75 L445 102 L520 58 L595 92 L680 42" fill="none" stroke="#e5c666" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />{[[20,155],[115,125],[205,95],[285,112],[365,75],[445,102],[520,58],[595,92],[680,42]].map(([x, y]) => <circle key={`${x}-${y}`} cx={x} cy={y} r="4" fill="#f6e29a" stroke="#9b782b" strokeWidth="2" />)}</svg><div className="chart-labels"><span>T1</span><span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span>T8</span><span>T9</span><span>T10</span><span>T11</span><span>T12</span></div></div></section>
-      <section className="admin-panel admin-quick-panel"><div><span className="admin-kicker">THAO TÁC NHANH</span><h2>Quản lý cửa hàng</h2></div><div className="quick-actions"><button onClick={() => onTab("products")}>＋ &nbsp;Thêm sản phẩm</button><button onClick={() => onTab("orders")}>▣ &nbsp;Xem đơn hàng</button><button onClick={() => onTab("vouchers")}>⌁ &nbsp;Tạo mã giảm giá</button></div></section>
-    </div>
-    <div className="admin-dashboard-grid admin-lower-grid"><section className="admin-panel admin-recent"><div className="admin-panel-head"><div><span className="admin-kicker">HOẠT ĐỘNG GẦN ĐÂY</span><h2>Đơn hàng mới nhất</h2></div><button className="admin-text-button" onClick={() => onTab("orders")}>Xem tất cả →</button></div>{orders.length ? <div className="admin-order-table"><div className="admin-order-header"><span>MÃ ĐƠN</span><span>KHÁCH HÀNG</span><span>TỔNG TIỀN</span><span>TRẠNG THÁI</span></div>{orders.slice(-5).reverse().map((order) => <div className="admin-order-row" key={order.id}><b>{order.id}</b><span>{order.customer}</span><span>{money(order.total)}</span><em>{order.status}</em></div>)}</div> : <div className="admin-empty">Chưa có đơn hàng. Đơn hàng mới sẽ xuất hiện ở đây.</div>}</section><section className="admin-panel admin-best-panel"><div className="admin-panel-head"><div><span className="admin-kicker">SẢN PHẨM BÁN CHẠY</span><h2>Top 5 sản phẩm</h2></div></div>{products.slice(0, 5).map((product, index) => <div className="admin-best-product" key={product.id}><img src={product.image} alt="" /><div><strong>{product.name}</strong><small>Đã bán</small></div><span>{28 - index * 4}%<b style={{ width: `${90 - index * 14}%` }} /></span></div>)}</section></div>
+    </AdminModal>
+    <div className="admin-dashboard-period-label">Đang xem: <strong>{periodLabel}</strong> · {periodOrders.length} đơn được ghi nhận</div>
+    <div className="admin-overview-stats">{stats.map(([label, value, note, icon]) => <div className="admin-stat" key={label}><span className="admin-stat-icon">{icon}</span><div><span>{label}</span><strong>{value}</strong><small>{note}</small></div></div>)}</div>
+    <div className="admin-dashboard-grid"><section className="admin-panel admin-recent"><div className="admin-panel-head"><div><span className="admin-kicker">ĐƠN HÀNG TRONG KỲ</span><h2>Hoạt động gần đây</h2></div><button className="admin-text-button" onClick={() => onTab("orders")}>Xem tất cả →</button></div>{latestOrders.length ? <div className="admin-order-table"><div className="admin-order-header"><span>MÃ ĐƠN</span><span>KHÁCH HÀNG</span><span>TỔNG TIỀN</span><span>TRẠNG THÁI</span></div>{latestOrders.map(order => <div className="admin-order-row" key={order.id}><b>{order.id}</b><span>{order.customer}</span><span>{money(order.total)}</span><em>{order.status}</em></div>)}</div> : <div className="admin-empty">Chưa có đơn hàng trong khoảng thời gian này.</div>}</section><section className="admin-panel admin-quick-panel"><div><span className="admin-kicker">THAO TÁC NHANH</span><h2>Quản lý cửa hàng</h2><small>{customer ? `Khách hàng gần nhất: ${customer.name}` : "Chưa có khách hàng đăng nhập"}</small></div><div className="quick-actions"><button onClick={() => onTab("products")}>＋ &nbsp;Thêm sản phẩm</button><button onClick={() => onTab("orders")}>▣ &nbsp;Xem đơn hàng</button><button onClick={() => onTab("finance")}>₫ &nbsp;Xem dòng tiền</button></div></section></div>
+    <section className="admin-panel admin-best-panel"><div className="admin-panel-head"><div><span className="admin-kicker">DANH MỤC SẢN PHẨM</span><h2>Sản phẩm đang quản lý</h2></div></div><div className="admin-best-products">{products.slice(0, 5).map(product => <div className="admin-best-product" key={product.id}><img src={product.image} alt="" /><div><strong>{product.name}</strong><small>{product.category}</small></div><span>{product.stock ?? 0}<b style={{ width: `${Math.min(100, (product.stock ?? 0) / 2)}%` }} /></span></div>)}</div></section>
   </>;
 }
 
@@ -408,12 +447,19 @@ function AdminDashboard({ revenue, orders, products, customer, onTab }: { revenu
 function ProductManager({ products, allProducts, categories, query, setQuery, categoryFilter, setCategoryFilter, editing, setEditing, saveProducts, deleteProduct, showNotice }: { products: Product[]; allProducts: Product[]; categories: { id: number; name: string; active: boolean }[]; query: string; setQuery: (v: string) => void; categoryFilter: string; setCategoryFilter: (v: string) => void; editing: Product | null; setEditing: (p: Product | null) => void; saveProducts: (p: Product[]) => void; deleteProduct: (id: number) => void; showNotice: (text: string, tone?: NoticeTone) => void }) {
   const [imagePreview, setImagePreview] = useState(editing?.image || "");
   const [imageUrl, setImageUrl] = useState(editing?.image || "");
+  const [imageSource, setImageSource] = useState<"upload" | "url">("upload");
   const [detail, setDetail] = useState<Product | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<Product | null>(null);
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
   const pageSize = 8;
-  useEffect(() => { setImagePreview(editing?.image || ""); setImageUrl(editing?.image || ""); }, [editing]);
+  useEffect(() => {
+    const imageValue = editing?.image || "";
+    const isDataUpload = imageValue.startsWith("data:image/");
+    setImagePreview(imageValue);
+    setImageUrl(isDataUpload ? "" : imageValue);
+    setImageSource(isDataUpload || !imageValue ? "upload" : "url");
+  }, [editing]);
 
   const productStock = (product: Product) => product.stock ?? Math.max(0, 320 - product.id * 15);
   const visibleProducts = products.filter(product => {
@@ -433,17 +479,19 @@ function ProductManager({ products, allProducts, categories, query, setQuery, ca
     const data = new FormData(event.currentTarget);
     const name = String(data.get("name") || "").trim();
     const category = String(data.get("category") || "").trim();
-    const stock = Number(data.get("stock") || 0);
+    const stock = editing?.stock ?? Number(data.get("stock") || 0);
+    const minStock = Number(data.get("minStock") || 0);
+    const unit = String(data.get("unit") || "kg") as Product["unit"];
     if (!name || !category) {
       showNotice("Vui lòng nhập tên sản phẩm và danh mục trước khi lưu.", "error");
       return;
     }
-    if (stock < 0) {
-      showNotice("Tồn kho không được âm. Vui lòng kiểm tra lại số lượng.", "error");
+    if (stock < 0 || minStock < 0) {
+      showNotice("Tồn kho và tồn tối thiểu không được âm. Vui lòng kiểm tra lại số lượng.", "error");
       return;
     }
     const weight = String(data.get("weight") || "");
-    const product: Product = { id: editing?.id ? editing.id : Date.now(), name, category, price: Number(data.get("price") || 0) * 1000 * getWeightInKg(weight), originalPrice: Number(data.get("originalPrice") || 0) * 1000 * getWeightInKg(weight) || undefined, discount: Number(data.get("discount") || 0) || undefined, image: imagePreview || imageUrl || "/images/st25.png.jpg", note: String(data.get("note") || ""), reviews: editing?.reviews ?? 0, rating: editing?.rating ?? 5, weight, badge: String(data.get("badge") || ""), origin: String(data.get("origin") || ""), storage: String(data.get("storage") || ""), standard: String(data.get("standard") || ""), tags: String(data.get("tags") || ""), stock, sold: Number(data.get("sold") || 0) };
+    const product: Product = { id: editing?.id ? editing.id : Date.now(), name, category, price: Number(data.get("price") || 0) * 1000 * getWeightInKg(weight), image: imagePreview || imageUrl || "/images/st25.png.jpg", note: String(data.get("note") || ""), reviews: editing?.reviews ?? 0, rating: editing?.rating ?? 5, weight, unit, badge: String(data.get("badge") || ""), origin: String(data.get("origin") || ""), storage: String(data.get("storage") || ""), standard: String(data.get("standard") || ""), tags: String(data.get("tags") || ""), stock, minStock, sold: Number(data.get("sold") || 0) };
     saveProducts(editing?.id ? allProducts.map((item) => item.id === editing.id ? product : item) : [...allProducts, product]);
     addAdminNotification(
       editing?.id ? `Cập nhật sản phẩm "${product.name}"` : `Thêm sản phẩm mới "${product.name}"`,
@@ -455,10 +503,20 @@ function ProductManager({ products, allProducts, categories, query, setQuery, ca
     setEditing(null);
     event.currentTarget.reset();
   }
-  function uploadImage(event: ChangeEvent<HTMLInputElement>) { const file = event.target.files?.[0]; if (!file || !file.type.startsWith("image/")) return; const reader = new FileReader(); reader.onload = () => { setImagePreview(String(reader.result)); setImageUrl(""); }; reader.readAsDataURL(file); }
+  function uploadImage(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file || !file.type.startsWith("image/")) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImageSource("upload");
+      setImagePreview(String(reader.result));
+      setImageUrl("");
+    };
+    reader.readAsDataURL(file);
+  }
 
   return <>
-    <div className="admin-product-heading"><div><span className="admin-kicker">QUẢN LÝ SẢN PHẨM</span><h2>Danh sách sản phẩm</h2><p>Quản lý danh mục gạo, giá bán và tồn kho.</p></div><button className="admin-primary" onClick={() => setEditing({ id: 0, name: "", category: "Gạo thơm", price: 0, image: "", note: "", reviews: 0, rating: 5, weight: "5kg", originalPrice: 0, discount: 0, origin: "Việt Nam", storage: "12 tháng", standard: "VietGAP - VSATTP", tags: "", stock: 0, sold: 0 })}><span aria-hidden="true">+</span> Thêm sản phẩm</button></div>
+    <div className="admin-product-heading"><div><span className="admin-kicker">QUẢN LÝ SẢN PHẨM</span><h2>Danh sách sản phẩm</h2><p>Quản lý danh mục gạo, giá bán và tồn kho.</p></div><button className="admin-primary" onClick={() => setEditing({ id: 0, name: "", category: "Gạo thơm", price: 0, image: "", note: "", reviews: 0, rating: 5, weight: "5kg", unit: "kg", originalPrice: 0, discount: 0, origin: "Việt Nam", storage: "12 tháng", standard: "VietGAP - VSATTP", tags: "", stock: 0, minStock: 20, sold: 0 })}><span aria-hidden="true">+</span> Thêm sản phẩm</button></div>
     <div className="product-crm-stats"><div><span>TỔNG SẢN PHẨM</span><strong>{allProducts.length}</strong><small>Sản phẩm trong hệ thống</small></div><div><span>LOẠI SẢN PHẨM</span><strong>{new Set(allProducts.map(product => product.category)).size}</strong><small>Danh mục đang quản lý</small></div><div><span>TỔNG TỒN KHO</span><strong>{totalStock.toLocaleString("vi-VN")}</strong><small>Đơn vị hàng hóa</small></div><div><span>ĐANG BÁN</span><strong>{activeProducts}</strong><small>Sản phẩm sẵn sàng bán</small></div><div><span>NGỪNG BÁN</span><strong>{inactiveProducts}</strong><small>Cần kiểm tra tồn kho</small></div></div>
     <section className="admin-panel admin-products-panel"><div className="admin-product-filters"><div className="admin-search">⌕<input value={query} onChange={(e) => { setQuery(e.target.value); setPage(1); }} placeholder="Tìm sản phẩm theo tên..." /></div><select value={categoryFilter} onChange={(e) => { setCategoryFilter(e.target.value); setPage(1); }} aria-label="Lọc danh mục"><option value="all">Tất cả danh mục</option>{categories.filter(category => category.active).map(category => <option key={category.id} value={category.name}>{category.name}</option>)}</select><select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }} aria-label="Lọc trạng thái"><option value="all">Tất cả trạng thái</option><option value="active">Đang bán</option><option value="inactive">Ngừng bán</option></select></div><div className="admin-product-table"><div className="admin-product-table-head"><span>ẢNH</span><span>SẢN PHẨM</span><span>QUY CÁCH</span><span>DANH MỤC</span><span>GIÁ BÁN</span><span>TỒN KHO</span><span>TRẠNG THÁI</span><span>THAO TÁC</span></div>{pagedProducts.map((product) => <div className="admin-product-row" key={product.id}><img src={product.image} alt="" /><div className="admin-product-name"><span><strong>{product.name}</strong><small>{product.note}</small></span></div><span>{product.weight}</span><span>{product.category}</span><b>{money(product.price)}</b><span>{productStock(product)}</span><em className={productStock(product) < 50 ? "low-stock" : "in-stock"}>{productStock(product) < 50 ? "Ngừng bán" : "Đang bán"}</em><div className="admin-row-actions"><button title="Xem chi tiết" aria-label="Xem chi tiết" onClick={() => setDetail(product)}><Target aria-hidden="true" /></button><button title="Sửa sản phẩm" aria-label="Sửa sản phẩm" onClick={() => setEditing(product)}><Pencil aria-hidden="true" /></button><button className="danger" title="Xóa sản phẩm" aria-label="Xóa sản phẩm" onClick={() => setConfirmDelete(product)}><X aria-hidden="true" /></button></div></div>)}</div><div className="admin-product-pagination"><span>Hiển thị {pagedProducts.length} / {visibleProducts.length} sản phẩm</span><div><button disabled={page <= 1} onClick={() => setPage(page - 1)}>‹</button><b>{page} / {pageCount}</b><button disabled={page >= pageCount} onClick={() => setPage(page + 1)}>›</button></div><span>{pageSize} / trang</span></div></section>
 
@@ -490,17 +548,16 @@ function ProductManager({ products, allProducts, categories, query, setQuery, ca
           <div className="vg-field"><span className="vg-field-label">Tên sản phẩm <span className="vg-required">*</span></span><input className="vg-input" name="name" defaultValue={editing?.name} required /></div>
           <div className="vg-field"><span className="vg-field-label">Danh mục <span className="vg-required">*</span></span><select className="vg-select" name="category" defaultValue={editing?.category} required>{categories.filter(c => c.active || c.name === editing?.category).map(c => <option key={c.id} value={c.name}>{c.name}</option>)}</select></div>
           <div className="vg-field"><span className="vg-field-label">Giá bán / 1kg <span className="vg-required">*</span></span><div className="vg-money-input"><input name="price" type="number" min="0" step="1" defaultValue={editing?.price ? getPricePerKg(editing) / 1000 : ""} placeholder="5000" required /><span>.000 VND/kg</span></div></div>
-          <div className="vg-field"><span className="vg-field-label">Giá niêm yết / 1kg</span><div className="vg-money-input"><input name="originalPrice" type="number" min="0" step="1" defaultValue={editing?.originalPrice ? editing.originalPrice / 1000 / getWeightInKg(editing.weight) : ""} placeholder="5000" /><span>.000 VND/kg</span></div></div>
-          <div className="vg-field"><span className="vg-field-label">Giảm giá (%)</span><input className="vg-input" name="discount" type="number" min="0" max="100" defaultValue={editing?.discount} /></div>
+          <div className="vg-field"><span className="vg-field-label">Đơn vị tính <span className="vg-required">*</span></span><select className="vg-select" name="unit" defaultValue={editing?.unit || "kg"}><option value="kg">kg</option><option value="bao">bao</option><option value="thùng">thùng</option><option value="chai">chai</option></select></div>
+          <div className="vg-field"><span className="vg-field-label">Tồn tối thiểu <span className="vg-required">*</span></span><input className="vg-input" name="minStock" type="number" min="0" defaultValue={editing?.minStock ?? ""} placeholder="Ví dụ: 20" required /></div>
           <div className="vg-field"><span className="vg-field-label">Khối lượng <span className="vg-required">*</span></span><select className="vg-select" name="weight" defaultValue={editing?.weight} required><option value="2kg">2kg</option><option value="5kg">5kg</option><option value="10kg">10kg</option><option value="20kg">20kg</option><option value="25kg">25kg</option></select></div>
           <div className="vg-field"><span className="vg-field-label">Xuất xứ</span><input className="vg-input" name="origin" defaultValue={editing?.origin} /></div>
           <div className="vg-field"><span className="vg-field-label">Bảo quản</span><input className="vg-input" name="storage" defaultValue={editing?.storage} /></div>
           <div className="vg-field"><span className="vg-field-label">Tiêu chuẩn</span><input className="vg-input" name="standard" defaultValue={editing?.standard} /></div>
-          <div className="vg-field"><span className="vg-field-label">Tồn kho</span><input className="vg-input" name="stock" type="number" min="0" defaultValue={editing?.stock} /></div>
           <div className="vg-field"><span className="vg-field-label">Đã bán</span><input className="vg-input" name="sold" type="number" min="0" defaultValue={editing?.sold} /></div>
           <div className="vg-field"><span className="vg-field-label">Badge</span><input className="vg-input" name="badge" defaultValue={editing?.badge} /></div>
           <div className="vg-field vg-full"><span className="vg-field-label">Đặc điểm / cam kết</span><input className="vg-input" name="tags" defaultValue={editing?.tags} placeholder="Chính hãng, Hữu cơ, Nguồn gốc rõ ràng" /></div>
-          <div className="vg-field vg-full"><span className="vg-field-label">Ảnh sản phẩm</span><div className="vg-upload-zone"><div className="vg-upload-bar"><label className="vg-upload-btn">⇪ Upload ảnh<input type="file" accept="image/png,image/jpeg,image/webp" onChange={uploadImage} /></label><div className="vg-upload-url"><input value={imageUrl} onChange={(e) => { const next = e.target.value.trim(); setImageUrl(next); if (next) setImagePreview(next); }} placeholder="Hoặc nhập URL ảnh..." /></div></div><div className="vg-upload-preview">{imagePreview ? <img src={imagePreview} alt="Xem trước" /> : <div className="vg-upload-empty"><span className="vg-upload-empty-icon">⊕</span><strong>Kéo thả hoặc click để chọn ảnh</strong><small>JPG, PNG, WEBP - Tối đa 5MB</small></div>}</div></div></div>
+          <div className="vg-field vg-full"><span className="vg-field-label">Ảnh sản phẩm</span><div className="vg-upload-zone"><div className="vg-upload-source"><button type="button" className={imageSource === "upload" ? "active" : ""} onClick={() => { setImageSource("upload"); setImageUrl(""); setImagePreview((current) => current && current.startsWith("data:image/") ? current : ""); }}>Upload ảnh</button><button type="button" className={imageSource === "url" ? "active" : ""} onClick={() => { setImageSource("url"); setImagePreview(""); setImageUrl(""); }}>URL ảnh</button></div><div className="vg-upload-bar">{imageSource === "upload" ? <label className="vg-upload-btn">⇪ Upload ảnh<input type="file" accept="image/png,image/jpeg,image/webp" onChange={uploadImage} /></label> : <div className="vg-upload-url"><input value={imageUrl} onChange={(e) => { const next = e.target.value.trim(); setImageSource("url"); setImageUrl(next); if (next) setImagePreview(next); }} placeholder="Hoặc nhập URL ảnh..." /></div>}</div><div className="vg-upload-preview">{imagePreview ? <img src={imagePreview} alt="Xem trước" /> : <div className="vg-upload-empty"><span className="vg-upload-empty-icon">⊕</span><strong>Kéo thả hoặc click để chọn ảnh</strong><small>JPG, PNG, WEBP - Tối đa 5MB</small></div>}</div></div></div>
           <div className="vg-field vg-full"><span className="vg-field-label">Mô tả <span className="vg-required">*</span></span><input className="vg-input" name="note" defaultValue={editing?.note} required /></div>
         </div>
       </form>
@@ -1327,6 +1384,7 @@ function ContentManager({ showNotice }: { showNotice: (text: string) => void }) 
   ];
   const [items, setItems] = useState<ContentItem[]>(() => { if (typeof window === "undefined") return defaults; const saved = localStorage.getItem(contentKey); return saved ? JSON.parse(saved) : defaults; });
   const [editing, setEditing] = useState<ContentItem | null>(null);
+  const [editingImageSource, setEditingImageSource] = useState<"upload" | "url">("upload");
   const [detail, setDetail] = useState<ContentItem | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<ContentItem | null>(null);
   const defaultHeroSlides: HeroSlideContent[] = [
@@ -1339,6 +1397,7 @@ function ContentManager({ showNotice }: { showNotice: (text: string) => void }) 
     try { return JSON.parse(localStorage.getItem(heroContentKey) || "null") || defaultHeroSlides; } catch { return defaultHeroSlides; }
   });
   const [heroEditing, setHeroEditing] = useState<number | null>(null);
+  const [heroImageSources, setHeroImageSources] = useState<{ background: "upload" | "url"; product: "upload" | "url" }>({ background: "url", product: "url" });
   const [memberOffer, setMemberOffer] = useState<MemberOfferContent>(() => {
     if (typeof window === "undefined") return defaultMemberOffer;
     try { return { ...defaultMemberOffer, ...JSON.parse(localStorage.getItem(memberOfferKey) || "null") }; } catch { return defaultMemberOffer; }
@@ -1355,8 +1414,16 @@ function ContentManager({ showNotice }: { showNotice: (text: string) => void }) 
     setEditing(null);
     showNotice(editing ? "Đã cập nhật nội dung" : "Đã thêm nội dung");
   }
-  function uploadImage(event: ChangeEvent<HTMLInputElement>) { const file = event.target.files?.[0]; if (!file || !file.type.startsWith("image/")) return; const reader = new FileReader(); reader.onload = () => setEditing(current => current ? { ...current, image: String(reader.result) } : current); reader.readAsDataURL(file); }
-  function uploadHeroImage(event: ChangeEvent<HTMLInputElement>, field: "background" | "product") { const file = event.target.files?.[0]; if (!file || !file.type.startsWith("image/") || heroEditing === null) return; const reader = new FileReader(); reader.onload = () => { const value = String(reader.result); setHeroSlides(current => current.map((slide, index) => index === heroEditing ? { ...slide, [field]: value } : slide)); const input = document.querySelector<HTMLInputElement>(`#hero-form [name="${field}"]`); if (input) input.value = value; }; reader.readAsDataURL(file); }
+  function uploadImage(event: ChangeEvent<HTMLInputElement>) { const file = event.target.files?.[0]; if (!file || !file.type.startsWith("image/")) return; const reader = new FileReader(); reader.onload = () => { setEditingImageSource("upload"); setEditing(current => current ? { ...current, image: String(reader.result) } : current); }; reader.readAsDataURL(file); }
+  function uploadHeroImage(event: ChangeEvent<HTMLInputElement>, field: "background" | "product") { const file = event.target.files?.[0]; if (!file || !file.type.startsWith("image/") || heroEditing === null) return; const reader = new FileReader(); reader.onload = () => { const value = String(reader.result); setHeroSlides(current => current.map((slide, index) => index === heroEditing ? { ...slide, [field]: value } : slide)); setHeroImageSources(current => ({ ...current, [field]: "upload" })); const input = document.querySelector<HTMLInputElement>(`#hero-form [name="${field}"]`); if (input) input.value = value; }; reader.readAsDataURL(file); }
+  function openHeroEditor(index: number) {
+    const slide = heroSlides[index];
+    setHeroImageSources({
+      background: slide.background.startsWith("data:image/") ? "upload" : "url",
+      product: slide.product.startsWith("data:image/") ? "upload" : "url",
+    });
+    setHeroEditing(index);
+  }
   function saveHeroSlides(next: HeroSlideContent[]) { setHeroSlides(next); localStorage.setItem(heroContentKey, JSON.stringify(next)); window.dispatchEvent(new Event("gao-ngon-content-updated")); }
   function submitHero(event: FormEvent<HTMLFormElement>) { event.preventDefault(); if (heroEditing === null) return; const data = new FormData(event.currentTarget); const next = heroSlides.map((slide, index) => index === heroEditing ? { background: String(data.get("background") || ""), product: String(data.get("product") || ""), eyebrow: String(data.get("eyebrow") || ""), title: String(data.get("title") || ""), script: String(data.get("script") || ""), description: String(data.get("description") || "") } : slide); saveHeroSlides(next); addAdminNotification(`Cập nhật slide trang chủ #${heroEditing + 1}`, "content", undefined, "content"); setHeroEditing(null); showNotice("Đã cập nhật slide trang chủ"); }
   function submitMemberOffer(event: FormEvent<HTMLFormElement>) { event.preventDefault(); const data = new FormData(event.currentTarget); const next: MemberOfferContent = { title: String(data.get("title") || ""), label: String(data.get("label") || ""), discount: String(data.get("discount") || ""), condition: String(data.get("condition") || ""), button: String(data.get("button") || ""), href: String(data.get("href") || "/user") }; setMemberOffer(next); localStorage.setItem(memberOfferKey, JSON.stringify(next)); window.dispatchEvent(new Event("gao-ngon-member-offer-updated")); addAdminNotification("Cập nhật nội dung ưu đãi hội viên", "content", undefined, "content"); setMemberOfferEditing(false); showNotice("Đã cập nhật ưu đãi hội viên"); }
@@ -1368,11 +1435,11 @@ function ContentManager({ showNotice }: { showNotice: (text: string) => void }) 
         <h2>Quản lý nội dung</h2>
         <p>Chỉnh sửa banner trang chủ, thông tin Về chúng tôi và bài viết tin tức.</p>
       </div>
-      <button className="admin-primary" onClick={() => setEditing({ id: 0, type: "banner", title: "", description: "", image: "" })}>+ Thêm nội dung</button>
+      <button className="admin-primary" onClick={() => { setEditingImageSource("upload"); setEditing({ id: 0, type: "banner", title: "", description: "", image: "" }); }}>+ Thêm nội dung</button>
     </div>
     <section className="admin-panel admin-content-group"><span className="admin-kicker">TRANG CHỦ / ƯU ĐÃI HỘI VIÊN</span><h2>{memberOffer.title}</h2><article className="admin-content-card"><div><strong>{memberOffer.label} {memberOffer.discount}</strong><p>{memberOffer.condition}</p><small>Nút: {memberOffer.button} · Link: {memberOffer.href}</small></div><div className="admin-row-actions"><button title="Sửa ưu đãi hội viên" aria-label="Sửa ưu đãi hội viên" onClick={() => setMemberOfferEditing(true)}><Pencil /></button></div></article></section>
-    <section className="admin-panel admin-content-group"><span className="admin-kicker">TRANG CHỦ / SLIDER HERO</span><h2>3 ảnh hero trang chủ</h2><div className="admin-content-tabs">{heroSlides.map((slide, index) => <article className="admin-content-card" key={`hero-${index}`}><img src={slide.background} alt={`Slide ${index + 1}`} /><div><strong>{slide.eyebrow}</strong><p>{slide.title.replace(/\n/g, " ")} · {slide.script}</p><small>Ảnh nền và ảnh sản phẩm có thể chỉnh sửa</small></div><div className="admin-row-actions"><button title="Sửa slide" aria-label={`Sửa slide ${index + 1}`} onClick={() => setHeroEditing(index)}><Pencil /></button></div></article>)}</div></section>
-    <div className="admin-content-tabs">{(["banner", "about", "news"] as ContentItem["type"][]).map(type => <div className="admin-panel admin-content-group" key={type}><span className="admin-kicker">{type === "banner" ? "TRANG CHỦ / BANNER" : type === "about" ? "VỀ CHÚNG TÔI" : "TIN TỨC"}</span><h2>{type === "banner" ? "Banner & nội dung banner" : type === "about" ? "Nội dung giới thiệu" : "Bài viết tin tức"}</h2>{items.filter(item => item.type === type).map(item => <article className="admin-content-card" key={item.id}><img src={item.image} alt="" /><div><strong>{item.title}</strong><p>{item.description}</p>{item.category && <small>{item.category} · {item.date}</small>}</div><div className="admin-row-actions"><button title="Xem chi tiết" aria-label="Xem chi tiết" onClick={() => setDetail(item)}><Target /></button><button title="Sửa" aria-label="Sửa" onClick={() => setEditing(item)}><Pencil /></button><button className="danger" title="Xóa" aria-label="Xóa" onClick={() => setConfirmDelete(item)}><X /></button></div></article>)}</div>)}</div>
+    <section className="admin-panel admin-content-group"><span className="admin-kicker">TRANG CHỦ / SLIDER HERO</span><h2>3 ảnh hero trang chủ</h2><div className="admin-content-tabs">{heroSlides.map((slide, index) => <article className="admin-content-card" key={`hero-${index}`}><img src={slide.background || "/images/banner1.jpg"} alt={`Slide ${index + 1}`} /><div><strong>{slide.eyebrow}</strong><p>{slide.title.replace(/\n/g, " ")} · {slide.script}</p><small>Ảnh nền và ảnh sản phẩm có thể chỉnh sửa</small></div><div className="admin-row-actions"><button title="Sửa slide" aria-label={`Sửa slide ${index + 1}`} onClick={() => openHeroEditor(index)}><Pencil /></button></div></article>)}</div></section>
+    <div className="admin-content-tabs">{(["banner", "about", "news"] as ContentItem["type"][]).map(type => <div className="admin-panel admin-content-group" key={type}><span className="admin-kicker">{type === "banner" ? "TRANG CHỦ / BANNER" : type === "about" ? "VỀ CHÚNG TÔI" : "TIN TỨC"}</span><h2>{type === "banner" ? "Banner & nội dung banner" : type === "about" ? "Nội dung giới thiệu" : "Bài viết tin tức"}</h2>{items.filter(item => item.type === type).map(item => <article className="admin-content-card" key={item.id}><img src={item.image || "/images/banner1.jpg"} alt="" /><div><strong>{item.title}</strong><p>{item.description}</p>{item.category && <small>{item.category} · {item.date}</small>}</div><div className="admin-row-actions"><button title="Xem chi tiết" aria-label="Xem chi tiết" onClick={() => setDetail(item)}><Target /></button><button title="Sửa" aria-label="Sửa" onClick={() => { setEditingImageSource(item.image && !item.image.startsWith("data:image/") ? "url" : "upload"); setEditing(item); }}><Pencil /></button><button className="danger" title="Xóa" aria-label="Xóa" onClick={() => setConfirmDelete(item)}><X /></button></div></article>)}</div>)}</div>
 
     <AdminModal open={!!detail} onClose={() => setDetail(null)} title={detail ? `Chi tiết ${detail.title}` : "Chi tiết nội dung"} subtitle="Thông tin chi tiết nội dung" size="md" footer={<><button className="vg-btn" type="button" onClick={() => setDetail(null)}>Đóng</button></>}>
       {detail && (
@@ -1395,12 +1462,12 @@ function ContentManager({ showNotice }: { showNotice: (text: string) => void }) 
           <div className="vg-field vg-full"><span className="vg-field-label">Mô tả / nội dung <span className="vg-required">*</span></span><textarea className="vg-textarea" name="description" defaultValue={editing?.description} required /></div>
           <div className="vg-field"><span className="vg-field-label">Danh mục</span><input className="vg-input" name="category" defaultValue={editing?.category} placeholder="Mẹo nhà bếp" /></div>
           <div className="vg-field"><span className="vg-field-label">Ngày đăng</span><input className="vg-input" name="date" defaultValue={editing?.date} placeholder="29 Tháng 8, 2026" /></div>
-          <div className="vg-field vg-full"><span className="vg-field-label">Hình ảnh</span><div className="vg-upload-zone"><div className="vg-upload-bar"><label className="vg-upload-btn">⇪ Upload ảnh<input type="file" accept="image/png,image/jpeg,image/webp" onChange={uploadImage} /></label><div className="vg-upload-url"><input value={editing?.image || ""} onChange={(e) => setEditing(cur => cur ? { ...cur, image: e.target.value.trim() } : cur)} placeholder="Nhập URL ảnh..." /></div></div><div className="vg-upload-preview">{editing?.image ? <img src={editing.image} alt="Xem trước" /> : <div className="vg-upload-empty"><span className="vg-upload-empty-icon">⊕</span><strong>Kéo thả hoặc click để chọn ảnh</strong><small>JPG, PNG, WEBP - Tối đa 5MB</small></div>}</div></div></div>
+          <div className="vg-field vg-full"><span className="vg-field-label">Hình ảnh</span><div className="vg-upload-zone"><div className="vg-upload-source"><button type="button" className={editingImageSource === "upload" ? "active" : ""} onClick={() => { setEditingImageSource("upload"); setEditing(current => current ? { ...current, image: current.image?.startsWith("data:image/") ? current.image : "" } : current); }}>Upload ảnh</button><button type="button" className={editingImageSource === "url" ? "active" : ""} onClick={() => { setEditingImageSource("url"); setEditing(current => current ? { ...current, image: current.image?.startsWith("data:image/") ? "" : current.image || "" } : current); }}>URL ảnh</button></div><div className="vg-upload-bar">{editingImageSource === "upload" ? <label className="vg-upload-btn">⇪ Upload ảnh<input type="file" accept="image/png,image/jpeg,image/webp" onChange={uploadImage} /></label> : <div className="vg-upload-url"><input value={editing?.image || ""} onChange={(e) => { setEditingImageSource("url"); setEditing(cur => cur ? { ...cur, image: e.target.value.trim() } : cur); }} placeholder="Nhập URL ảnh..." /></div>}</div><div className="vg-upload-preview">{editing?.image ? <img src={editing.image} alt="Xem trước" /> : <div className="vg-upload-empty"><span className="vg-upload-empty-icon">⊕</span><strong>Kéo thả hoặc click để chọn ảnh</strong><small>JPG, PNG, WEBP - Tối đa 5MB</small></div>}</div></div></div>
         </div>
       </form>
     </AdminModal>
     <AdminModal open={heroEditing !== null} onClose={() => setHeroEditing(null)} title="Chỉnh sửa slide hero" subtitle="Thay ảnh và nội dung hiển thị trên trang chủ" size="lg" footer={<><button className="vg-btn" type="button" onClick={() => setHeroEditing(null)}>Hủy</button><button className="vg-btn vg-btn-primary" type="submit" form="hero-form">Lưu slide</button></>}>
-      {heroEditing !== null && <form id="hero-form" onSubmit={submitHero}><div className="vg-form-grid"><div className="vg-field"><span className="vg-field-label">Nhãn nhỏ</span><input className="vg-input" name="eyebrow" defaultValue={heroSlides[heroEditing].eyebrow} /></div><div className="vg-field"><span className="vg-field-label">Câu slogan</span><input className="vg-input" name="script" defaultValue={heroSlides[heroEditing].script} /></div><div className="vg-field vg-full"><span className="vg-field-label">Tiêu đề</span><textarea className="vg-textarea" name="title" defaultValue={heroSlides[heroEditing].title} required /></div><div className="vg-field vg-full"><span className="vg-field-label">Mô tả</span><textarea className="vg-textarea" name="description" defaultValue={heroSlides[heroEditing].description} required /></div><div className="vg-field"><span className="vg-field-label">URL ảnh nền</span><input className="vg-input" name="background" defaultValue={heroSlides[heroEditing].background} required /><label className="vg-upload-btn">⇪ Upload ảnh nền<input type="file" accept="image/png,image/jpeg,image/webp" onChange={event => uploadHeroImage(event, "background")} /></label></div><div className="vg-field"><span className="vg-field-label">URL ảnh sản phẩm</span><input className="vg-input" name="product" defaultValue={heroSlides[heroEditing].product} /><label className="vg-upload-btn">⇪ Upload ảnh sản phẩm<input type="file" accept="image/png,image/jpeg,image/webp" onChange={event => uploadHeroImage(event, "product")} /></label></div></div></form>}
+      {heroEditing !== null && <form id="hero-form" onSubmit={submitHero}><div className="vg-form-grid"><div className="vg-field"><span className="vg-field-label">Nhãn nhỏ</span><input className="vg-input" name="eyebrow" defaultValue={heroSlides[heroEditing].eyebrow} /></div><div className="vg-field"><span className="vg-field-label">Câu slogan</span><input className="vg-input" name="script" defaultValue={heroSlides[heroEditing].script} /></div><div className="vg-field vg-full"><span className="vg-field-label">Tiêu đề</span><textarea className="vg-textarea" name="title" defaultValue={heroSlides[heroEditing].title} required /></div><div className="vg-field vg-full"><span className="vg-field-label">Mô tả</span><textarea className="vg-textarea" name="description" defaultValue={heroSlides[heroEditing].description} required /></div><div className="vg-field"><span className="vg-field-label">Ảnh nền</span><div className="vg-upload-zone"><div className="vg-upload-source"><button type="button" className={heroImageSources.background === "upload" ? "active" : ""} onClick={() => { setHeroImageSources(current => ({ ...current, background: "upload" })); setHeroSlides(currentSlides => currentSlides.map((slide, index) => index === heroEditing ? { ...slide, background: slide.background.startsWith("data:image/") ? slide.background : "" } : slide)); }}>Upload ảnh nền</button><button type="button" className={heroImageSources.background === "url" ? "active" : ""} onClick={() => { setHeroImageSources(current => ({ ...current, background: "url" })); setHeroSlides(currentSlides => currentSlides.map((slide, index) => index === heroEditing ? { ...slide, background: slide.background.startsWith("data:image/") ? "" : slide.background } : slide)); }}>URL ảnh nền</button></div><div className="vg-upload-bar">{heroImageSources.background === "upload" ? <label className="vg-upload-btn">⇪ Upload ảnh nền<input type="file" accept="image/png,image/jpeg,image/webp" onChange={event => uploadHeroImage(event, "background")} /></label> : <div className="vg-upload-url"><input className="vg-input" name="background" value={heroSlides[heroEditing].background} onChange={(event) => { const next = event.target.value.trim(); setHeroSlides(currentSlides => currentSlides.map((slide, index) => index === heroEditing ? { ...slide, background: next } : slide)); }} placeholder="https://..." required /></div>}</div></div></div><div className="vg-field"><span className="vg-field-label">Ảnh sản phẩm</span><div className="vg-upload-zone"><div className="vg-upload-source"><button type="button" className={heroImageSources.product === "upload" ? "active" : ""} onClick={() => { setHeroImageSources(current => ({ ...current, product: "upload" })); setHeroSlides(currentSlides => currentSlides.map((slide, index) => index === heroEditing ? { ...slide, product: slide.product.startsWith("data:image/") ? slide.product : "" } : slide)); }}>Upload ảnh sản phẩm</button><button type="button" className={heroImageSources.product === "url" ? "active" : ""} onClick={() => { setHeroImageSources(current => ({ ...current, product: "url" })); setHeroSlides(currentSlides => currentSlides.map((slide, index) => index === heroEditing ? { ...slide, product: slide.product.startsWith("data:image/") ? "" : slide.product } : slide)); }}>URL ảnh sản phẩm</button></div><div className="vg-upload-bar">{heroImageSources.product === "upload" ? <label className="vg-upload-btn">⇪ Upload ảnh sản phẩm<input type="file" accept="image/png,image/jpeg,image/webp" onChange={event => uploadHeroImage(event, "product")} /></label> : <div className="vg-upload-url"><input className="vg-input" name="product" value={heroSlides[heroEditing].product} onChange={(event) => { const next = event.target.value.trim(); setHeroSlides(currentSlides => currentSlides.map((slide, index) => index === heroEditing ? { ...slide, product: next } : slide)); }} placeholder="https://..." /></div>}</div></div></div></div></form>}
     </AdminModal>
     <AdminModal open={memberOfferEditing} onClose={() => setMemberOfferEditing(false)} title="Chỉnh sửa ưu đãi hội viên" subtitle="Nội dung hiển thị trong khối ưu đãi trang chủ" size="md" footer={<><button className="vg-btn" type="button" onClick={() => setMemberOfferEditing(false)}>Hủy</button><button className="vg-btn vg-btn-primary" type="submit" form="member-offer-form">Lưu ưu đãi</button></>}>
       <form id="member-offer-form" onSubmit={submitMemberOffer}><div className="vg-form-grid"><div className="vg-field vg-full"><span className="vg-field-label">Tiêu đề</span><input className="vg-input" name="title" defaultValue={memberOffer.title} required /></div><div className="vg-field"><span className="vg-field-label">Nhãn ưu đãi</span><input className="vg-input" name="label" defaultValue={memberOffer.label} required /></div><div className="vg-field"><span className="vg-field-label">Mức giảm</span><input className="vg-input" name="discount" defaultValue={memberOffer.discount} required /></div><div className="vg-field vg-full"><span className="vg-field-label">Điều kiện</span><input className="vg-input" name="condition" defaultValue={memberOffer.condition} required /></div><div className="vg-field"><span className="vg-field-label">Tên nút</span><input className="vg-input" name="button" defaultValue={memberOffer.button} required /></div><div className="vg-field"><span className="vg-field-label">Đường dẫn khi bấm</span><input className="vg-input" name="href" defaultValue={memberOffer.href} placeholder="/user" required /></div></div></form>

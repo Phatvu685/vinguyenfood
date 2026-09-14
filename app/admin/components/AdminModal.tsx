@@ -11,11 +11,12 @@ interface AdminModalProps {
   title: string;
   subtitle?: string;
   size?: ModalSize;
+  className?: string;
   children: ReactNode;
   footer?: ReactNode;
 }
 
-export default function AdminModal({ open, onClose, title, subtitle, size = "md", children, footer }: AdminModalProps) {
+export default function AdminModal({ open, onClose, title, subtitle, size = "md", className, children, footer }: AdminModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
   const [portalHost, setPortalHost] = useState<HTMLDivElement | null>(null);
@@ -30,7 +31,9 @@ export default function AdminModal({ open, onClose, title, subtitle, size = "md"
     setPortalHost(host);
     setMounted(true);
     return () => {
-      host.remove();
+      window.setTimeout(() => {
+        if (host.parentNode) host.parentNode.removeChild(host);
+      }, 0);
     };
   }, []);
 
@@ -61,7 +64,7 @@ export default function AdminModal({ open, onClose, title, subtitle, size = "md"
       role="presentation"
       onMouseDown={(e) => { if (e.target === overlayRef.current) onClose(); }}
     >
-      <div className={`vg-modal vg-modal-${size}`} role="dialog" aria-modal="true" onMouseDown={(e) => e.stopPropagation()}>
+      <div className={`vg-modal vg-modal-${size} ${className || ""}`.trim()} role="dialog" aria-modal="true" onMouseDown={(e) => e.stopPropagation()}>
         <div className="vg-modal-header">
           <div className="vg-modal-header-info">
             <h2 className="vg-modal-title">{title}</h2>

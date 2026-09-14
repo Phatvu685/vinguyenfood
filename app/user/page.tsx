@@ -7,6 +7,7 @@ import SiteFooter from "../components/SiteFooter";
 import BrandLogo from "../components/BrandLogo";
 import SiteHeader from "../components/SiteHeader";
 import styles from "./page.module.css";
+import "./userpage.css";
 
 type User = { name: string; phone: string; avatar?: string; password?: string; role?: "user" | "admin" };
 type Tab = "overview" | "orders" | "address" | "vouchers";

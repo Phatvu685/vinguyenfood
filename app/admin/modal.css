@@ -601,6 +601,28 @@
     flex-direction: column;
     gap: 10px;
 }
+.vg-upload-source {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+.vg-upload-source button {
+    padding: 6px 10px;
+    border: 1px solid rgba(229, 198, 102, 0.32);
+    border-radius: 999px;
+    color: rgba(248, 246, 238, 0.72);
+    background: rgba(16, 60, 38, 0.35);
+    font: 600 11px Inter, sans-serif;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+.vg-upload-source button.active {
+    border-color: rgba(229, 198, 102, 0.75);
+    color: #17291d;
+    background: linear-gradient(180deg, #f0dc7a, #d8b45a);
+    box-shadow: 0 6px 16px rgba(229, 198, 102, 0.18);
+}
 .vg-upload-bar {
     display: flex;
     gap: 10px;
@@ -619,6 +641,10 @@
     cursor: pointer;
 }
 .vg-upload-btn:hover { background: rgba(229, 198, 102, 0.15); }
+.vg-upload-btn.is-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
 .vg-upload-btn input[type="file"] { display: none; }
 .vg-upload-url {
     display: flex;
@@ -637,6 +663,10 @@
     color: #f8f6ee;
     background: rgba(16, 60, 38, 0.5);
     font: 400 12px Inter, sans-serif;
+}
+.vg-upload-url input:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
 }
 .vg-upload-preview {
     display: flex;

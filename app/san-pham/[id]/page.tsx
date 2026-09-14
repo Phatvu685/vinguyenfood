@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { CART_STORAGE_KEY, CartItem, Product, getCatalogProducts, getPricePerKg } from "../data";
+import { CART_STORAGE_KEY, CartItem, Product, getCatalogProducts, getPricePerKg, products as fallbackProducts, saveCartItems } from "../data";
 import AuthModal, { USER_STORAGE_KEY } from "../../components/AuthModal";
 import SiteFooter from "../../components/SiteFooter";
 import BrandLogo from "../../components/BrandLogo";
@@ -41,9 +41,10 @@ function Policy({
 
 export default function ProductLandingPage() {
   const { id } = useParams<{ id: string }>();
-  const catalogProducts = getCatalogProducts();
-  const product =
-    catalogProducts.find((item) => item.id === Number(id)) ?? catalogProducts[0];
+  const [product, setProduct] = useState<Product>(() => {
+    const productId = Number(id);
+    return fallbackProducts.find((item) => item.id === productId) ?? fallbackProducts[0];
+  });
   const [weight, setWeight] = useState(product.weight);
   const [riceType, setRiceType] = useState(product.category);
   const [quantity, setQuantity] = useState(1);
@@ -56,16 +57,11 @@ export default function ProductLandingPage() {
   const [wished, setWished] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(product.image);
-  const [catalogVersion, setCatalogVersion] = useState(0);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
-  const images = [
-    product.image,
-    "/images/hinh gao2t25.jpg",
-    "/images/st.png",
-    "/images/rice-landscape.png",
-  ];
-  const price = getPricePerKg(product).toLocaleString("vi-VN");
+  const images = [product.image].filter(Boolean);
+  const price = getPricePerKg(product);
+  const hasRealOriginalPrice = Boolean(product.originalPrice && product.originalPrice > product.price);
   useEffect(() => {
     const loadCart = () => {
       const stored = window.localStorage.getItem(CART_STORAGE_KEY);
@@ -74,15 +70,32 @@ export default function ProductLandingPage() {
       setCartCount(items.reduce((total, item) => total + item.quantity, 0));
       setCartHydrated(true);
     };
-    const syncCatalog = () => setCatalogVersion((value) => value + 1);
+
+    const syncCatalog = () => {
+      const storedProducts = getCatalogProducts();
+      const productId = Number(id);
+      const nextProduct = storedProducts.find((item) => item.id === productId) ?? storedProducts[0] ?? fallbackProducts[0];
+      setProduct(nextProduct);
+    };
+
     loadCart();
+    syncCatalog();
     window.addEventListener("storage", loadCart);
+    window.addEventListener("storage", syncCatalog);
     window.addEventListener("gao-ngon-products-updated", syncCatalog);
+
     return () => {
       window.removeEventListener("storage", loadCart);
+      window.removeEventListener("storage", syncCatalog);
       window.removeEventListener("gao-ngon-products-updated", syncCatalog);
     };
-  }, [catalogVersion]);
+  }, [id]);
+
+  useEffect(() => {
+    setWeight(product.weight);
+    setRiceType(product.category);
+    setSelectedImage(product.image);
+  }, [product]);
   useEffect(() => {
     if (cartHydrated) window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems));
   }, [cartItems, cartHydrated]);
@@ -92,13 +105,27 @@ export default function ProductLandingPage() {
       setAuthOpen(true);
       return;
     }
-    setCartItems((items) => {
-      const existing = items.find((item) => item.product.id === product.id && item.weight === weight);
-      if (existing) return items.map((item) => item === existing ? { ...item, quantity: item.quantity + quantity } : item);
-      return [...items, { product, quantity, weight }];
-    });
-    setCartCount((count) => count + quantity);
-    setNotice(buyNow ? "Đã thêm sản phẩm · Sẵn sàng thanh toán" : "Đã thêm sản phẩm vào giỏ");
+
+    const nextItems = (() => {
+      const existing = cartItems.find((item) => item.product.id === product.id && item.weight === weight);
+      if (existing) {
+        return cartItems.map((item) => item.product.id === product.id && item.weight === weight
+          ? { ...item, quantity: item.quantity + quantity }
+          : item);
+      }
+      return [...cartItems, { product, quantity, weight }];
+    })();
+
+    setCartItems(nextItems);
+    setCartCount(nextItems.reduce((total, item) => total + item.quantity, 0));
+    saveCartItems(nextItems);
+
+    if (buyNow) {
+      window.location.href = "/thanh-toan";
+      return;
+    }
+
+    setNotice("Đã thêm sản phẩm vào giỏ");
   };
   const cartSubtotal = cartItems.reduce((total, item) => total + item.product.price * item.quantity, 0);
   const removeFromCart = (id: number) => {
@@ -173,9 +200,10 @@ export default function ProductLandingPage() {
             <span>Đã bán 1,280+</span>
           </div>
           <div className="vigen-price">
-            <strong>{price}đ</strong>
-            <del>{(product.price + 20000).toLocaleString("vi-VN")}đ</del>
-            <em>-10%</em>
+            <strong>{price.toLocaleString("vi-VN")}đ</strong>
+            {hasRealOriginalPrice && (
+              <del>{product.originalPrice?.toLocaleString("vi-VN")}đ</del>
+            )}
           </div>
           <p className="vigen-lead">
             {product.note}. Hạt gạo được tuyển chọn từ vùng nguyên liệu tin cậy,

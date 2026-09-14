@@ -212,9 +212,7 @@ export default function PermissionManager({
   const [detailRole, setDetailRole] = useState<AdminRole | null>(null);
   const [confirmDeleteRole, setConfirmDeleteRole] = useState<AdminRole | null>(null);
   const [roleColor, setRoleColor] = useState("#e5c666");
-  const [expandedModules, setExpandedModules] = useState<Record<PermissionModule, boolean>>(() =>
-    ALL_MODULES.reduce((result, module) => ({ ...result, [module]: false }), {} as Record<PermissionModule, boolean>)
-  );
+  const [permissionModalModule, setPermissionModalModule] = useState<PermissionModule | null>(null);
 
   const PRESET_COLORS = ["#e5c666", "#8bd3a5", "#6bb5ff", "#f09a82", "#d08bff", "#e67e22"];
 
@@ -946,20 +944,16 @@ export default function PermissionManager({
                     [modKey]: {
                       ...prev[modKey],
                       [action]: value,
-                      view: action === "view" ? value : value ? true : prev[modKey]?.view,
-                      edit: action === "view" && !value ? false : action === "edit" ? value : prev[modKey]?.edit,
-                      delete: action === "view" && !value ? false : action === "delete" ? value : prev[modKey]?.delete,
                     },
                   }));
                 };
 
                 return (
-                  <article className={`permission-card ${expandedModules[modKey] ? "expanded" : ""}`} key={modKey}>
+                  <article className="permission-card" key={modKey}>
                     <button
                       type="button"
                       className="permission-card-header"
-                      aria-expanded={expandedModules[modKey]}
-                      onClick={() => setExpandedModules((current) => ({ ...current, [modKey]: !current[modKey] }))}
+                      onClick={() => setPermissionModalModule(modKey)}
                     >
                       <span className="permission-card-icon">{moduleInfo.icon}</span>
                       <span className="permission-card-copy">
@@ -969,30 +963,70 @@ export default function PermissionManager({
                       <span className={`permission-count ${permissionCount > 0 ? "has-permissions" : ""}`}>{permissionCount}/3 quyền</span>
                       <span className="permission-card-chevron" aria-hidden="true">⌄</span>
                     </button>
-                    {expandedModules[modKey] && (
-                      <div className="permission-card-body">
-                        {([
-                          ["view", "Xem dữ liệu", "Cho phép truy cập và xem thông tin"],
-                          ["edit", "Thêm / sửa", "Cho phép tạo mới và cập nhật thông tin"],
-                          ["delete", "Xóa dữ liệu", "Cho phép xóa dữ liệu khỏi hệ thống"],
-                        ] as [PermissionAction, string, string][]).map(([action, label, description]) => (
-                          <label className={`permission-checkbox ${state[action] ? "checked" : ""}`} key={action}>
-                            <input type="checkbox" checked={state[action]} onChange={(event) => setPermission(action, event.target.checked)} />
-                            <span className="permission-checkbox-mark" aria-hidden="true">{state[action] ? "✓" : ""}</span>
-                            <span className="permission-checkbox-copy">
-                              <strong>{label}</strong>
-                              <small>{description}</small>
-                            </span>
-                          </label>
-                        ))}
-                      </div>
-                    )}
                   </article>
                 );
               })}
             </div>
           </section>
         </form>
+      </AdminModal>
+
+      {/* ── MODAL: CHỈNH SỬA QUYỀN THEO TỪNG MODULE ── */}
+      <AdminModal
+        open={!!permissionModalModule}
+        onClose={() => setPermissionModalModule(null)}
+        title={permissionModalModule ? `Phân quyền: ${MODULE_NAMES[permissionModalModule].label}` : "Phân quyền chức năng"}
+        subtitle="Chọn các hành động được phép thực hiện cho module này"
+        size="md"
+        className="permission-module-editor-modal"
+        footer={
+          <>
+            <button className="vg-btn" type="button" onClick={() => setPermissionModalModule(null)}>
+              Đóng
+            </button>
+            <button className="vg-btn vg-btn-primary" type="button" onClick={() => setPermissionModalModule(null)}>
+              Áp dụng
+            </button>
+          </>
+        }
+      >
+        {permissionModalModule && (
+          <div className="permission-module-modal">
+            {([
+              ["view", "Xem dữ liệu", "Cho phép truy cập và xem thông tin", "👁️"],
+              ["edit", "Thêm / sửa", "Cho phép tạo mới và cập nhật thông tin", "✏️"],
+              ["delete", "Xóa dữ liệu", "Cho phép xóa dữ liệu khỏi hệ thống", "🗑️"],
+            ] as [PermissionAction, string, string, string][]).map(([action, label, description, icon]) => {
+              const state = rolePermsMap[permissionModalModule] || { view: false, edit: false, delete: false };
+              const isChecked = state[action];
+
+              return (
+                <label className={`permission-checkbox ${isChecked ? "checked" : ""}`} key={action}>
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={(event) => {
+                      const nextValue = event.target.checked;
+                      setRolePermsMap((prev) => ({
+                        ...prev,
+                        [permissionModalModule]: {
+                          ...prev[permissionModalModule],
+                          [action]: nextValue,
+                        },
+                      }));
+                    }}
+                  />
+                  <span className="permission-checkbox-mark" aria-hidden="true">{isChecked ? "✓" : ""}</span>
+                  <span className="permission-option-icon" aria-hidden="true">{icon}</span>
+                  <span className="permission-checkbox-copy">
+                    <strong>{label}</strong>
+                    <small>{description}</small>
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        )}
       </AdminModal>
 
       {/* ── CONFIRM MODALS ── */}

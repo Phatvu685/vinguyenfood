@@ -46,7 +46,7 @@
     width: 100%; /* Độ rộng 100% khung thẻ */
     aspect-ratio: 3/4; /* Tỷ lệ khung ảnh 3:4 chuẩn nhiếp ảnh sản phẩm */
     overflow: hidden; /* Cắt góc ảnh */
-    background: linear-gradient(to bottom, rgba(10, 30, 16, 0) 0%, rgba(10, 30, 16, 0.18) 100%), url("/images/product-field.jpg") center 30% / cover; /* Ảnh nền cánh đồng lúa nhạt */
+    background: transparent; /* Bỏ nền phong cảnh để chỉ còn hình sản phẩm */
     border: 0; /* Bỏ viền button mặc định */
     cursor: pointer; /* Đổi con trỏ thành hình bàn tay */
     display: block; /* Hiển thị dạng khối */
@@ -55,13 +55,13 @@
 .catalog-image img {
     width: 100%; /* Rộng 100% */
     height: 100%; /* Cao 100% */
-    object-fit: contain; /* Co giãn vừa vặn túi gạo không bị méo */
+    object-fit: cover; /* Lấp đầy khung ảnh để hình sản phẩm lớn hơn */
     filter: drop-shadow(0 14px 13px rgba(0, 0, 0, .3)); /* Đổ bóng chân túi gạo */
-    transition: transform .3s ease; /* Phóng to nhẹ khi rê chuột */
+    transition: none; /* Không zoom khi rê chuột */
 }
 
 .catalog-image:hover img {
-    transform: scale(1.04); /* Phóng to ảnh túi gạo lên 1.04 lần */
+    transform: none; /* Giữ nguyên kích thước ảnh khi hover */
 }
 
 .catalog-image .view-details {

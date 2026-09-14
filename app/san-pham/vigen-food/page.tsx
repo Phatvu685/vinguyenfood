@@ -110,7 +110,13 @@ export default function VigenFoodPage() {
       : [...items, { product, quantity, weight }];
     window.localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(nextItems));
     setCartCount(nextItems.reduce((total, item) => total + item.quantity, 0));
-    setNotice(buyNow ? "Đã thêm sản phẩm · Sẵn sàng thanh toán" : "Đã thêm sản phẩm vào giỏ hàng");
+
+    if (buyNow) {
+      window.location.href = "/thanh-toan";
+      return;
+    }
+
+    setNotice("Đã thêm sản phẩm vào giỏ hàng");
   }
 
   return (

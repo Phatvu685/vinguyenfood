@@ -83,7 +83,7 @@ export default function ProductCard({
           alt={product.name}
           fill
           sizes="(max-width: 768px) 100vw, 25vw"
-          style={{ objectFit: 'contain' }}
+          style={{ objectFit: 'cover' }}
         />
         <span className="view-details">Xem chi tiết <b>→</b></span>
       </button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 const Target = () => <span>👁️</span>;
 const Pencil = () => <span>✏️</span>;
 const Trash2 = () => <span>🗑️</span>;
@@ -64,6 +64,17 @@ export default function InventoryManager({ products, records, transactions, save
   const [productQuery, setProductQuery] = useState("");
   const [productMenuOpen, setProductMenuOpen] = useState(false);
   const [productListCompact, setProductListCompact] = useState(false);
+  const [productImagePreview, setProductImagePreview] = useState<string>("");
+  const [productImageUrl, setProductImageUrl] = useState("");
+  const [productImageSource, setProductImageSource] = useState<"upload" | "url">("upload");
+
+  useEffect(() => {
+    const existingImage = productEditing?.image || "";
+    const isDataUrl = existingImage.startsWith("data:image/");
+    setProductImagePreview(isDataUrl ? existingImage : "");
+    setProductImageUrl(isDataUrl ? "" : existingImage);
+    setProductImageSource(isDataUrl || !existingImage ? "upload" : "url");
+  }, [productEditing]);
 
   const getProduct = (productId: number) => products.find(product => product.id === productId);
   const getEffectiveStock = (product: Product) => Number(product.stock ?? Math.max(20, 320 - product.id * 15));
@@ -107,6 +118,18 @@ export default function InventoryManager({ products, records, transactions, save
     saveProducts(products.map(product => product.id === productId ? { ...product, stock: Math.max(0, getEffectiveStock(product) + amount) } : product));
   }
 
+  function uploadProductImage(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file || !file.type.startsWith("image/")) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setProductImageSource("upload");
+      setProductImagePreview(String(reader.result));
+      setProductImageUrl("");
+    };
+    reader.readAsDataURL(file);
+  }
+
   function recordImpact(record: InventoryRecord) { return record.type === "import" ? record.quantity : -record.quantity; }
 
   function submitProduct(event: FormEvent<HTMLFormElement>) {
@@ -118,6 +141,8 @@ export default function InventoryManager({ products, records, transactions, save
     const pricePerUnit = Number(data.get("productPrice") || 0);
     const minStockValue = String(data.get("productMinStock") || "").trim();
     const minStock = Number(minStockValue);
+    const weight = String(data.get("productWeight") || productEditing?.weight || "5kg");
+    const image = productImagePreview || productImageUrl || productEditing?.image || "/images/st25.png.jpg";
     if (!name || !category || pricePerUnit <= 0 || !minStockValue || !Number.isFinite(minStock) || minStock < 0) {
       showNotice("Vui lòng nhập tên, danh mục, giá bán và tồn tối thiểu hợp lệ.", "error");
       return;
@@ -132,19 +157,26 @@ export default function InventoryManager({ products, records, transactions, save
       name,
       category,
       price: pricePerUnit * 1000,
-      image: "/images/st25.png.jpg",
+      image,
       note: String(data.get("productNote") || "").trim(),
-      reviews: 0,
-      rating: 5,
-      weight: "1kg",
+      reviews: productEditing?.reviews ?? 0,
+      rating: productEditing?.rating ?? 5,
+      weight,
       unit,
-      stock: 0,
+      stock: productEditing?.stock ?? 0,
       minStock,
-      sold: 0,
+      sold: Number(data.get("productSold") || (productEditing?.sold ?? 0)),
+      badge: String(data.get("productBadge") || productEditing?.badge || ""),
+      origin: String(data.get("productOrigin") || productEditing?.origin || ""),
+      storage: String(data.get("productStorage") || productEditing?.storage || ""),
+      standard: String(data.get("productStandard") || productEditing?.standard || ""),
+      tags: String(data.get("productTags") || productEditing?.tags || ""),
     };
     saveProducts(productEditing ? products.map(item => item.id === productEditing.id ? product : item) : [...products, product]);
     setAddingProduct(false);
     setProductEditing(null);
+    setProductImagePreview("");
+    setProductImageUrl("");
     showNotice(productEditing ? "Đã cập nhật sản phẩm kho." : "Đã thêm sản phẩm mới vào kho.", "success");
   }
 
@@ -289,13 +321,21 @@ export default function InventoryManager({ products, records, transactions, save
     <section className={`admin-panel admin-inventory-products ${productListCompact ? "inventory-products-compact" : ""}`}><div className="admin-table-head"><div><strong>Danh sách sản phẩm & tồn kho</strong><span>{inventoryProducts.length} sản phẩm</span></div><div className="inventory-product-controls"><div className="inventory-product-filters"><div className="admin-search"><span>⌕</span><input value={productFilter} onChange={event => setProductFilter(event.target.value)} placeholder="Lọc sản phẩm..." /></div><select value={categoryFilter} onChange={event => setCategoryFilter(event.target.value)} aria-label="Lọc danh mục"><option value="all">Tất cả danh mục</option>{inventoryCategories.map(category => <option key={category}>{category}</option>)}</select></div><button className="inventory-collapse-button" type="button" onClick={() => setProductListCompact(value => !value)}>{productListCompact ? "▣ Mở rộng" : "− Thu gọn"}</button></div></div><div className="inventory-product-grid"><div className="inventory-product-list-head"><span>SẢN PHẨM</span><span>ĐƠN VỊ</span><span>TỒN KHO</span><span>TỒN TỐI THIỂU</span><span>GIÁ NHẬP GẦN NHẤT</span><span>GIÁ BÁN</span><span>GHI CHÚ</span><span>THAO TÁC</span></div>{inventoryProducts.map(product => { const latestImport = records.find(record => record.productId === product.id && record.type === "import" && record.purchasePrice); const minStock = product.minStock ?? 20; const stock = getEffectiveStock(product); return <div className="inventory-product-card" key={product.id}><div><strong>{product.name}</strong><small>{product.category}</small></div><span>{product.unit || "kg"}</span><b className={stock <= minStock ? "finance-negative" : "finance-profit"}>{stock.toLocaleString("vi-VN")} {product.unit || "kg"}</b><span>{minStock.toLocaleString("vi-VN")} {product.unit || "kg"}</span><span>{latestImport ? `${money(latestImport.purchasePrice)}/kg` : "—"}</span><strong>{money(Math.round(product.price / (Number.parseFloat(product.weight) || 1)))}/kg</strong><span>{product.note || "—"}</span><div className="inventory-product-actions"><button className="inventory-product-edit" type="button" title={`Sửa ${product.name}`} aria-label={`Sửa ${product.name}`} onClick={() => editProductStock(product)}><Pencil /></button><button className="inventory-product-delete" type="button" title={`Xóa ${product.name}`} aria-label={`Xóa ${product.name}`} onClick={() => setProductToDelete(product)}><Trash2 /></button></div></div>; })}</div>{!inventoryProducts.length && <div className="admin-empty">Không tìm thấy sản phẩm phù hợp.</div>}</section>
     <section className="admin-panel admin-inventory-table"><div className="admin-table-head"><div><strong>Sổ nhập xuất ({filtered.length})</strong><span>Phiếu kho và thông tin đối soát</span></div></div><div className="admin-product-filters inventory-filters"><div className="admin-search">⌕<input value={query} onChange={event => setQuery(event.target.value)} placeholder="Tìm mã phiếu, sản phẩm, đối tác..." /></div><select value={typeFilter} onChange={event => setTypeFilter(event.target.value as typeof typeFilter)} aria-label="Lọc loại phiếu"><option value="all">Nhập và xuất</option><option value="import">Chỉ phiếu nhập</option><option value="export">Chỉ phiếu xuất</option></select><select value={recordCategoryFilter} onChange={event => setRecordCategoryFilter(event.target.value)} aria-label="Lọc danh mục"><option value="all">Tất cả danh mục</option>{inventoryCategories.map(category => <option key={category}>{category}</option>)}</select><select value={recordWarehouseFilter} onChange={event => setRecordWarehouseFilter(event.target.value)} aria-label="Lọc kho"><option value="all">Tất cả kho</option>{Array.from(new Set(records.map(record => record.warehouse).filter(Boolean))).map(warehouse => <option key={warehouse}>{warehouse}</option>)}</select><select value={recordStatusFilter} onChange={event => setRecordStatusFilter(event.target.value as typeof recordStatusFilter)} aria-label="Lọc trạng thái"><option value="all">Tất cả trạng thái</option><option value="completed">Đã ghi nhận</option><option value="pending">Đang chờ</option></select></div>{filtered.length ? <div className="inventory-table"><div className="inventory-table-head"><span>MÃ PHIẾU</span><span>TÊN SẢN PHẨM</span><span>LOẠI PHIẾU</span><span>SỐ LƯỢNG</span><span>GIÁ NHẬP</span><span>GIÁ XUẤT</span><span>NGÀY NHẬP / XUẤT</span><span>THAO TÁC</span></div>{filtered.map(record => { const product = getProduct(record.productId); return <div className="inventory-row" key={record.id}><div><strong>{record.id}</strong><small>{record.partner || "Không có đối tác"}</small></div><div><strong>{product?.name || "Sản phẩm đã xóa"}</strong><small>{product?.category || "Không có danh mục"}</small></div><em className={record.type === "import" ? "finance-income" : "finance-expense"}>{record.type === "import" ? "Nhập hàng" : "Xuất hàng"}<small>{record.status === "completed" ? "Đã ghi nhận" : "Đang chờ"}</small></em><b>{record.quantity.toLocaleString("vi-VN")}</b><span>{money(record.purchasePrice)}<small>{record.batch || "Không có mã lô"}</small></span><span>{money(record.salePrice)}</span><span>{new Date(`${record.date}T12:00:00`).toLocaleDateString("vi-VN")}<small>{record.warehouse}</small></span><div className="admin-row-actions"><button title="Xem chi tiết" aria-label="Xem chi tiết" onClick={() => setDetail(record)}><Target /></button><button title="Sửa phiếu kho" aria-label="Sửa phiếu kho" onClick={() => { setProductQuery(product?.name || ""); setEditing(record); }}><Pencil /></button><button className="danger" title="Xóa phiếu kho" aria-label="Xóa phiếu kho" onClick={() => setConfirmDelete(record)}><Trash2 /></button></div></div>; })}</div> : <div className="admin-empty">Chưa có phiếu nhập xuất phù hợp.</div>}</section>
 
-    <AdminModal open={addingProduct || !!productEditing} onClose={() => { setAddingProduct(false); setProductEditing(null); }} title={productEditing ? "Chỉnh sửa sản phẩm kho" : "Thêm sản phẩm vào kho"} subtitle="Cập nhật thông tin sản phẩm và tồn tối thiểu" size="md" footer={<><button className="vg-btn" type="button" onClick={() => { setAddingProduct(false); setProductEditing(null); }}>Hủy</button><button className="vg-btn vg-btn-primary" type="submit" form="inventory-product-form">Lưu sản phẩm</button></>}>
+    <AdminModal open={addingProduct || !!productEditing} onClose={() => { setAddingProduct(false); setProductEditing(null); setProductImagePreview(""); setProductImageUrl(""); }} title={productEditing ? "Chỉnh sửa sản phẩm kho" : "Thêm sản phẩm vào kho"} subtitle="Cập nhật thông tin sản phẩm và tồn tối thiểu" size="md" footer={<><button className="vg-btn" type="button" onClick={() => { setAddingProduct(false); setProductEditing(null); setProductImagePreview(""); setProductImageUrl(""); }}>Hủy</button><button className="vg-btn vg-btn-primary" type="submit" form="inventory-product-form">Lưu sản phẩm</button></>}>
       <form id="inventory-product-form" onSubmit={submitProduct}><div className="vg-form-grid">
         <div className="vg-field vg-full"><span className="vg-field-label">Tên sản phẩm <span className="vg-required">*</span></span><input className="vg-input" name="productName" defaultValue={productEditing?.name} placeholder="Ví dụ: Gạo ST25 Thượng Hạng" required /></div>
         <div className="vg-field"><span className="vg-field-label">Danh mục <span className="vg-required">*</span></span><select className="vg-select" name="productCategory" defaultValue={productEditing?.category || inventoryCategories[0] || "Gạo thơm"} required>{inventoryCategories.map(category => <option key={category}>{category}</option>)}<option value="Gạo trắng">Gạo trắng</option><option value="Gạo thơm">Gạo thơm</option><option value="Gạo nếp">Gạo nếp</option><option value="Gạo lứt">Gạo lứt</option><option value="Gạo dinh dưỡng">Gạo dinh dưỡng</option><option value="Combo">Combo</option></select></div>
         <div className="vg-field"><span className="vg-field-label">Đơn vị tính <span className="vg-required">*</span></span><select className="vg-select" name="productUnit" defaultValue={productEditing?.unit || "kg"}><option value="kg">kg</option><option value="bao">bao</option><option value="thùng">thùng</option><option value="chai">chai</option></select></div>
         <div className="vg-field"><span className="vg-field-label">Giá bán / đơn vị (nghìn VND) <span className="vg-required">*</span></span><div className="vg-money-input"><input name="productPrice" type="number" min="1" step="1" defaultValue={productEditing ? productEditing.price / 1000 : ""} placeholder="32" required /><span>.000 đ / đơn vị</span></div></div>
+        <div className="vg-field"><span className="vg-field-label">Khối lượng <span className="vg-required">*</span></span><select className="vg-select" name="productWeight" defaultValue={productEditing?.weight || "5kg"}><option value="2kg">2kg</option><option value="5kg">5kg</option><option value="10kg">10kg</option><option value="20kg">20kg</option><option value="25kg">25kg</option></select></div>
         <div className="vg-field"><span className="vg-field-label">Tồn tối thiểu <span className="vg-required">*</span></span><input className="vg-input" name="productMinStock" type="number" min="0" defaultValue={productEditing?.minStock ?? ""} placeholder="Ví dụ: 20" required /></div>
+        <div className="vg-field"><span className="vg-field-label">Xuất xứ</span><input className="vg-input" name="productOrigin" defaultValue={productEditing?.origin || ""} /></div>
+        <div className="vg-field"><span className="vg-field-label">Bảo quản</span><input className="vg-input" name="productStorage" defaultValue={productEditing?.storage || ""} /></div>
+        <div className="vg-field"><span className="vg-field-label">Tiêu chuẩn</span><input className="vg-input" name="productStandard" defaultValue={productEditing?.standard || ""} /></div>
+        <div className="vg-field"><span className="vg-field-label">Đã bán</span><input className="vg-input" name="productSold" type="number" min="0" defaultValue={productEditing?.sold ?? 0} /></div>
+        <div className="vg-field"><span className="vg-field-label">Badge</span><input className="vg-input" name="productBadge" defaultValue={productEditing?.badge || ""} /></div>
+        <div className="vg-field vg-full"><span className="vg-field-label">Đặc điểm / cam kết</span><input className="vg-input" name="productTags" defaultValue={productEditing?.tags || ""} placeholder="Chính hãng, Hữu cơ, Nguồn gốc rõ ràng" /></div>
+        <div className="vg-field vg-full"><span className="vg-field-label">Ảnh sản phẩm</span><div className="vg-upload-zone"><div className="vg-upload-source"><button type="button" className={productImageSource === "upload" ? "active" : ""} onClick={() => { setProductImageSource("upload"); setProductImageUrl(""); setProductImagePreview((current) => current && current.startsWith("data:image/") ? current : ""); }}>Upload ảnh</button><button type="button" className={productImageSource === "url" ? "active" : ""} onClick={() => { setProductImageSource("url"); setProductImagePreview(""); setProductImageUrl(""); }}>URL ảnh</button></div><div className="vg-upload-bar">{productImageSource === "upload" ? <label className="vg-upload-btn">⇪ Upload ảnh<input type="file" accept="image/png,image/jpeg,image/webp" onChange={uploadProductImage} /></label> : <div className="vg-upload-url"><input value={productImageUrl} onChange={(e) => { const next = e.target.value.trim(); setProductImageSource("url"); setProductImageUrl(next); if (next) setProductImagePreview(next); }} placeholder="Hoặc nhập URL ảnh..." /></div>}</div><div className="vg-upload-preview">{productImagePreview || productEditing?.image ? <img src={productImagePreview || productEditing?.image} alt="Xem trước" /> : <div className="vg-upload-empty"><span className="vg-upload-empty-icon">⊕</span><strong>Kéo thả hoặc click để chọn ảnh</strong><small>JPG, PNG, WEBP - Tối đa 5MB</small></div>}</div></div></div>
         <div className="vg-field vg-full"><span className="vg-field-label">Mô tả</span><textarea className="vg-textarea" name="productNote" defaultValue={productEditing?.note} placeholder="Mô tả ngắn về sản phẩm..." /></div>
       </div></form>
     </AdminModal>

@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CART_STORAGE_KEY, CartItem, Product, getCatalogProducts, getCatalogCategories, getPricePerKg, saveCartItems } from "./data";
+import { useRouter } from "next/navigation";
+import { CART_STORAGE_KEY, CartItem, Product, products as defaultProducts, getCatalogProducts, getCatalogCategories, getPricePerKg, saveCartItems } from "./data";
 import AuthModal, { USER_STORAGE_KEY } from "../components/AuthModal";
 import SiteFooter from "../components/SiteFooter";
 import BrandLogo from "../components/BrandLogo";
 import SiteHeader from "../components/SiteHeader";
 import styles from "./page.module.css";
+import "./sanphampage.css";
 import ProductCard from "../components/ProductCard";
 
 const categories = ["Tất cả", "Gạo thơm", "Gạo trắng", "Gạo nếp", "Gạo lứt", "Gạo dinh dưỡng", "Combo"];
@@ -29,159 +31,6 @@ function Stars({ rating }: { rating: number }) {
 }
 
 
-
-function ProductDetail({
-  product,
-  onClose,
-  onQuickAdd,
-}: {
-  product: Product;
-  onClose: () => void;
-  onQuickAdd: () => void;
-}) {
-  const [quantity, setQuantity] = useState(1);
-  const gallery = [
-    product.image,
-    "/images/hinh gao2t25.jpg",
-    "/images/st.png",
-    "/images/rice-landscape.png",
-  ];
-  const [selectedImage, setSelectedImage] = useState(product.image);
-  const [weight, setWeight] = useState(product.weight);
-  const [riceType, setRiceType] = useState("Gạo trắng");
-  return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <section
-        className="product-detail"
-        role="dialog"
-        aria-modal="true"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <button className="modal-close" onClick={onClose} aria-label="Đóng">
-          ×
-        </button>
-        <div className="detail-gallery">
-          <div className="detail-image">
-            <img src={selectedImage} alt={product.name} />
-          </div>
-          <div className="detail-thumbnails">
-            {gallery.map((image, index) => (
-              <button
-                className={selectedImage === image ? "is-selected" : ""}
-                key={image}
-                onClick={() => setSelectedImage(image)}
-                aria-label={`Xem ảnh ${index + 1}`}
-              >
-                <img src={image} alt="" />
-              </button>
-            ))}
-          </div>
-          <div className="gallery-caption">
-            <span>GAO NGON</span>
-            <span>Thu hoạch đúng vụ · Đóng gói trong ngày</span>
-          </div>
-        </div>
-        <div className="detail-copy">
-          <span className="section-kicker">
-            {product.category.toUpperCase()}
-          </span>
-          <h2>{product.name}</h2>
-          <div className="detail-rating">
-            <Stars rating={product.rating} />{" "}
-            <span>{product.reviews} đánh giá</span>
-          </div>
-          <strong className="detail-price">
-            {formatPrice(getPricePerKg(product))} <small>/ kg</small>
-          </strong>
-          <p className="detail-description">
-            {product.note}. Hạt gạo được tuyển chọn từ vùng nguyên liệu tin cậy,
-            xay xát và đóng gói cẩn thận để giữ trọn độ tươi ngon.
-          </p>
-          <div className="detail-badges">
-            <span>✓ 100% hữu cơ</span>
-            <span>✓ Chính hãng</span>
-          </div>
-          <div className="detail-meta">
-            <span>
-              <b>Xuất xứ</b>Hậu Giang, Việt Nam
-            </span>
-            <span>
-              <b>Trọng lượng</b>5kg / túi
-            </span>
-            <span>
-              <b>Bảo quản</b>12 tháng (chân không)
-            </span>
-            <span>
-              <b>Tiêu chuẩn</b>VietGAP · VSATTP
-            </span>
-          </div>
-          <div className="detail-promo">
-            <strong>🎁 ƯU ĐÃI HÔM NAY</strong>
-            <span>Miễn phí vận chuyển cho đơn hàng từ 500.000đ</span>
-          </div>
-          <div className="detail-option">
-            <b>Khối lượng</b>
-            {["2kg", "5kg", "10kg", "20kg"].map((item) => (
-              <button key={item} className={weight === item ? "option-selected" : ""} onClick={() => setWeight(item)}>{item}</button>
-            ))}
-          </div>
-          <div className="detail-option detail-rice-type">
-            <b>Loại gạo</b>
-            {["Gạo trắng", "Nguyên cám", "Gạo lứt"].map((item) => (
-              <button key={item} className={riceType === item ? "option-selected" : ""} onClick={() => setRiceType(item)}>{item}</button>
-            ))}
-          </div>
-          <div className="detail-buy">
-            <b className="detail-quantity-label">Số lượng</b>
-            <div className="quantity">
-              <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>
-                −
-              </button>
-              <span>{quantity}</span>
-              <button onClick={() => setQuantity(quantity + 1)}>+</button>
-            </div>
-            <button className="detail-add" onClick={onQuickAdd}>
-              🛒 Thêm vào giỏ
-            </button>
-            <button className="buy-now" onClick={onQuickAdd}>
-              Mua ngay
-            </button>
-            <span className="detail-stock">☑ Còn 248</span>
-          </div>
-          <div className="detail-trust">
-            <span>
-              🚚 <b>Giao hàng nhanh</b>
-            </span>
-            <span>
-              🛡 <b>Chính hãng</b>
-            </span>
-            <span>
-              ↩ <b>Đổi trả</b>
-            </span>
-            <span>🛡 <b>Chứng nhận VSATTP</b></span>
-            <span>▣ <b>Thanh toán an toàn</b></span>
-          </div>
-          <div className="detail-accordions">
-            <details>
-              <summary>Thông tin sản phẩm</summary>
-              <p>
-                Gạo mới, nguyên chất, không chất bảo quản. Phù hợp cho cơm gia
-                đình hàng ngày.
-              </p>
-            </details>
-            <details>
-              <summary>Cách nấu & bảo quản</summary>
-              <p>
-                Vo nhẹ 1 lần, tỷ lệ nước 1:1.1. Đậy kín sau khi mở và dùng trong
-                30 ngày.
-              </p>
-            </details>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-}
 
 function QuickAdd({
   product,
@@ -266,8 +115,8 @@ export default function ProductsPage() {
   const [weight, setWeight] = useState("all");
   const [visibleCount, setVisibleCount] = useState(8);
   const [wishes, setWishes] = useState<number[]>([]);
-  const [detail, setDetail] = useState<Product | null>(null);
   const [quickProduct, setQuickProduct] = useState<Product | null>(null);
+  const router = useRouter();
   const [cartCount, setCartCount] = useState(0);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [cartHydrated, setCartHydrated] = useState(false);
@@ -277,6 +126,7 @@ export default function ProductsPage() {
   const [mobileFilters, setMobileFilters] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [catalogVersion, setCatalogVersion] = useState(0);
+  const [catalogProducts, setCatalogProducts] = useState<Product[]>(defaultProducts);
   useEffect(() => {
     const timer = window.setTimeout(() => setDebouncedQuery(query), 1000);
     return () => window.clearTimeout(timer);
@@ -296,12 +146,20 @@ export default function ProductsPage() {
       setCartCount(items.reduce((total, item) => total + item.quantity, 0));
       setCartHydrated(true);
     };
-    const syncCatalog = () => setCatalogVersion((value) => value + 1);
+    const loadCatalog = () => {
+      const savedProducts = getCatalogProducts();
+      setCatalogProducts(savedProducts.length ? savedProducts : defaultProducts);
+      setCatalogVersion((value) => value + 1);
+    };
+    const syncCatalog = () => loadCatalog();
     loadCart();
+    loadCatalog();
     window.addEventListener("storage", loadCart);
+    window.addEventListener("storage", syncCatalog);
     window.addEventListener("gao-ngon-products-updated", syncCatalog);
     return () => {
       window.removeEventListener("storage", loadCart);
+      window.removeEventListener("storage", syncCatalog);
       window.removeEventListener("gao-ngon-products-updated", syncCatalog);
     };
   }, []);
@@ -310,7 +168,7 @@ export default function ProductsPage() {
   }, [cartItems, cartHydrated]);
   const filteredProducts = useMemo(
     () =>
-      getCatalogProducts()
+      catalogProducts
         .filter((product) => {
           const text = `${product.name} ${product.category}`.toLowerCase();
           const categoryMatch =
@@ -343,7 +201,7 @@ export default function ProductsPage() {
                     ? second.id - first.id
                     : first.id - second.id,
         ),
-    [category, debouncedQuery, price, sort, weight, catalogVersion],
+    [catalogProducts, category, debouncedQuery, price, sort, weight, catalogVersion],
   );
   const shownProducts = filteredProducts.slice(0, visibleCount);
   const toggleWish = (id: number) =>
@@ -369,7 +227,6 @@ export default function ProductsPage() {
       return nextItems;
     });
     setQuickProduct(null);
-    setDetail(null);
   };
   const removeFromCart = (id: number) => {
     setCartItems((items) => {
@@ -562,7 +419,7 @@ export default function ProductsPage() {
                     wished={wishes.includes(product.id)}
                     onWish={() => toggleWish(product.id)}
                     onQuickAdd={() => setQuickProduct(product)}
-                    onDetails={() => setDetail(product)}
+                    onDetails={() => router.push(`/san-pham/${product.id}`)}
                     onAddToCart={(p, qty) => addToCart(p, qty, p.weight)}
                   />
                 ))}
@@ -616,13 +473,6 @@ export default function ProductsPage() {
           className="sheet-dismiss"
           onClick={() => setMobileFilters(false)}
           aria-label="Đóng bộ lọc"
-        />
-      )}
-      {detail && (
-        <ProductDetail
-          product={detail}
-          onClose={() => setDetail(null)}
-          onQuickAdd={() => setQuickProduct(detail)}
         />
       )}
       {quickProduct && (
