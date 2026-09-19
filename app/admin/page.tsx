@@ -14,6 +14,7 @@ import InventoryManager, { InventoryRecord } from "./InventoryManager";
 import PromotionManager, { Promotion } from "./PromotionManager";
 import PermissionManager from "./PermissionManager";
 import SettingsManager from "./SettingsManager";
+import ReviewsManager from "./ReviewsManager";
 import AdminModal from "./components/AdminModal";
 import ConfirmModal from "./components/ConfirmModal";
 import styles from "./page.module.css";
@@ -30,7 +31,7 @@ import {
   NOTIFICATIONS_UPDATED_EVENT,
 } from "../lib/notifications";
 
-type AdminTab = "overview" | "products" | "categories" | "orders" | "customers" | "vouchers" | "finance" | "inventory" | "promotions" | "content" | "permissions" | "settings";
+type AdminTab = "overview" | "products" | "categories" | "orders" | "customers" | "reviews" | "vouchers" | "finance" | "inventory" | "promotions" | "content" | "permissions" | "settings";
 type NoticeTone = "success" | "info" | "warning" | "error";
 type Order = { id: string; createdAt: string; status: string; customer: string; phone: string; email?: string; address?: string; province?: string; district?: string; ward?: string; note?: string; total: number; paidAmount?: number; paymentStatus?: "paid" | "unpaid"; subtotal?: number; items: number; orderType?: "retail" | "combo"; products?: { productId: number; quantity: number; purchasePrice?: number; isGift?: boolean }[]; voucherCode?: string; promotionCode?: string; promotionName?: string; giftProductId?: number; discount?: number; shipping?: number; paymentMethod?: string };
 type OrderProduct = { product: Product; quantity: number };
@@ -243,7 +244,30 @@ export default function AdminPage() {
         <a href="/" className="admin-brand"><BrandLogo compact /></a>
         <span className="admin-label">QUẢN TRỊ CỬA HÀNG</span>
         <nav className="admin-nav">
-          {(["overview", "products", "categories", "orders", "customers", "vouchers", "finance", "inventory", "promotions", "content", "permissions", "settings"] as AdminTab[]).map((item) => <button key={item} className={tab === item ? "active" : ""} onClick={() => setTab(item)}>{{ overview: "Tổng quan", products: "Sản phẩm", categories: "Danh mục", orders: "Đơn hàng", customers: "Khách hàng", vouchers: "Mã giảm giá", finance: "Dòng tiền", inventory: "Quản lý kho", promotions: "Combo & ưu đãi", content: "Nội dung", permissions: "Phân quyền", settings: "Cài đặt" }[item]}</button>)}
+          {([
+            { key: "overview", label: "Tổng quan", icon: "📊" },
+            { key: "products", label: "Sản phẩm", icon: "📦" },
+            { key: "categories", label: "Danh mục", icon: "🏷️" },
+            { key: "orders", label: "Đơn hàng", icon: "🛒" },
+            { key: "customers", label: "Khách hàng", icon: "👥" },
+            { key: "reviews", label: "Quản lý đánh giá", icon: "⭐" },
+            { key: "vouchers", label: "Mã giảm giá", icon: "🎟️" },
+            { key: "finance", label: "Dòng tiền", icon: "💰" },
+            { key: "inventory", label: "Quản lý kho", icon: "🏭" },
+            { key: "promotions", label: "Combo & ưu đãi", icon: "🎁" },
+            { key: "content", label: "Nội dung", icon: "📰" },
+            { key: "permissions", label: "Phân quyền", icon: "🔐" },
+            { key: "settings", label: "Cài đặt", icon: "⚙️" },
+          ] as { key: AdminTab; label: string; icon: string }[]).map(({ key, label, icon }) => (
+            <button
+              key={key}
+              data-icon={icon}
+              className={tab === key ? "active" : ""}
+              onClick={() => setTab(key)}
+            >
+              {label}
+            </button>
+          ))}
         </nav>
         <div className="admin-sidebar-actions"><button className="admin-back" onClick={() => { localStorage.removeItem(USER_STORAGE_KEY); setAuthorized(false); }}>Đăng xuất</button><a className="admin-back" href="/">← Về website</a></div>
       </aside>
@@ -259,6 +283,7 @@ export default function AdminPage() {
                 categories: "Danh mục",
                 orders: "Đơn hàng",
                 customers: "Khách hàng",
+                reviews: "Quản lý đánh giá",
                 vouchers: "Mã giảm giá",
                 finance: "Dòng tiền",
                 inventory: "Quản lý kho",
@@ -369,6 +394,7 @@ export default function AdminPage() {
         {tab === "categories" && <CategoryManager categories={categories} products={products} saveCategories={saveCategories} renameProducts={(oldName, newName) => saveProducts(products.map(product => product.category === oldName ? { ...product, category: newName } : product))} showNotice={showNotice} />}
         {tab === "orders" && <OrderManager orders={orders} products={products} promotions={promotions} updateOrder={updateOrder} saveOrders={saveOrders} showNotice={showNotice} />}
         {tab === "customers" && <CustomerManager orders={orders} />}
+        {tab === "reviews" && <ReviewsManager showNotice={showNotice} />}
         {tab === "vouchers" && <VoucherManager vouchers={vouchers} saveVouchers={saveVouchers} />}
         {tab === "finance" && <FinanceManager transactions={transactions} orders={orders} saveTransactions={saveTransactions} saveOrders={saveOrders} updateOrder={updateOrder} products={products} showNotice={showNotice} />}
         {tab === "inventory" && <InventoryManager products={products} records={inventoryRecords} transactions={transactions} saveRecords={saveInventoryRecords} saveProducts={saveProducts} saveTransactions={saveTransactions} showNotice={showNotice} />}
@@ -1079,39 +1105,39 @@ function CustomerManager({ orders }: { orders: Order[] }) {
     </div>
 
     <section className="admin-panel">
-    <div className="customer-toolbar"><label className="admin-search">⌕<input value={query} onChange={event => setQuery(event.target.value)} placeholder="Tìm theo tên hoặc số điện thoại..." /></label><select className="customer-period-filter" value={customerPeriod} onChange={event => setCustomerPeriod(event.target.value as typeof customerPeriod)} aria-label="Lọc khách hàng theo thời gian"><option value="all">Tất cả thời gian</option><option value="today">Hôm nay</option><option value="week">Tuần này</option><option value="month">Tháng này</option><option value="year">Năm này</option></select><div className="customer-group-filters"><button className={customerGroup === "all" ? "active" : ""} onClick={() => setCustomerGroup("all")}>Tất cả <b>{customers.length}</b></button><button className={customerGroup === "care" ? "active" : ""} onClick={() => setCustomerGroup("care")}>Cần chăm sóc <b>{careCount}</b></button><button className={customerGroup === "active" ? "active" : ""} onClick={() => setCustomerGroup("active")}>Đã phát sinh đơn <b>{activeCount}</b></button></div></div>
-    <div className="customer-period-summary"><span>{customerPeriodLabel}</span><strong>{periodCustomerCount} khách</strong><strong>{periodOrderCount} đơn</strong><strong>{money(periodTotalPurchased)}</strong><small>Tổng tiền đã mua</small></div>
-    <div className="admin-customer-table"><div className="admin-customer-table-head"><span>KHÁCH HÀNG</span><span>LIÊN HỆ</span><span>ĐỊA CHỈ</span><span>SỐ ĐƠN HÀNG</span><span>TỔNG TIỀN ĐÃ MUA</span><span>CÒN NỢ</span><span>TRẠNG THÁI</span><span>THAO TÁC</span></div>{filteredCustomers.length === 0 ? <div className="admin-empty">Chưa có khách hàng phù hợp.</div> : filteredCustomers.map(c => { const ordersForCustomer = customerOrders(c); const count = ordersForCustomer.length; const customerNeedsCare = needsCare(c); const debt = totalDebt(c); return <div className="admin-customer-row" key={c.id}><div className="customer-identity"><span className="admin-avatar">{c.name.charAt(0)}</span><span><strong>{c.name}</strong><small>{c.id}</small></span></div><div><span>{c.phone}</span><small>{c.email || "Chưa có email"}</small></div><span>{c.address || "Chưa có địa chỉ"}</span><span>{count} đơn</span><strong className="customer-total">{money(customerPeriod === "all" ? totalPurchased(c) : periodCustomerOrders(c).reduce((sum, order) => sum + order.total, 0))}</strong><strong className="customer-total">{debt ? money(debt) : "Đã thanh toán"}</strong><em className={debt ? "customer-care" : customerNeedsCare ? "customer-care" : c.status === "active" ? "in-stock" : "low-stock"}>{debt ? "Còn công nợ" : customerNeedsCare ? "Cần chăm sóc" : count === 1 ? "Khách mới" : "Đã chăm sóc"}</em><div className="admin-row-actions"><button title="Xem chi tiết" aria-label="Xem chi tiết" onClick={() => setDetail(c)}><Target /></button><button title="Sửa" aria-label="Sửa" onClick={() => setEditing(c)}><Pencil /></button><button className="danger" title="Xóa" aria-label="Xóa" onClick={() => setConfirmDelete(c)}><X /></button></div></div>; })}</div>
+      <div className="customer-toolbar"><label className="admin-search">⌕<input value={query} onChange={event => setQuery(event.target.value)} placeholder="Tìm theo tên hoặc số điện thoại..." /></label><select className="customer-period-filter" value={customerPeriod} onChange={event => setCustomerPeriod(event.target.value as typeof customerPeriod)} aria-label="Lọc khách hàng theo thời gian"><option value="all">Tất cả thời gian</option><option value="today">Hôm nay</option><option value="week">Tuần này</option><option value="month">Tháng này</option><option value="year">Năm này</option></select><div className="customer-group-filters"><button className={customerGroup === "all" ? "active" : ""} onClick={() => setCustomerGroup("all")}>Tất cả <b>{customers.length}</b></button><button className={customerGroup === "care" ? "active" : ""} onClick={() => setCustomerGroup("care")}>Cần chăm sóc <b>{careCount}</b></button><button className={customerGroup === "active" ? "active" : ""} onClick={() => setCustomerGroup("active")}>Đã phát sinh đơn <b>{activeCount}</b></button></div></div>
+      <div className="customer-period-summary"><span>{customerPeriodLabel}</span><strong>{periodCustomerCount} khách</strong><strong>{periodOrderCount} đơn</strong><strong>{money(periodTotalPurchased)}</strong><small>Tổng tiền đã mua</small></div>
+      <div className="admin-customer-table"><div className="admin-customer-table-head"><span>KHÁCH HÀNG</span><span>LIÊN HỆ</span><span>ĐỊA CHỈ</span><span>SỐ ĐƠN HÀNG</span><span>TỔNG TIỀN ĐÃ MUA</span><span>CÒN NỢ</span><span>TRẠNG THÁI</span><span>THAO TÁC</span></div>{filteredCustomers.length === 0 ? <div className="admin-empty">Chưa có khách hàng phù hợp.</div> : filteredCustomers.map(c => { const ordersForCustomer = customerOrders(c); const count = ordersForCustomer.length; const customerNeedsCare = needsCare(c); const debt = totalDebt(c); return <div className="admin-customer-row" key={c.id}><div className="customer-identity"><span className="admin-avatar">{c.name.charAt(0)}</span><span><strong>{c.name}</strong><small>{c.id}</small></span></div><div><span>{c.phone}</span><small>{c.email || "Chưa có email"}</small></div><span>{c.address || "Chưa có địa chỉ"}</span><span>{count} đơn</span><strong className="customer-total">{money(customerPeriod === "all" ? totalPurchased(c) : periodCustomerOrders(c).reduce((sum, order) => sum + order.total, 0))}</strong><strong className="customer-total">{debt ? money(debt) : "Đã thanh toán"}</strong><em className={debt ? "customer-care" : customerNeedsCare ? "customer-care" : c.status === "active" ? "in-stock" : "low-stock"}>{debt ? "Còn công nợ" : customerNeedsCare ? "Cần chăm sóc" : count === 1 ? "Khách mới" : "Đã chăm sóc"}</em><div className="admin-row-actions"><button title="Xem chi tiết" aria-label="Xem chi tiết" onClick={() => setDetail(c)}><Target /></button><button title="Sửa" aria-label="Sửa" onClick={() => setEditing(c)}><Pencil /></button><button className="danger" title="Xóa" aria-label="Xóa" onClick={() => setConfirmDelete(c)}><X /></button></div></div>; })}</div>
 
-    <AdminModal open={!!detail} onClose={() => setDetail(null)} title={detail ? `Chi tiết ${detail.name}` : "Chi tiết khách hàng"} subtitle="Thông tin khách hàng và lịch sử mua hàng" size="md" footer={<><button className="vg-btn" type="button" onClick={() => setDetail(null)}>Đóng</button></>}>
-      {detail && (
-        <div className="customer-detail-content">
-          <div className="vg-field"><span className="vg-field-label">Họ và tên</span><input className="vg-input" value={detail.name} readOnly /></div>
-          <div className="vg-field"><span className="vg-field-label">Số điện thoại</span><input className="vg-input" value={detail.phone} readOnly /></div>
-          <div className="vg-field"><span className="vg-field-label">Email</span><input className="vg-input" value={detail.email || "Chưa có email"} readOnly /></div>
-          <div className="vg-field vg-full"><span className="vg-field-label">Địa chỉ</span><input className="vg-input" value={detail.address || "Chưa có địa chỉ"} readOnly /></div>
-          <div className="vg-field"><span className="vg-field-label">Trạng thái</span><input className="vg-input" value={detail.status === "active" ? "Hoạt động" : "Khóa"} readOnly /></div>
-          <div className="vg-field"><span className="vg-field-label">Số đơn hàng</span><input className="vg-input" value={orderCount(detail)} readOnly /></div>
-          <div className="vg-field"><span className="vg-field-label">Công nợ hiện tại</span><input className="vg-input" value={totalDebt(detail) ? money(totalDebt(detail)) : "Không có công nợ"} readOnly /></div>
-          <div className="customer-detail-section"><h3>Lịch sử đơn hàng ({customerOrders(detail).length})</h3>{customerOrders(detail).length ? customerOrders(detail).map(order => <div className="customer-history-row" key={order.id}><span><strong>{order.id}</strong><small>{formatDate(order.createdAt)} · {order.status} · {order.paidAmount && order.paidAmount >= order.total ? "Đã thanh toán" : order.paidAmount ? `Còn nợ ${money(order.total - order.paidAmount)}` : "Chưa thanh toán"}</small></span><b>{money(order.total)}</b></div>) : <p>Chưa có đơn hàng.</p>}</div>
-          <div className="customer-detail-section"><h3>Lịch sử chăm sóc</h3><p>{customerOrders(detail).length ? `Lần mua gần nhất: ${formatDate(customerOrders(detail)[0].createdAt)}.` : "Chưa có lịch sử chăm sóc."}</p></div>
-        </div>
-      )}
-    </AdminModal>
+      <AdminModal open={!!detail} onClose={() => setDetail(null)} title={detail ? `Chi tiết ${detail.name}` : "Chi tiết khách hàng"} subtitle="Thông tin khách hàng và lịch sử mua hàng" size="md" footer={<><button className="vg-btn" type="button" onClick={() => setDetail(null)}>Đóng</button></>}>
+        {detail && (
+          <div className="customer-detail-content">
+            <div className="vg-field"><span className="vg-field-label">Họ và tên</span><input className="vg-input" value={detail.name} readOnly /></div>
+            <div className="vg-field"><span className="vg-field-label">Số điện thoại</span><input className="vg-input" value={detail.phone} readOnly /></div>
+            <div className="vg-field"><span className="vg-field-label">Email</span><input className="vg-input" value={detail.email || "Chưa có email"} readOnly /></div>
+            <div className="vg-field vg-full"><span className="vg-field-label">Địa chỉ</span><input className="vg-input" value={detail.address || "Chưa có địa chỉ"} readOnly /></div>
+            <div className="vg-field"><span className="vg-field-label">Trạng thái</span><input className="vg-input" value={detail.status === "active" ? "Hoạt động" : "Khóa"} readOnly /></div>
+            <div className="vg-field"><span className="vg-field-label">Số đơn hàng</span><input className="vg-input" value={orderCount(detail)} readOnly /></div>
+            <div className="vg-field"><span className="vg-field-label">Công nợ hiện tại</span><input className="vg-input" value={totalDebt(detail) ? money(totalDebt(detail)) : "Không có công nợ"} readOnly /></div>
+            <div className="customer-detail-section"><h3>Lịch sử đơn hàng ({customerOrders(detail).length})</h3>{customerOrders(detail).length ? customerOrders(detail).map(order => <div className="customer-history-row" key={order.id}><span><strong>{order.id}</strong><small>{formatDate(order.createdAt)} · {order.status} · {order.paidAmount && order.paidAmount >= order.total ? "Đã thanh toán" : order.paidAmount ? `Còn nợ ${money(order.total - order.paidAmount)}` : "Chưa thanh toán"}</small></span><b>{money(order.total)}</b></div>) : <p>Chưa có đơn hàng.</p>}</div>
+            <div className="customer-detail-section"><h3>Lịch sử chăm sóc</h3><p>{customerOrders(detail).length ? `Lần mua gần nhất: ${formatDate(customerOrders(detail)[0].createdAt)}.` : "Chưa có lịch sử chăm sóc."}</p></div>
+          </div>
+        )}
+      </AdminModal>
 
-    <AdminModal open={!!editing} onClose={() => setEditing(null)} title={editing?.id ? "Sửa khách hàng" : "Thêm khách hàng"} subtitle="Quản lý thông tin khách hàng" size="sm" footer={<><button className="vg-btn" type="button" onClick={() => setEditing(null)}>Hủy</button><button className="vg-btn vg-btn-primary" type="submit" form="customer-form">Lưu khách hàng</button></>}>
-      <form id="customer-form" onSubmit={submit}>
-        <div className="vg-form-grid">
-          <div className="vg-field vg-full"><span className="vg-field-label">Họ và tên <span className="vg-required">*</span></span><input className="vg-input" name="name" defaultValue={editing?.name} required /></div>
-          <div className="vg-field"><span className="vg-field-label">Số điện thoại <span className="vg-required">*</span></span><input className="vg-input" name="phone" defaultValue={editing?.phone} required /></div>
-          <div className="vg-field"><span className="vg-field-label">Email</span><input className="vg-input" name="email" defaultValue={editing?.email} type="email" /></div>
-          <div className="vg-field vg-full"><span className="vg-field-label">Địa chỉ</span><input className="vg-input" name="address" defaultValue={editing?.address} /></div>
-          <div className="vg-field vg-full"><span className="vg-field-label">Trạng thái</span><select className="vg-select" name="status" defaultValue={editing?.status}><option value="active">Hoạt động</option><option value="inactive">Khóa</option></select></div>
-        </div>
-      </form>
-    </AdminModal>
-    <ConfirmModal open={!!confirmDelete} onClose={() => setConfirmDelete(null)} onConfirm={() => { if (confirmDelete) { save(customers.filter(c => c.id !== confirmDelete.id)); addAdminNotification(`Đã xóa khách hàng "${confirmDelete.name}"`, "customer", undefined, "customers"); } setConfirmDelete(null); }} title="Xóa khách hàng?" message="Thông tin khách hàng sẽ bị xóa và không thể hoàn tác." />
-  </section></>;
+      <AdminModal open={!!editing} onClose={() => setEditing(null)} title={editing?.id ? "Sửa khách hàng" : "Thêm khách hàng"} subtitle="Quản lý thông tin khách hàng" size="sm" footer={<><button className="vg-btn" type="button" onClick={() => setEditing(null)}>Hủy</button><button className="vg-btn vg-btn-primary" type="submit" form="customer-form">Lưu khách hàng</button></>}>
+        <form id="customer-form" onSubmit={submit}>
+          <div className="vg-form-grid">
+            <div className="vg-field vg-full"><span className="vg-field-label">Họ và tên <span className="vg-required">*</span></span><input className="vg-input" name="name" defaultValue={editing?.name} required /></div>
+            <div className="vg-field"><span className="vg-field-label">Số điện thoại <span className="vg-required">*</span></span><input className="vg-input" name="phone" defaultValue={editing?.phone} required /></div>
+            <div className="vg-field"><span className="vg-field-label">Email</span><input className="vg-input" name="email" defaultValue={editing?.email} type="email" /></div>
+            <div className="vg-field vg-full"><span className="vg-field-label">Địa chỉ</span><input className="vg-input" name="address" defaultValue={editing?.address} /></div>
+            <div className="vg-field vg-full"><span className="vg-field-label">Trạng thái</span><select className="vg-select" name="status" defaultValue={editing?.status}><option value="active">Hoạt động</option><option value="inactive">Khóa</option></select></div>
+          </div>
+        </form>
+      </AdminModal>
+      <ConfirmModal open={!!confirmDelete} onClose={() => setConfirmDelete(null)} onConfirm={() => { if (confirmDelete) { save(customers.filter(c => c.id !== confirmDelete.id)); addAdminNotification(`Đã xóa khách hàng "${confirmDelete.name}"`, "customer", undefined, "customers"); } setConfirmDelete(null); }} title="Xóa khách hàng?" message="Thông tin khách hàng sẽ bị xóa và không thể hoàn tác." />
+    </section></>;
 }
 
 /* ===== VOUCHER MANAGER ===== */
@@ -1178,14 +1204,14 @@ function VoucherManager({ vouchers, saveVouchers }: { vouchers: Voucher[]; saveV
   const displayList = voucherTab === "public" ? publicVouchers : rewardVouchers;
 
   const CONDITION_OPTIONS: { value: NonNullable<Voucher["conditionType"]>; icon: string; label: string; hint: string }[] = [
-    { value: "none",          icon: "🌐", label: "Mã công khai",              hint: "Tất cả khách hàng đều dùng được" },
-    { value: "min_orders",    icon: "📦", label: "Đủ số đơn hàng",           hint: "Tự động tặng khi mua đủ N đơn" },
-    { value: "min_spend",     icon: "💰", label: "Đủ số tiền chi tiêu",       hint: "Tự động tặng khi tổng chi tiêu đủ" },
-    { value: "first_order",   icon: "🎉", label: "Đơn hàng đầu tiên",        hint: "Chỉ tặng cho lần mua đầu tiên" },
-    { value: "holiday",       icon: "📅", label: "Ngày đặc biệt / Dịp lễ",   hint: "Tặng dịp 2/9, Tết, Noel, 8/3..." },
-    { value: "review_reward", icon: "⭐", label: "Đánh giá sản phẩm",         hint: "Tặng khi viết nhận xét + ảnh" },
-    { value: "next_order",    icon: "🔄", label: "Quay lại mua (Đơn tới)",    hint: "Tặng sau khi mua đơn hàng" },
-    { value: "top_customer",  icon: "🏆", label: "Khách mua nhiều nhất",      hint: "Dành riêng Top khách chi tiêu cao" },
+    { value: "none", icon: "🌐", label: "Mã công khai", hint: "Tất cả khách hàng đều dùng được" },
+    { value: "min_orders", icon: "📦", label: "Đủ số đơn hàng", hint: "Tự động tặng khi mua đủ N đơn" },
+    { value: "min_spend", icon: "💰", label: "Đủ số tiền chi tiêu", hint: "Tự động tặng khi tổng chi tiêu đủ" },
+    { value: "first_order", icon: "🎉", label: "Đơn hàng đầu tiên", hint: "Chỉ tặng cho lần mua đầu tiên" },
+    { value: "holiday", icon: "📅", label: "Ngày đặc biệt / Dịp lễ", hint: "Tặng dịp 2/9, Tết, Noel, 8/3..." },
+    { value: "review_reward", icon: "⭐", label: "Đánh giá sản phẩm", hint: "Tặng khi viết nhận xét + ảnh" },
+    { value: "next_order", icon: "🔄", label: "Quay lại mua (Đơn tới)", hint: "Tặng sau khi mua đơn hàng" },
+    { value: "top_customer", icon: "🏆", label: "Khách mua nhiều nhất", hint: "Dành riêng Top khách chi tiêu cao" },
   ];
 
   return <>
@@ -1199,178 +1225,178 @@ function VoucherManager({ vouchers, saveVouchers }: { vouchers: Voucher[]; saveV
     </div>
 
     <section className="admin-panel">
-    <div className="admin-table-head">
-      <div>
-        <strong>{vouchers.length} mã giảm giá</strong>
-        <div className="voucher-tab-switcher">
-          <button className={voucherTab === "public" ? "voucher-tab-active" : ""} onClick={() => setVoucherTab("public")}>
-            Mã công khai ({publicVouchers.length})
-          </button>
-          <button className={voucherTab === "reward" ? "voucher-tab-active" : ""} onClick={() => setVoucherTab("reward")}>
-            🎁 Mã thưởng điều kiện ({rewardVouchers.length})
-          </button>
+      <div className="admin-table-head">
+        <div>
+          <strong>{vouchers.length} mã giảm giá</strong>
+          <div className="voucher-tab-switcher">
+            <button className={voucherTab === "public" ? "voucher-tab-active" : ""} onClick={() => setVoucherTab("public")}>
+              Mã công khai ({publicVouchers.length})
+            </button>
+            <button className={voucherTab === "reward" ? "voucher-tab-active" : ""} onClick={() => setVoucherTab("reward")}>
+              🎁 Mã thưởng điều kiện ({rewardVouchers.length})
+            </button>
+          </div>
         </div>
+        <button className="admin-primary" onClick={openNew}><span aria-hidden="true">+</span> Tạo mã</button>
       </div>
-      <button className="admin-primary" onClick={openNew}><span aria-hidden="true">+</span> Tạo mã</button>
-    </div>
 
-    {voucherTab === "reward" && (
-      <div className="voucher-reward-notice">
-        <span>⚡</span>
-        <span>Mã thưởng điều kiện sẽ <b>tự động chuyển</b> vào tài khoản khách hàng khi đạt điều kiện. Khách xem và sao chép mã trong mục <b>Ưu đãi hội viên</b> trên trang cá nhân.</span>
-      </div>
-    )}
-
-    {displayList.length ? displayList.map((voucher) => {
-      const realIndex = vouchers.indexOf(voucher);
-      return <div className="admin-voucher-row admin-order-full" key={voucher.code}>
-        <b>{voucher.code}</b>
-        <span>
-          {voucher.desc}
-          <small>HSD: {voucher.exp}</small>
-          {isReward(voucher) && <small className="voucher-condition-badge">🎁 {conditionLabel(voucher)}</small>}
-        </span>
-        <em className={voucher.active ? "voucher-active" : ""}>{voucher.active ? "Đang bật" : "Đã tắt"}</em>
-        <div className="admin-row-actions">
-          <button title="Xem chi tiết" aria-label="Xem chi tiết" onClick={() => setDetail(voucher)}><Target /></button>
-          <button onClick={() => saveVouchers(vouchers.map((item, i) => i === realIndex ? { ...item, active: !item.active } : item))} title={voucher.active ? "Tắt" : "Bật"}>{voucher.active ? "■" : "▶"}</button>
-          <button title="Sửa" aria-label="Sửa" onClick={() => openEdit(voucher)}><Pencil /></button>
-          <button className="danger" title="Xóa" aria-label="Xóa" onClick={() => setConfirmDelete(voucher)}><X /></button>
-        </div>
-      </div>;
-    }) : (
-      <div className="admin-empty">
-        {voucherTab === "public" ? "Chưa có mã công khai nào." : "Chưa có mã thưởng điều kiện nào. Nhấn \"Tạo mã\" và chọn điều kiện để bắt đầu."}
-      </div>
-    )}
-
-    {/* ── Detail Modal ── */}
-    <AdminModal open={!!detail} onClose={() => setDetail(null)} title={detail ? `Chi tiết ${detail.code}` : "Chi tiết mã giảm giá"} subtitle="Thông tin chi tiết voucher" size="sm" footer={<><button className="vg-btn" type="button" onClick={() => setDetail(null)}>Đóng</button></>}>
-      {detail && (
-        <div className="vg-form-grid">
-          <div className="vg-field"><span className="vg-field-label">Mã code</span><input className="vg-input" value={detail.code} readOnly /></div>
-          <div className="vg-field"><span className="vg-field-label">Hạn sử dụng</span><input className="vg-input" value={detail.exp} readOnly /></div>
-          <div className="vg-field"><span className="vg-field-label">Trạng thái</span><input className="vg-input" value={detail.active ? "Đang bật" : "Đã tắt"} readOnly /></div>
-          <div className="vg-field"><span className="vg-field-label">Loại giảm</span><input className="vg-input" value={detail.discountType === "shipping" ? "Miễn phí vận chuyển" : detail.discountType === "amount" ? "Giảm số tiền" : "Giảm phần trăm"} readOnly /></div>
-          <div className="vg-field"><span className="vg-field-label">Giá trị giảm</span><input className="vg-input" value={detail.discountType === "shipping" ? "0đ" : detail.discountType === "amount" ? `${(detail.discountValue || 0).toLocaleString("vi-VN")}đ` : `${detail.discountValue || 0}%`} readOnly /></div>
-          <div className="vg-field"><span className="vg-field-label">Điều kiện nhận</span><input className="vg-input" value={conditionLabel(detail)} readOnly /></div>
-          <div className="vg-field vg-full"><span className="vg-field-label">Mô tả</span><textarea className="vg-textarea" value={detail.desc} readOnly /></div>
+      {voucherTab === "reward" && (
+        <div className="voucher-reward-notice">
+          <span>⚡</span>
+          <span>Mã thưởng điều kiện sẽ <b>tự động chuyển</b> vào tài khoản khách hàng khi đạt điều kiện. Khách xem và sao chép mã trong mục <b>Ưu đãi hội viên</b> trên trang cá nhân.</span>
         </div>
       )}
-    </AdminModal>
 
-    {/* ── Create / Edit Modal ── */}
-    <AdminModal open={!!editing} onClose={() => setEditing(null)} title={editing?.code ? "Sửa mã giảm giá" : "Tạo mã giảm giá"} subtitle="Quản lý voucher khuyến mãi" size="sm" footer={<><button className="vg-btn" type="button" onClick={() => setEditing(null)}>Hủy</button><button className="vg-btn vg-btn-primary" type="submit" form="voucher-form">Lưu mã</button></>}>
-      <form id="voucher-form" onSubmit={submit}>
-        <div className="vg-form-grid">
-          <div className="vg-field"><span className="vg-field-label">Mã code <span className="vg-required">*</span></span><input className="vg-input" name="code" defaultValue={editing?.code} placeholder="GAONGON20" required /></div>
-          <div className="vg-field"><span className="vg-field-label">Hạn sử dụng <span className="vg-required">*</span></span><input className="vg-input" name="exp" defaultValue={editing?.exp} placeholder="31/12/2026" required /></div>
-          <div className="vg-field vg-full"><span className="vg-field-label">Mô tả <span className="vg-required">*</span></span><input className="vg-input" name="desc" defaultValue={editing?.desc} placeholder="Giảm 20.000đ khi viết đánh giá kèm ảnh" required /></div>
-          <div className="vg-field"><span className="vg-field-label">Loại giảm</span><select className="vg-select" name="discountType" defaultValue={editing?.discountType || "percent"}><option value="percent">Giảm phần trăm</option><option value="amount">Giảm số tiền</option><option value="shipping">Miễn phí vận chuyển</option></select></div>
-          <div className="vg-field"><span className="vg-field-label">Giá trị giảm</span><input className="vg-input" name="discountValue" type="number" min="0" defaultValue={editing?.discountType === "amount" && editing.discountValue ? editing.discountValue / 1000 : editing?.discountValue || ""} placeholder="10 (%) hoặc 20 (nghìn VND)" /></div>
-
-          {/* ══ ĐIỀU KIỆN NHẬN MÃ ══ */}
-          <div className="vg-field vg-full voucher-condition-section">
-            <span className="vg-field-label">Điều kiện nhận mã <span className="admin-kicker" style={{ marginLeft: 6 }}>TỰ ĐỘNG TẶNG</span></span>
-            <div className="voucher-condition-options voucher-condition-grid">
-              {CONDITION_OPTIONS.map(opt => (
-                <label key={opt.value} className={conditionType === opt.value ? "voucher-cond-selected" : ""}>
-                  <input type="radio" name="conditionTypeRadio" value={opt.value} checked={conditionType === opt.value} onChange={() => setConditionType(opt.value)} />
-                  <span>{opt.icon} {opt.label}</span>
-                  <small>{opt.hint}</small>
-                </label>
-              ))}
-            </div>
+      {displayList.length ? displayList.map((voucher) => {
+        const realIndex = vouchers.indexOf(voucher);
+        return <div className="admin-voucher-row admin-order-full" key={voucher.code}>
+          <b>{voucher.code}</b>
+          <span>
+            {voucher.desc}
+            <small>HSD: {voucher.exp}</small>
+            {isReward(voucher) && <small className="voucher-condition-badge">🎁 {conditionLabel(voucher)}</small>}
+          </span>
+          <em className={voucher.active ? "voucher-active" : ""}>{voucher.active ? "Đang bật" : "Đã tắt"}</em>
+          <div className="admin-row-actions">
+            <button title="Xem chi tiết" aria-label="Xem chi tiết" onClick={() => setDetail(voucher)}><Target /></button>
+            <button onClick={() => saveVouchers(vouchers.map((item, i) => i === realIndex ? { ...item, active: !item.active } : item))} title={voucher.active ? "Tắt" : "Bật"}>{voucher.active ? "■" : "▶"}</button>
+            <button title="Sửa" aria-label="Sửa" onClick={() => openEdit(voucher)}><Pencil /></button>
+            <button className="danger" title="Xóa" aria-label="Xóa" onClick={() => setConfirmDelete(voucher)}><X /></button>
           </div>
+        </div>;
+      }) : (
+        <div className="admin-empty">
+          {voucherTab === "public" ? "Chưa có mã công khai nào." : "Chưa có mã thưởng điều kiện nào. Nhấn \"Tạo mã\" và chọn điều kiện để bắt đầu."}
+        </div>
+      )}
 
-          {/* ── Nhập số đơn ── */}
-          {conditionType === "min_orders" && (
-            <div className="vg-field vg-full">
-              <span className="vg-field-label">Số đơn hàng tối thiểu <span className="vg-required">*</span></span>
-              <div className="voucher-cond-input-row">
-                <input className="vg-input" name="minOrders" type="number" min="1" step="1" defaultValue={editing?.minOrders || 2} required />
-                <span className="voucher-cond-unit">đơn hàng hoàn thành</span>
-              </div>
-              <small className="voucher-cond-tip">💡 Hệ thống đếm theo số điện thoại khách hàng khi đặt hàng.</small>
-            </div>
-          )}
+      {/* ── Detail Modal ── */}
+      <AdminModal open={!!detail} onClose={() => setDetail(null)} title={detail ? `Chi tiết ${detail.code}` : "Chi tiết mã giảm giá"} subtitle="Thông tin chi tiết voucher" size="sm" footer={<><button className="vg-btn" type="button" onClick={() => setDetail(null)}>Đóng</button></>}>
+        {detail && (
+          <div className="vg-form-grid">
+            <div className="vg-field"><span className="vg-field-label">Mã code</span><input className="vg-input" value={detail.code} readOnly /></div>
+            <div className="vg-field"><span className="vg-field-label">Hạn sử dụng</span><input className="vg-input" value={detail.exp} readOnly /></div>
+            <div className="vg-field"><span className="vg-field-label">Trạng thái</span><input className="vg-input" value={detail.active ? "Đang bật" : "Đã tắt"} readOnly /></div>
+            <div className="vg-field"><span className="vg-field-label">Loại giảm</span><input className="vg-input" value={detail.discountType === "shipping" ? "Miễn phí vận chuyển" : detail.discountType === "amount" ? "Giảm số tiền" : "Giảm phần trăm"} readOnly /></div>
+            <div className="vg-field"><span className="vg-field-label">Giá trị giảm</span><input className="vg-input" value={detail.discountType === "shipping" ? "0đ" : detail.discountType === "amount" ? `${(detail.discountValue || 0).toLocaleString("vi-VN")}đ` : `${detail.discountValue || 0}%`} readOnly /></div>
+            <div className="vg-field"><span className="vg-field-label">Điều kiện nhận</span><input className="vg-input" value={conditionLabel(detail)} readOnly /></div>
+            <div className="vg-field vg-full"><span className="vg-field-label">Mô tả</span><textarea className="vg-textarea" value={detail.desc} readOnly /></div>
+          </div>
+        )}
+      </AdminModal>
 
-          {/* ── Nhập số tiền chi tiêu ── */}
-          {conditionType === "min_spend" && (
-            <div className="vg-field vg-full">
-              <span className="vg-field-label">Tổng chi tiêu tối thiểu <span className="vg-required">*</span></span>
-              <div className="voucher-cond-input-row">
-                <input className="vg-input" name="minSpend" type="number" min="1" step="1" defaultValue={editing?.minSpend ? editing.minSpend / 1000 : 500} required />
-                <span className="voucher-cond-unit">.000 VND (tổng tất cả đơn)</span>
-              </div>
-              <small className="voucher-cond-tip">💡 Tính tổng tất cả đơn hàng của khách theo số điện thoại.</small>
-            </div>
-          )}
+      {/* ── Create / Edit Modal ── */}
+      <AdminModal open={!!editing} onClose={() => setEditing(null)} title={editing?.code ? "Sửa mã giảm giá" : "Tạo mã giảm giá"} subtitle="Quản lý voucher khuyến mãi" size="sm" footer={<><button className="vg-btn" type="button" onClick={() => setEditing(null)}>Hủy</button><button className="vg-btn vg-btn-primary" type="submit" form="voucher-form">Lưu mã</button></>}>
+        <form id="voucher-form" onSubmit={submit}>
+          <div className="vg-form-grid">
+            <div className="vg-field"><span className="vg-field-label">Mã code <span className="vg-required">*</span></span><input className="vg-input" name="code" defaultValue={editing?.code} placeholder="GAONGON20" required /></div>
+            <div className="vg-field"><span className="vg-field-label">Hạn sử dụng <span className="vg-required">*</span></span><input className="vg-input" name="exp" defaultValue={editing?.exp} placeholder="31/12/2026" required /></div>
+            <div className="vg-field vg-full"><span className="vg-field-label">Mô tả <span className="vg-required">*</span></span><input className="vg-input" name="desc" defaultValue={editing?.desc} placeholder="Giảm 20.000đ khi viết đánh giá kèm ảnh" required /></div>
+            <div className="vg-field"><span className="vg-field-label">Loại giảm</span><select className="vg-select" name="discountType" defaultValue={editing?.discountType || "percent"}><option value="percent">Giảm phần trăm</option><option value="amount">Giảm số tiền</option><option value="shipping">Miễn phí vận chuyển</option></select></div>
+            <div className="vg-field"><span className="vg-field-label">Giá trị giảm</span><input className="vg-input" name="discountValue" type="number" min="0" defaultValue={editing?.discountType === "amount" && editing.discountValue ? editing.discountValue / 1000 : editing?.discountValue || ""} placeholder="10 (%) hoặc 20 (nghìn VND)" /></div>
 
-          {/* ── Đơn hàng đầu tiên ── */}
-          {conditionType === "first_order" && (
-            <div className="vg-field vg-full">
-              <div className="voucher-cond-auto-note">
-                <span>🎉</span>
-                <span>Mã sẽ tự động mở khóa cho khách hàng chưa từng đặt đơn nào trước đó.</span>
-              </div>
-            </div>
-          )}
-
-          {/* ── Ngày đặc biệt / Dịp lễ ── */}
-          {conditionType === "holiday" && (
-            <div className="vg-field vg-full">
-              <span className="vg-field-label">Tên dịp lễ / Ngày đặc biệt <span className="vg-required">*</span></span>
-              <div className="voucher-cond-input-row" style={{ display: "grid", gridTemplateColumns: "1fr 120px", gap: 10 }}>
-                <input className="vg-input" name="holidayName" defaultValue={editing?.holidayName || "Quốc Khánh 2/9"} placeholder="VD: Quốc Khánh 2/9, Tết Nguyên Đán, Noel, 8/3..." required />
-                <input className="vg-input" name="holidayDate" defaultValue={editing?.holidayDate || "02/09"} placeholder="Ngày (DD/MM)" required />
-              </div>
-              <small className="voucher-cond-tip">📅 Mã sẽ tự động mở khóa vào đúng dịp lễ/ngày đặc biệt này.</small>
-            </div>
-          )}
-
-          {/* ── Đánh giá sản phẩm ── */}
-          {conditionType === "review_reward" && (
-            <div className="vg-field vg-full">
-              <div className="voucher-cond-auto-note">
-                <span>⭐</span>
-                <div>
-                  <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", color: "#fff", fontWeight: 600 }}>
-                    <input type="checkbox" name="requireReviewPhoto" defaultChecked={editing?.requireReviewPhoto ?? true} />
-                    Yêu cầu bài đánh giá phải kèm HÌNH ẢNH sản phẩm
+            {/* ══ ĐIỀU KIỆN NHẬN MÃ ══ */}
+            <div className="vg-field vg-full voucher-condition-section">
+              <span className="vg-field-label">Điều kiện nhận mã <span className="admin-kicker" style={{ marginLeft: 6 }}>TỰ ĐỘNG TẶNG</span></span>
+              <div className="voucher-condition-options voucher-condition-grid">
+                {CONDITION_OPTIONS.map(opt => (
+                  <label key={opt.value} className={conditionType === opt.value ? "voucher-cond-selected" : ""}>
+                    <input type="radio" name="conditionTypeRadio" value={opt.value} checked={conditionType === opt.value} onChange={() => setConditionType(opt.value)} />
+                    <span>{opt.icon} {opt.label}</span>
+                    <small>{opt.hint}</small>
                   </label>
-                  <small style={{ color: "rgba(255,255,255,.5)", marginTop: 4, display: "block" }}>Mã sẽ tự động tặng ngay khi khách gửi nhận xét cho bất kỳ sản phẩm nào.</small>
+                ))}
+              </div>
+            </div>
+
+            {/* ── Nhập số đơn ── */}
+            {conditionType === "min_orders" && (
+              <div className="vg-field vg-full">
+                <span className="vg-field-label">Số đơn hàng tối thiểu <span className="vg-required">*</span></span>
+                <div className="voucher-cond-input-row">
+                  <input className="vg-input" name="minOrders" type="number" min="1" step="1" defaultValue={editing?.minOrders || 2} required />
+                  <span className="voucher-cond-unit">đơn hàng hoàn thành</span>
+                </div>
+                <small className="voucher-cond-tip">💡 Hệ thống đếm theo số điện thoại khách hàng khi đặt hàng.</small>
+              </div>
+            )}
+
+            {/* ── Nhập số tiền chi tiêu ── */}
+            {conditionType === "min_spend" && (
+              <div className="vg-field vg-full">
+                <span className="vg-field-label">Tổng chi tiêu tối thiểu <span className="vg-required">*</span></span>
+                <div className="voucher-cond-input-row">
+                  <input className="vg-input" name="minSpend" type="number" min="1" step="1" defaultValue={editing?.minSpend ? editing.minSpend / 1000 : 500} required />
+                  <span className="voucher-cond-unit">.000 VND (tổng tất cả đơn)</span>
+                </div>
+                <small className="voucher-cond-tip">💡 Tính tổng tất cả đơn hàng của khách theo số điện thoại.</small>
+              </div>
+            )}
+
+            {/* ── Đơn hàng đầu tiên ── */}
+            {conditionType === "first_order" && (
+              <div className="vg-field vg-full">
+                <div className="voucher-cond-auto-note">
+                  <span>🎉</span>
+                  <span>Mã sẽ tự động mở khóa cho khách hàng chưa từng đặt đơn nào trước đó.</span>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* ── Quay lại mua (Đơn tiếp theo) ── */}
-          {conditionType === "next_order" && (
-            <div className="vg-field vg-full">
-              <div className="voucher-cond-auto-note">
-                <span>🔄</span>
-                <span>Mã sẽ tự động kích hoạt và tặng ngay cho khách sau khi vừa hoàn thành 1 đơn hàng để áp dụng cho lần mua tiếp theo.</span>
+            {/* ── Ngày đặc biệt / Dịp lễ ── */}
+            {conditionType === "holiday" && (
+              <div className="vg-field vg-full">
+                <span className="vg-field-label">Tên dịp lễ / Ngày đặc biệt <span className="vg-required">*</span></span>
+                <div className="voucher-cond-input-row" style={{ display: "grid", gridTemplateColumns: "1fr 120px", gap: 10 }}>
+                  <input className="vg-input" name="holidayName" defaultValue={editing?.holidayName || "Quốc Khánh 2/9"} placeholder="VD: Quốc Khánh 2/9, Tết Nguyên Đán, Noel, 8/3..." required />
+                  <input className="vg-input" name="holidayDate" defaultValue={editing?.holidayDate || "02/09"} placeholder="Ngày (DD/MM)" required />
+                </div>
+                <small className="voucher-cond-tip">📅 Mã sẽ tự động mở khóa vào đúng dịp lễ/ngày đặc biệt này.</small>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* ── Khách mua nhiều nhất (Top Khách hàng) ── */}
-          {conditionType === "top_customer" && (
-            <div className="vg-field vg-full">
-              <span className="vg-field-label">Thứ hạng Top Khách hàng <span className="vg-required">*</span></span>
-              <div className="voucher-cond-input-row">
-                <input className="vg-input" name="topRank" type="number" min="1" step="1" defaultValue={editing?.topRank || 10} required />
-                <span className="voucher-cond-unit">Top khách hàng chi tiêu cao nhất</span>
+            {/* ── Đánh giá sản phẩm ── */}
+            {conditionType === "review_reward" && (
+              <div className="vg-field vg-full">
+                <div className="voucher-cond-auto-note">
+                  <span>⭐</span>
+                  <div>
+                    <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", color: "#fff", fontWeight: 600 }}>
+                      <input type="checkbox" name="requireReviewPhoto" defaultChecked={editing?.requireReviewPhoto ?? true} />
+                      Yêu cầu bài đánh giá phải kèm HÌNH ẢNH sản phẩm
+                    </label>
+                    <small style={{ color: "rgba(255,255,255,.5)", marginTop: 4, display: "block" }}>Mã sẽ tự động tặng ngay khi khách gửi nhận xét cho bất kỳ sản phẩm nào.</small>
+                  </div>
+                </div>
               </div>
-              <small className="voucher-cond-tip">🏆 Hệ thống tự động xếp hạng thứ hạng chi tiêu của tất cả khách hàng để tặng quà VIP.</small>
-            </div>
-          )}
-        </div>
-      </form>
-    </AdminModal>
-    <ConfirmModal open={!!confirmDelete} onClose={() => setConfirmDelete(null)} onConfirm={() => { if (confirmDelete) { saveVouchers(vouchers.filter(v => v.code !== confirmDelete.code)); addAdminNotification(`Đã xóa mã giảm giá ${confirmDelete.code}`, "voucher", undefined, "vouchers"); } setConfirmDelete(null); }} title="Xóa voucher?" message="Mã giảm giá sẽ bị xóa và không thể hoàn tác." />
-  </section></>;
+            )}
+
+            {/* ── Quay lại mua (Đơn tiếp theo) ── */}
+            {conditionType === "next_order" && (
+              <div className="vg-field vg-full">
+                <div className="voucher-cond-auto-note">
+                  <span>🔄</span>
+                  <span>Mã sẽ tự động kích hoạt và tặng ngay cho khách sau khi vừa hoàn thành 1 đơn hàng để áp dụng cho lần mua tiếp theo.</span>
+                </div>
+              </div>
+            )}
+
+            {/* ── Khách mua nhiều nhất (Top Khách hàng) ── */}
+            {conditionType === "top_customer" && (
+              <div className="vg-field vg-full">
+                <span className="vg-field-label">Thứ hạng Top Khách hàng <span className="vg-required">*</span></span>
+                <div className="voucher-cond-input-row">
+                  <input className="vg-input" name="topRank" type="number" min="1" step="1" defaultValue={editing?.topRank || 10} required />
+                  <span className="voucher-cond-unit">Top khách hàng chi tiêu cao nhất</span>
+                </div>
+                <small className="voucher-cond-tip">🏆 Hệ thống tự động xếp hạng thứ hạng chi tiêu của tất cả khách hàng để tặng quà VIP.</small>
+              </div>
+            )}
+          </div>
+        </form>
+      </AdminModal>
+      <ConfirmModal open={!!confirmDelete} onClose={() => setConfirmDelete(null)} onConfirm={() => { if (confirmDelete) { saveVouchers(vouchers.filter(v => v.code !== confirmDelete.code)); addAdminNotification(`Đã xóa mã giảm giá ${confirmDelete.code}`, "voucher", undefined, "vouchers"); } setConfirmDelete(null); }} title="Xóa voucher?" message="Mã giảm giá sẽ bị xóa và không thể hoàn tác." />
+    </section></>;
 }
 
 
@@ -1397,6 +1423,7 @@ function ContentManager({ showNotice }: { showNotice: (text: string) => void }) 
     try { return JSON.parse(localStorage.getItem(heroContentKey) || "null") || defaultHeroSlides; } catch { return defaultHeroSlides; }
   });
   const [heroEditing, setHeroEditing] = useState<number | null>(null);
+  const [heroPreview, setHeroPreview] = useState<{ field: "background" | "product"; value: string } | null>(null);
   const [heroImageSources, setHeroImageSources] = useState<{ background: "upload" | "url"; product: "upload" | "url" }>({ background: "url", product: "url" });
   const [memberOffer, setMemberOffer] = useState<MemberOfferContent>(() => {
     if (typeof window === "undefined") return defaultMemberOffer;
@@ -1415,7 +1442,7 @@ function ContentManager({ showNotice }: { showNotice: (text: string) => void }) 
     showNotice(editing ? "Đã cập nhật nội dung" : "Đã thêm nội dung");
   }
   function uploadImage(event: ChangeEvent<HTMLInputElement>) { const file = event.target.files?.[0]; if (!file || !file.type.startsWith("image/")) return; const reader = new FileReader(); reader.onload = () => { setEditingImageSource("upload"); setEditing(current => current ? { ...current, image: String(reader.result) } : current); }; reader.readAsDataURL(file); }
-  function uploadHeroImage(event: ChangeEvent<HTMLInputElement>, field: "background" | "product") { const file = event.target.files?.[0]; if (!file || !file.type.startsWith("image/") || heroEditing === null) return; const reader = new FileReader(); reader.onload = () => { const value = String(reader.result); setHeroSlides(current => current.map((slide, index) => index === heroEditing ? { ...slide, [field]: value } : slide)); setHeroImageSources(current => ({ ...current, [field]: "upload" })); const input = document.querySelector<HTMLInputElement>(`#hero-form [name="${field}"]`); if (input) input.value = value; }; reader.readAsDataURL(file); }
+  function uploadHeroImage(event: ChangeEvent<HTMLInputElement>, field: "background" | "product") { const file = event.target.files?.[0]; if (!file || !file.type.startsWith("image/") || heroEditing === null) return; if (file.size > 5 * 1024 * 1024) { showNotice("Ảnh quá lớn, vui lòng chọn ảnh dưới 5MB"); event.target.value = ""; return; } const reader = new FileReader(); reader.onload = () => { const image = new Image(); image.onload = () => { const maxSize = 1600; const scale = Math.min(1, maxSize / Math.max(image.naturalWidth, image.naturalHeight)); const canvas = document.createElement("canvas"); canvas.width = Math.max(1, Math.round(image.naturalWidth * scale)); canvas.height = Math.max(1, Math.round(image.naturalHeight * scale)); const context = canvas.getContext("2d"); if (!context) { showNotice("Không thể đọc ảnh, vui lòng thử ảnh khác"); return; } context.drawImage(image, 0, 0, canvas.width, canvas.height); const value = canvas.toDataURL("image/jpeg", 0.82); setHeroSlides(current => current.map((slide, index) => index === heroEditing ? { ...slide, [field]: value } : slide)); setHeroImageSources(current => ({ ...current, [field]: "upload" })); setHeroPreview({ field, value }); }; image.onerror = () => showNotice("Không thể đọc ảnh, vui lòng thử ảnh khác"); image.src = String(reader.result); }; reader.readAsDataURL(file); }
   function openHeroEditor(index: number) {
     const slide = heroSlides[index];
     setHeroImageSources({
@@ -1425,7 +1452,7 @@ function ContentManager({ showNotice }: { showNotice: (text: string) => void }) 
     setHeroEditing(index);
   }
   function saveHeroSlides(next: HeroSlideContent[]) { setHeroSlides(next); localStorage.setItem(heroContentKey, JSON.stringify(next)); window.dispatchEvent(new Event("gao-ngon-content-updated")); }
-  function submitHero(event: FormEvent<HTMLFormElement>) { event.preventDefault(); if (heroEditing === null) return; const data = new FormData(event.currentTarget); const next = heroSlides.map((slide, index) => index === heroEditing ? { background: String(data.get("background") || ""), product: String(data.get("product") || ""), eyebrow: String(data.get("eyebrow") || ""), title: String(data.get("title") || ""), script: String(data.get("script") || ""), description: String(data.get("description") || "") } : slide); saveHeroSlides(next); addAdminNotification(`Cập nhật slide trang chủ #${heroEditing + 1}`, "content", undefined, "content"); setHeroEditing(null); showNotice("Đã cập nhật slide trang chủ"); }
+  function submitHero(event: FormEvent<HTMLFormElement>) { event.preventDefault(); if (heroEditing === null) return; const data = new FormData(event.currentTarget); const currentSlide = heroSlides[heroEditing]; const next = heroSlides.map((slide, index) => index === heroEditing ? { background: heroImageSources.background === "upload" ? currentSlide.background : String(data.get("background") || currentSlide.background), product: heroImageSources.product === "upload" ? currentSlide.product : String(data.get("product") || currentSlide.product), eyebrow: String(data.get("eyebrow") || ""), title: String(data.get("title") || ""), script: String(data.get("script") || ""), description: String(data.get("description") || "") } : slide); try { saveHeroSlides(next); } catch { showNotice("Không thể lưu ảnh, vui lòng chọn ảnh nhỏ hơn"); return; } addAdminNotification(`Cập nhật slide trang chủ #${heroEditing + 1}`, "content", undefined, "content"); setHeroEditing(null); showNotice("Đã cập nhật slide trang chủ"); }
   function submitMemberOffer(event: FormEvent<HTMLFormElement>) { event.preventDefault(); const data = new FormData(event.currentTarget); const next: MemberOfferContent = { title: String(data.get("title") || ""), label: String(data.get("label") || ""), discount: String(data.get("discount") || ""), condition: String(data.get("condition") || ""), button: String(data.get("button") || ""), href: String(data.get("href") || "/user") }; setMemberOffer(next); localStorage.setItem(memberOfferKey, JSON.stringify(next)); window.dispatchEvent(new Event("gao-ngon-member-offer-updated")); addAdminNotification("Cập nhật nội dung ưu đãi hội viên", "content", undefined, "content"); setMemberOfferEditing(false); showNotice("Đã cập nhật ưu đãi hội viên"); }
 
   return <div className="admin-content-manager">
@@ -1467,7 +1494,7 @@ function ContentManager({ showNotice }: { showNotice: (text: string) => void }) 
       </form>
     </AdminModal>
     <AdminModal open={heroEditing !== null} onClose={() => setHeroEditing(null)} title="Chỉnh sửa slide hero" subtitle="Thay ảnh và nội dung hiển thị trên trang chủ" size="lg" footer={<><button className="vg-btn" type="button" onClick={() => setHeroEditing(null)}>Hủy</button><button className="vg-btn vg-btn-primary" type="submit" form="hero-form">Lưu slide</button></>}>
-      {heroEditing !== null && <form id="hero-form" onSubmit={submitHero}><div className="vg-form-grid"><div className="vg-field"><span className="vg-field-label">Nhãn nhỏ</span><input className="vg-input" name="eyebrow" defaultValue={heroSlides[heroEditing].eyebrow} /></div><div className="vg-field"><span className="vg-field-label">Câu slogan</span><input className="vg-input" name="script" defaultValue={heroSlides[heroEditing].script} /></div><div className="vg-field vg-full"><span className="vg-field-label">Tiêu đề</span><textarea className="vg-textarea" name="title" defaultValue={heroSlides[heroEditing].title} required /></div><div className="vg-field vg-full"><span className="vg-field-label">Mô tả</span><textarea className="vg-textarea" name="description" defaultValue={heroSlides[heroEditing].description} required /></div><div className="vg-field"><span className="vg-field-label">Ảnh nền</span><div className="vg-upload-zone"><div className="vg-upload-source"><button type="button" className={heroImageSources.background === "upload" ? "active" : ""} onClick={() => { setHeroImageSources(current => ({ ...current, background: "upload" })); setHeroSlides(currentSlides => currentSlides.map((slide, index) => index === heroEditing ? { ...slide, background: slide.background.startsWith("data:image/") ? slide.background : "" } : slide)); }}>Upload ảnh nền</button><button type="button" className={heroImageSources.background === "url" ? "active" : ""} onClick={() => { setHeroImageSources(current => ({ ...current, background: "url" })); setHeroSlides(currentSlides => currentSlides.map((slide, index) => index === heroEditing ? { ...slide, background: slide.background.startsWith("data:image/") ? "" : slide.background } : slide)); }}>URL ảnh nền</button></div><div className="vg-upload-bar">{heroImageSources.background === "upload" ? <label className="vg-upload-btn">⇪ Upload ảnh nền<input type="file" accept="image/png,image/jpeg,image/webp" onChange={event => uploadHeroImage(event, "background")} /></label> : <div className="vg-upload-url"><input className="vg-input" name="background" value={heroSlides[heroEditing].background} onChange={(event) => { const next = event.target.value.trim(); setHeroSlides(currentSlides => currentSlides.map((slide, index) => index === heroEditing ? { ...slide, background: next } : slide)); }} placeholder="https://..." required /></div>}</div></div></div><div className="vg-field"><span className="vg-field-label">Ảnh sản phẩm</span><div className="vg-upload-zone"><div className="vg-upload-source"><button type="button" className={heroImageSources.product === "upload" ? "active" : ""} onClick={() => { setHeroImageSources(current => ({ ...current, product: "upload" })); setHeroSlides(currentSlides => currentSlides.map((slide, index) => index === heroEditing ? { ...slide, product: slide.product.startsWith("data:image/") ? slide.product : "" } : slide)); }}>Upload ảnh sản phẩm</button><button type="button" className={heroImageSources.product === "url" ? "active" : ""} onClick={() => { setHeroImageSources(current => ({ ...current, product: "url" })); setHeroSlides(currentSlides => currentSlides.map((slide, index) => index === heroEditing ? { ...slide, product: slide.product.startsWith("data:image/") ? "" : slide.product } : slide)); }}>URL ảnh sản phẩm</button></div><div className="vg-upload-bar">{heroImageSources.product === "upload" ? <label className="vg-upload-btn">⇪ Upload ảnh sản phẩm<input type="file" accept="image/png,image/jpeg,image/webp" onChange={event => uploadHeroImage(event, "product")} /></label> : <div className="vg-upload-url"><input className="vg-input" name="product" value={heroSlides[heroEditing].product} onChange={(event) => { const next = event.target.value.trim(); setHeroSlides(currentSlides => currentSlides.map((slide, index) => index === heroEditing ? { ...slide, product: next } : slide)); }} placeholder="https://..." /></div>}</div></div></div></div></form>}
+      {heroEditing !== null && <form id="hero-form" onSubmit={submitHero}><div className="vg-form-grid"><div className="vg-field"><span className="vg-field-label">Nhãn nhỏ</span><input className="vg-input" name="eyebrow" defaultValue={heroSlides[heroEditing].eyebrow} /></div><div className="vg-field"><span className="vg-field-label">Câu slogan</span><input className="vg-input" name="script" defaultValue={heroSlides[heroEditing].script} /></div><div className="vg-field vg-full"><span className="vg-field-label">Tiêu đề</span><textarea className="vg-textarea" name="title" defaultValue={heroSlides[heroEditing].title} required /></div><div className="vg-field vg-full"><span className="vg-field-label">Mô tả</span><textarea className="vg-textarea" name="description" defaultValue={heroSlides[heroEditing].description} required /></div><div className="vg-field"><span className="vg-field-label">Ảnh nền</span><div className="vg-upload-zone"><div className="vg-upload-source"><button type="button" className={heroImageSources.background === "upload" ? "active" : ""} onClick={() => { setHeroImageSources(current => ({ ...current, background: "upload" })); setHeroSlides(currentSlides => currentSlides.map((slide, index) => index === heroEditing ? { ...slide, background: slide.background.startsWith("data:image/") ? slide.background : "" } : slide)); }}>Upload ảnh nền</button><button type="button" className={heroImageSources.background === "url" ? "active" : ""} onClick={() => { setHeroImageSources(current => ({ ...current, background: "url" })); setHeroSlides(currentSlides => currentSlides.map((slide, index) => index === heroEditing ? { ...slide, background: slide.background.startsWith("data:image/") ? "" : slide.background } : slide)); }}>URL ảnh nền</button></div><div className="vg-upload-bar">{heroImageSources.background === "upload" ? <label className="vg-upload-btn">⇪ Upload ảnh nền<input type="file" accept="image/png,image/jpeg,image/webp" onChange={event => uploadHeroImage(event, "background")} /></label> : <div className="vg-upload-url"><input className="vg-input" name="background" value={heroSlides[heroEditing].background} onChange={(event) => { const next = event.target.value.trim(); setHeroSlides(currentSlides => currentSlides.map((slide, index) => index === heroEditing ? { ...slide, background: next } : slide)); }} placeholder="https://..." required /></div>}</div>{(heroPreview?.field === "background" || heroSlides[heroEditing].background) && <img className="hero-upload-preview" src={heroPreview?.field === "background" ? heroPreview.value : heroSlides[heroEditing].background} alt="Xem trước ảnh nền" />}</div></div><div className="vg-field"><span className="vg-field-label">Ảnh sản phẩm</span><div className="vg-upload-zone"><div className="vg-upload-source"><button type="button" className={heroImageSources.product === "upload" ? "active" : ""} onClick={() => { setHeroImageSources(current => ({ ...current, product: "upload" })); setHeroSlides(currentSlides => currentSlides.map((slide, index) => index === heroEditing ? { ...slide, product: slide.product.startsWith("data:image/") ? slide.product : "" } : slide)); }}>Upload ảnh sản phẩm</button><button type="button" className={heroImageSources.product === "url" ? "active" : ""} onClick={() => { setHeroImageSources(current => ({ ...current, product: "upload" })); setHeroSlides(currentSlides => currentSlides.map((slide, index) => index === heroEditing ? { ...slide, product: slide.product.startsWith("data:image/") ? slide.product : "" } : slide)); }}>URL ảnh sản phẩm</button></div><div className="vg-upload-bar">{heroImageSources.product === "upload" ? <label className="vg-upload-btn">⇪ Upload ảnh sản phẩm<input type="file" accept="image/png,image/jpeg,image/webp" onChange={event => uploadHeroImage(event, "product")} /></label> : <div className="vg-upload-url"><input className="vg-input" name="product" value={heroSlides[heroEditing].product} onChange={(event) => { const next = event.target.value.trim(); setHeroSlides(currentSlides => currentSlides.map((slide, index) => index === heroEditing ? { ...slide, product: next } : slide)); }} placeholder="https://..." /></div>}</div>{(heroPreview?.field === "product" || heroSlides[heroEditing].product) && <img className="hero-upload-preview" src={heroPreview?.field === "product" ? heroPreview.value : heroSlides[heroEditing].product} alt="Xem trước ảnh sản phẩm" />}</div></div></div></form>}
     </AdminModal>
     <AdminModal open={memberOfferEditing} onClose={() => setMemberOfferEditing(false)} title="Chỉnh sửa ưu đãi hội viên" subtitle="Nội dung hiển thị trong khối ưu đãi trang chủ" size="md" footer={<><button className="vg-btn" type="button" onClick={() => setMemberOfferEditing(false)}>Hủy</button><button className="vg-btn vg-btn-primary" type="submit" form="member-offer-form">Lưu ưu đãi</button></>}>
       <form id="member-offer-form" onSubmit={submitMemberOffer}><div className="vg-form-grid"><div className="vg-field vg-full"><span className="vg-field-label">Tiêu đề</span><input className="vg-input" name="title" defaultValue={memberOffer.title} required /></div><div className="vg-field"><span className="vg-field-label">Nhãn ưu đãi</span><input className="vg-input" name="label" defaultValue={memberOffer.label} required /></div><div className="vg-field"><span className="vg-field-label">Mức giảm</span><input className="vg-input" name="discount" defaultValue={memberOffer.discount} required /></div><div className="vg-field vg-full"><span className="vg-field-label">Điều kiện</span><input className="vg-input" name="condition" defaultValue={memberOffer.condition} required /></div><div className="vg-field"><span className="vg-field-label">Tên nút</span><input className="vg-input" name="button" defaultValue={memberOffer.button} required /></div><div className="vg-field"><span className="vg-field-label">Đường dẫn khi bấm</span><input className="vg-input" name="href" defaultValue={memberOffer.href} placeholder="/user" required /></div></div></form>

@@ -9,6 +9,7 @@ interface Props {
   onWish?: () => void;
   onQuickAdd?: () => void;
   onDetails?: () => void;
+  onReviews?: () => void;
   onAddToCart?: (product: Product, quantity: number) => void;
 }
 
@@ -18,6 +19,7 @@ export default function ProductCard({
   onWish,
   onQuickAdd,
   onDetails,
+  onReviews,
   onAddToCart,
 }: Props) {
   const [quantity, setQuantity] = useState(1);
@@ -46,6 +48,15 @@ export default function ProductCard({
 
   const increase = () => setQuantity((q) => q + 1);
   const decrease = () => setQuantity((q) => (q > 1 ? q - 1 : 1));
+  const handleReviews = () => {
+    if (onReviews) {
+      onReviews();
+      return;
+    }
+    if (onDetails) {
+      onDetails();
+    }
+  };
 
   const originStr = product.origin || 'Điện Biên';
   const features = [
@@ -56,7 +67,7 @@ export default function ProductCard({
   ];
 
   return (
-    <article className="catalog-card">
+    <article className="catalog-card shared-product-card">
       {/* Badge */}
       {product.badge && <span className="catalog-badge">{product.badge}</span>}
 
@@ -82,8 +93,8 @@ export default function ProductCard({
           src={product.image}
           alt={product.name}
           fill
-          sizes="(max-width: 768px) 100vw, 25vw"
-          style={{ objectFit: 'cover' }}
+          sizes="280px"
+          style={{ objectFit: 'cover', objectPosition: 'center' }}
         />
         <span className="view-details">Xem chi tiết <b>→</b></span>
       </button>
@@ -93,13 +104,13 @@ export default function ProductCard({
         <span className="catalog-category">
           {product.category}{product.weight ? ` · ${product.weight}` : ''}
         </span>
-        
+
         {/* Title and Badge row */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '6px', marginTop: '6px' }}>
-          <h3 
-            onClick={onDetails} 
+        <div className="product-title-row" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '6px', marginTop: '6px' }}>
+          <h3
+            onClick={onDetails}
             className="cursor-pointer hover:text-[#efd889] transition-colors"
-            style={{ fontFamily: "'Cormorant Garamond', serif", flex: 1, margin: 0 }}
+            style={{ fontFamily: "'Cormorant Garamond', serif", flex: 1, minWidth: 0, margin: 0 }}
           >
             {product.name}
           </h3>
@@ -107,31 +118,46 @@ export default function ProductCard({
             🌿 Đặc sản
           </span>
         </div>
-        
-        {product.note && (
-          <p style={{ minHeight: '32px', margin: '8px 0 0', fontSize: '13px', color: 'rgba(255, 255, 255, 0.65)', lineHeight: '1.4' }}>
-            {product.note}
-          </p>
-        )}
+
+        <p
+          className="product-note cursor-pointer hover:text-[#efd889] transition-colors"
+          onClick={onDetails}
+          title="Bấm để xem chi tiết sản phẩm"
+          style={{
+            margin: '6px 0 0',
+            fontSize: '12.5px',
+            color: 'rgba(255, 255, 255, 0.65)',
+            lineHeight: '1.4',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            height: '36px',
+            minHeight: '36px',
+            maxHeight: '36px',
+          }}
+        >
+          {product.note || '\u00a0'}
+        </p>
 
 
         {/* Rating and view reviews row */}
-        {product.rating !== undefined && (
-          <div className="catalog-review" style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '12px', fontSize: '12.5px', color: 'rgba(255, 255, 255, 0.5)' }}>
-            <span className="catalog-stars" aria-label={`${product.rating} trên 5 sao`}>
-              ★★★★★ <small style={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: '11px' }}>{product.rating.toFixed(1)}</small>
-            </span>
-            {product.reviews !== undefined && <span>({product.reviews})</span>}
-            <span style={{ color: 'rgba(255, 255, 255, 0.2)', margin: '0 2px' }}>|</span>
-            <button 
-              type="button" 
-              style={{ border: 'none', background: 'transparent', padding: 0, color: 'rgba(255, 255, 255, 0.6)', cursor: 'pointer', textDecoration: 'underline', fontSize: '11.5px', display: 'flex', alignItems: 'center', gap: '2px' }}
-              className="hover:text-[#efd889] transition-colors"
-            >
-              <span>💬</span> <span>Xem đánh giá</span>
-            </button>
-          </div>
-        )}
+        <div className="catalog-review" style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '12px', fontSize: '12.5px', color: 'rgba(255, 255, 255, 0.5)' }}>
+          <span className="catalog-stars" aria-label={`${product.rating} trên 5 sao`}>
+            ★★★★★ <small style={{ color: 'rgba(255, 255, 255, 0.65)', fontSize: '11px' }}>{product.rating?.toFixed(1) || '0.0'}</small>
+          </span>
+          <span>({product.reviews ?? 0})</span>
+          <span style={{ color: 'rgba(255, 255, 255, 0.2)', margin: '0 2px' }}>|</span>
+          <button
+            type="button"
+            onClick={handleReviews}
+            style={{ border: 'none', background: 'transparent', padding: 0, color: 'rgba(255, 255, 255, 0.6)', cursor: 'pointer', textDecoration: 'underline', fontSize: '11.5px', display: 'flex', alignItems: 'center', gap: '2px' }}
+            className="hover:text-[#efd889] transition-colors"
+          >
+            <span>💬</span> <span className="review-label">Xem đánh giá</span>
+          </button>
+        </div>
 
         {/* Price and Action Section - named to catalog-buy-section to avoid targeting by stylesheet's .catalog-price button selector */}
         <div className="catalog-buy-section" style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '14px', paddingTop: '14px', borderTop: '1px solid rgba(239, 216, 137, 0.1)' }}>
@@ -141,34 +167,48 @@ export default function ProductCard({
             </strong>
             <span style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.6)', marginLeft: '4px' }}>/ kg</span>
           </div>
-          
+
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', width: '100%' }}>
             {/* Quantity Selector */}
             <div style={{ display: 'flex', alignItems: 'center', border: '1px solid rgba(216, 180, 90, 0.5)', borderRadius: '9999px', padding: '4px 10px', backgroundColor: 'rgba(24, 53, 35, 0.3)' }}>
-              <button 
-                type="button" 
-                onClick={decrease} 
+              <button
+                type="button"
+                onClick={decrease}
                 style={{ border: 'none', background: 'transparent', color: '#efd889', cursor: 'pointer', fontWeight: 'bold', fontSize: '15px', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >
                 −
               </button>
               <span style={{ margin: '0 8px', width: '14px', textAlign: 'center', color: '#fff', fontSize: '13px', fontWeight: 'bold' }}>{quantity}</span>
-              <button 
-                type="button" 
-                onClick={increase} 
+              <button
+                type="button"
+                onClick={increase}
                 style={{ border: 'none', background: 'transparent', color: '#efd889', cursor: 'pointer', fontWeight: 'bold', fontSize: '15px', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >
                 +
               </button>
             </div>
-            
+
             {/* Add to Cart Button */}
             <button
               type="button"
               onClick={handleAdd}
               style={{ flex: 1, background: 'linear-gradient(90deg, #d8b45a 0%, #efd889 100%)', border: 'none', borderRadius: '9999px', color: '#102d1d', fontWeight: 'bold', padding: '8px 16px', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', boxShadow: '0 4px 6px rgba(0,0,0,0.15)' }}
             >
-              <span>🛒</span>
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                width="15"
+                height="15"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="9" cy="20" r="1" />
+                <circle cx="19" cy="20" r="1" />
+                <path d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 1.9-1.4L21 8H6.2" />
+              </svg>
               <span>Thêm vào giỏ</span>
             </button>
           </div>
@@ -177,4 +217,3 @@ export default function ProductCard({
     </article>
   );
 }
-

@@ -1,0 +1,151 @@
+.page {
+  min-height: 100vh;
+  color: #f8f6ee;
+  background: linear-gradient(90deg, rgba(4, 29, 20, .94), rgba(8, 36, 25, .82)), url("/images/rice-landscape.png") center/cover fixed;
+}
+
+.content {
+  width: min(1010px, calc(100% - 48px));
+  margin: 24px auto 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.75fr) minmax(280px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.article,
+.related {
+  min-width: 0;
+  padding: 22px 30px 20px;
+  border: 1px solid rgba(216, 180, 90, .45);
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(19, 53, 36, .76), rgba(5, 29, 20, .7));
+  box-shadow: inset 0 1px rgba(255, 255, 255, .06), 0 18px 40px rgba(0, 0, 0, .16);
+  backdrop-filter: blur(12px);
+}
+
+.backLink {
+  display: inline-block;
+  margin-bottom: 22px;
+  color: #ffd700;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.tag {
+  display: inline-block;
+  padding: 5px 11px;
+  border-radius: 5px;
+  color: #f5d873;
+  background: rgba(75, 132, 67, .44);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+}
+
+.article h1 {
+  max-width: 650px;
+  margin-top: 14px;
+  font: 700 36px/1.08 Inter, sans-serif;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+  color: rgba(255, 255, 255, .7);
+  font-size: 11px;
+}
+
+.meta i { width: 1px; height: 14px; background: rgba(255, 215, 0, .5); }
+
+.heroImage {
+  height: 210px;
+  margin: 15px 0 17px;
+  border: 1px solid rgba(216, 180, 90, .28);
+  border-radius: 12px;
+  background: url("/images/rice-landscape.png") center/cover;
+}
+
+.article p {
+  margin-top: 14px;
+  color: rgba(255, 255, 255, .77);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.actions { display: flex; gap: 12px; margin-top: 16px; }
+.actions button,
+.actions a {
+  display: inline-block;
+  padding: 10px 24px;
+  border: 1px solid #d8b45a;
+  border-radius: 6px;
+  color: #193421;
+  background: linear-gradient(180deg, #f0d56d, #d8b45a);
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+.actions .share { color: #f8f6ee; background: transparent; border-color: rgba(216, 180, 90, .3); }
+.article h2 { margin-top: 28px; color: #ffd700; font: 600 25px "Cormorant Garamond", serif; }
+.details { animation: details-reveal .25s ease both; }
+
+@keyframes details-reveal {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.related { margin-top: 12px; padding: 28px 25px 18px; border-color: rgba(126, 179, 113, .25); }
+.relatedHeading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+.relatedHeading h2 { color: #f8f6ee; font-size: 16px; }
+.relatedHeading a { padding: 7px 10px; border: 1px solid rgba(216, 180, 90, .35); border-radius: 6px; color: #f8f6ee; font-size: 10px; text-decoration: none; }
+.relatedItem { display: grid; grid-template-columns: 70px 1fr 12px; gap: 12px; align-items: center; margin-top: 18px; color: inherit; text-decoration: none; }
+.relatedItem > span { width: 70px; height: 70px; border-radius: 10px; background-position: center; background-size: cover; }
+.relatedItem b { display: block; color: rgba(255, 255, 255, .88); font-size: 12px; line-height: 1.4; }
+.relatedItem small { display: block; margin-top: 9px; color: rgba(255, 215, 0, .72); font-size: 9px; }
+.relatedItem em { color: #ffd700; font-size: 22px; font-style: normal; }
+
+.relatedCta {
+  margin-top: 24px;
+  padding: 17px 15px;
+  border: 1px solid rgba(216, 180, 90, .28);
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(216, 180, 90, .12), rgba(4, 34, 23, .35));
+}
+
+.relatedCta span {
+  color: #ffd700;
+  font-size: 9px;
+  letter-spacing: 1.2px;
+}
+
+.relatedCta b {
+  display: block;
+  max-width: 190px;
+  margin-top: 6px;
+  color: rgba(255, 255, 255, .88);
+  font: 600 18px/1.1 "Cormorant Garamond", serif;
+}
+
+.relatedCta a {
+  display: inline-block;
+  margin-top: 12px;
+  color: #ffd700;
+  font-size: 10px;
+  text-decoration: none;
+}
+
+@media (max-width: 800px) {
+  .content { grid-template-columns: 1fr; width: calc(100% - 30px); }
+  .related { margin-top: 0; }
+}
+
+@media (max-width: 520px) {
+  .article, .related { padding: 18px; }
+  .article h1 { font-size: 29px; }
+  .heroImage { height: 180px; }
+}

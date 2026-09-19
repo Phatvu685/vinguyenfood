@@ -11,6 +11,7 @@ import SiteHeader from "./components/SiteHeader";
 import { CART_STORAGE_KEY, getCartItems, getCatalogProducts, products as defaultProducts, saveCartItems, type Product } from "./san-pham/data";
 import ProductCard from "./components/ProductCard";
 import styles from "./page.module.css";
+import ReviewsSection from "./components/ReviewsSection";
 
 
 const Icon = ({ children }: { children: React.ReactNode }) => (
@@ -255,10 +256,6 @@ export default function Home() {
             <button className="gold-button">KHÁM PHÁ NGAY　→</button>
           </div>
 
-          <div className="hero-product">
-            {heroSlides[activeSlide].product && <img src={heroSlides[activeSlide].product} alt="Gạo ngon" />}
-          </div>
-
           <div className="member-box">
             <strong>♛ {memberOffer.title}</strong>
             <hr />
@@ -273,16 +270,17 @@ export default function Home() {
       </section>
 
       <section className="services scroll-reveal">
-        <div><span className="service-icon">🚚</span><p><b>GIAO HÀNG TOÀN QUỐC</b><small>Giao nhanh chóng,<br />an toàn, tận nơi</small></p></div>
-        <div><span className="service-icon">▣</span><p><b>THANH TOÁN AN TOÀN</b><small>Nhiều hình thức thanh toán<br />tiện lợi</small></p></div>
-        <div><span className="service-icon">✥</span><p><b>CAM KẾT CHẤT LƯỢNG</b><small>Hạt gạo ngon, nguyên chất,<br />nguồn gốc rõ ràng</small></p></div>
-        <div><span className="service-icon">♧</span><p><b>TƯ VẤN NHIỆT TÌNH</b><small>Hỗ trợ 24/7, giải đáp<br />mọi thắc mắc</small></p></div>
+        <div><span className="service-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3 6h11v10H3zM14 10h3.5L21 13.5V16h-7zM6.5 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM17.5 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" /><path d="M3 10h11" /></svg></span><p><b>GIAO HÀNG TOÀN QUỐC</b><small>Giao nhanh chóng,<br />an toàn, tận nơi</small></p></div>
+        <div><span className="service-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 9h18M7 15h3" /><path d="m16.5 13 .8 1.4 1.6.3-1.1 1.2.2 1.6-1.5-.7-1.5.7.2-1.6-1.1-1.2 1.6-.3z" /></svg></span><p><b>THANH TOÁN AN TOÀN</b><small>Nhiều hình thức thanh toán<br />tiện lợi</small></p></div>
+        <div><span className="service-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m12 3 2.1 2.1 3-.1.8 2.9 2.5 1.7-1.2 2.7 1.2 2.7-2.5 1.7-.8 2.9-3-.1L12 21l-2.1-2.1-3 .1-.8-2.9-2.5-1.7 1.2-2.7-1.2-2.7L6.1 7l.8-2.9 3 .1z" /><path d="m8.5 12 2.2 2.2 4.8-5" /></svg></span><p><b>CAM KẾT CHẤT LƯỢNG</b><small>Hạt gạo ngon, nguyên chất,<br />nguồn gốc rõ ràng</small></p></div>
+        <div><span className="service-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 13v-1a8 8 0 0 1 16 0v1" /><path d="M4 13h3v6H5a1 1 0 0 1-1-1zM20 13h-3v6h2a1 1 0 0 0 1-1zM17 19c0 1.3-1.2 2-3 2h-2" /><path d="M12 21h2" /></svg></span><p><b>TƯ VẤN NHIỆT TÌNH</b><small>Hỗ trợ 24/7, giải đáp<br />mọi thắc mắc</small></p></div>
       </section>
 
       <section className="products-section scroll-reveal">
         <div className="section-heading">
           <div>
-            <h2>⌁ SẢN PHẨM NỔI BẬT ⌁</h2>
+            <span className="featured-kicker">Bộ sưu tập được yêu thích</span>
+            <h2>Sản phẩm nổi bật</h2>
             <p>Khám phá những hạt gạo được yêu thích nhất</p>
           </div>
           <a href="/san-pham">Xem tất cả　→</a>
@@ -294,8 +292,9 @@ export default function Home() {
               key={product.id}
               product={product}
               wished={false}
-              onWish={() => {}}
+              onWish={() => { }}
               onDetails={() => window.location.assign(`/san-pham/${product.id}`)}
+              onReviews={() => window.location.assign(`/san-pham/${product.id}#reviews`)}
               onAddToCart={(p, qty) => addProductToCart(p as any, qty, p.weight)}
             />
           ))}
@@ -361,17 +360,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="reviews-section scroll-reveal">
-        <div className="section-title-centered">
-          <span className="section-kicker">BỮA CƠM NHÀ MÌNH</span>
-          <h2>KHÁCH HÀNG ĐÁNH GIÁ</h2>
-        </div>
-        <div className="reviews-grid">
-          <blockquote><div className="rating">★★★★★</div><p>“Cơm nấu lên dẻo vừa, thơm nhẹ và để nguội vẫn ngon. Cả nhà mình đều thích.”</p><footer>— Chị Minh Anh <span>Khách hàng thân thiết</span></footer></blockquote>
-          <blockquote><div className="rating">★★★★★</div><p>“Đóng gói chắc chắn, giao nhanh. Mình đã mua lại ST25 lần thứ ba rồi.”</p><footer>— Anh Hoàng Nam <span>Khách hàng online</span></footer></blockquote>
-          <blockquote><div className="rating">★★★★★</div><p>“Tư vấn rất nhiệt tình, chọn được loại gạo hợp khẩu vị cho gia đình bốn người.”</p><footer>— Cô Thu Hà <span>Khách hàng tại Hà Nội</span></footer></blockquote>
-        </div>
-      </section>
+      <ReviewsSection />
 
       <section className="final-cta scroll-reveal">
         <div>

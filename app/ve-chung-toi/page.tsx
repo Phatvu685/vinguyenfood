@@ -727,7 +727,7 @@ export default function AboutPage() {
         .timeline:before {
           content: "";
           position: absolute;
-          left: 77px;
+          left: 76px;
           top: 18px;
           bottom: 18px;
           width: 2px;
@@ -736,10 +736,41 @@ export default function AboutPage() {
 
         .timeline-item {
           display: grid;
-          grid-template-columns: 110px 1fr;
+          grid-template-columns: 116px minmax(0, 1fr);
           gap: 26px;
           align-items: center;
           min-height: 116px;
+        }
+
+        .timeline-marker {
+          position: relative;
+          z-index: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 116px;
+          min-height: 94px;
+        }
+
+        .timeline-index {
+          position: absolute;
+          top: 0;
+          left: 7px;
+          z-index: 2;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 34px;
+          height: 28px;
+          padding: 0 7px;
+          border: 1px solid rgba(240, 206, 105, 0.5);
+          border-radius: 999px;
+          background: #123523;
+          color: #f5d77b;
+          font-size: 0.68rem;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          box-shadow: 0 6px 14px rgba(5, 18, 12, 0.3);
         }
 
         .timeline-year {
@@ -750,13 +781,14 @@ export default function AboutPage() {
           display: flex;
           align-items: center;
           justify-content: center;
-          margin-left: 24px;
+          margin-left: 0;
           border-radius: 50%;
-          background: linear-gradient(135deg, #0e2a1d, #1c4a32);
-          color: #f0ce69;
+          background: radial-gradient(circle at 30% 25%, #f7dd88 0%, #d8ad45 58%, #a66d1f 100%);
+          color: #173524;
           font-weight: 800;
-          border: 2px solid rgba(216,180,90,0.45);
-          box-shadow: 0 12px 24px rgba(16, 37, 26, 0.12);
+          border: 2px solid rgba(255, 235, 164, 0.82);
+          box-shadow: 0 0 0 7px rgba(216, 180, 90, 0.12), 0 12px 24px rgba(5, 20, 13, 0.25);
+          font-size: 0.98rem;
         }
 
         .timeline-card {
@@ -856,55 +888,127 @@ export default function AboutPage() {
         }
 
         .stats-section {
-          margin-top: 110px;
-          padding: 86px 5%;
-          background: linear-gradient(135deg, #112d1e 0%, #1a3d2d 100%);
+          position: relative;
+          overflow: hidden;
+          margin-top: 80px;
+          padding: 54px 5%;
+          background:
+            linear-gradient(100deg, rgba(7, 33, 22, 0.98), rgba(18, 62, 42, 0.94)),
+            url('/images/rice-landscape.png') center / cover no-repeat;
           color: #f7f3ea;
         }
 
+        .stats-section::before {
+          content: "";
+          position: absolute;
+          inset: 14px 5%;
+          border: 1px solid rgba(239, 204, 108, 0.18);
+          border-radius: 28px;
+          pointer-events: none;
+        }
+
+        .stats-intro {
+          position: relative;
+          z-index: 1;
+          width: min(1200px, 100%);
+          margin: 0 auto 30px;
+          display: flex;
+          align-items: end;
+          justify-content: space-between;
+          gap: 24px;
+        }
+
+        .stats-intro span {
+          color: #eccb72;
+          font-size: 0.7rem;
+          font-weight: 800;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+        }
+
+        .stats-intro h2 {
+          margin-top: 8px;
+          font-family: "Cormorant Garamond", serif;
+          font-size: clamp(2rem, 3vw, 3rem);
+          font-weight: 600;
+          line-height: 1;
+          color: #fbf1d9;
+        }
+
+        .stats-intro p {
+          max-width: 350px;
+          color: rgba(248, 240, 218, 0.72);
+          font-size: 0.93rem;
+          line-height: 1.65;
+        }
+
         .stats-grid {
+          position: relative;
+          z-index: 1;
           width: min(1200px, 100%);
           margin: 0 auto;
           display: grid;
           grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 24px;
+          border-top: 1px solid rgba(239, 204, 108, 0.22);
         }
 
         .stat-card {
-          padding: 30px 16px;
-          text-align: center;
-          border-radius: 24px;
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(216,180,90,0.18);
-          box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+          position: relative;
+          padding: 24px 26px 18px;
+          text-align: left;
+        }
+
+        .stat-card + .stat-card {
+          border-left: 1px solid rgba(239, 204, 108, 0.18);
         }
 
         .stat-card strong {
           display: block;
-          font-size: clamp(2rem, 4vw, 3rem);
+          font-family: "Cormorant Garamond", serif;
+          font-size: clamp(2.8rem, 4vw, 4rem);
           color: #f0ce69;
-          font-weight: 800;
-          line-height: 1;
+          font-weight: 700;
+          line-height: 0.9;
         }
 
         .stat-card span {
           display: block;
-          margin-top: 12px;
+          margin-top: 14px;
           color: rgba(255,255,255,0.8);
-          font-size: 0.9rem;
-          letter-spacing: 0.08em;
+          font-size: 0.72rem;
+          font-weight: 700;
+          letter-spacing: 0.12em;
           text-transform: uppercase;
         }
 
         .commitment-section {
-          width: min(1200px, calc(100% - 40px));
-          margin: 0 auto;
-          padding: 110px 0 120px;
+          position: relative;
+          overflow: hidden;
+          width: min(1320px, calc(100% - 40px));
+          margin: 64px auto 90px;
+          padding: 74px 60px 62px;
+          border: 1px solid rgba(218, 184, 91, 0.2);
+          border-radius: 32px;
+          background: linear-gradient(135deg, rgba(28, 68, 46, 0.56), rgba(8, 35, 23, 0.78));
+        }
+
+        .commitment-section::after {
+          content: "";
+          position: absolute;
+          width: 340px;
+          height: 340px;
+          right: -130px;
+          top: -175px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(229, 193, 90, 0.16), transparent 68%);
+          pointer-events: none;
         }
 
         .commitment-header {
+          position: relative;
+          z-index: 1;
           max-width: 900px;
-          margin: 0 auto 42px;
+          margin: 0 auto 46px;
           text-align: center;
         }
 
@@ -917,17 +1021,27 @@ export default function AboutPage() {
         }
 
         .commitment-grid {
+          position: relative;
+          z-index: 1;
           display: grid;
           grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 22px;
+          gap: 16px;
         }
 
         .commitment-card {
-          padding: 30px 22px;
-          border-radius: 22px;
-          background: rgba(218, 208, 170, 0.12);
-          border: 1px solid rgba(209, 177, 90, 0.14);
-          box-shadow: 0 14px 30px rgba(17, 34, 24, 0.05);
+          min-height: 250px;
+          padding: 28px 24px;
+          border-radius: 18px;
+          background: rgba(5, 31, 20, 0.38);
+          border: 1px solid rgba(228, 198, 112, 0.19);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+          transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+        }
+
+        .commitment-card:hover {
+          transform: translateY(-6px);
+          background: rgba(34, 76, 49, 0.7);
+          border-color: rgba(240, 206, 105, 0.52);
         }
 
         .commitment-icon {
@@ -938,21 +1052,23 @@ export default function AboutPage() {
           height: 54px;
           border-radius: 16px;
           background: rgba(216,180,90,0.12);
-          color: #9d7a29;
+          color: #e8c45d;
           font-size: 1.5rem;
           font-weight: 800;
         }
 
         .commitment-card h3 {
           margin-top: 18px;
-          font-size: 1.5rem;
+          font-family: "Cormorant Garamond", serif;
+          font-size: 2rem;
           color: #f4e9cc;
         }
 
         .commitment-card p {
           margin-top: 12px;
           color: rgba(245, 239, 219, 0.82);
-          line-height: 1.8;
+          font-size: 0.92rem;
+          line-height: 1.7;
         }
 
         .footer {
@@ -1054,6 +1170,10 @@ export default function AboutPage() {
           .footer {
             grid-template-columns: 1fr 1fr;
           }
+
+          .commitment-section {
+            padding: 56px 32px 38px;
+          }
         }
 
         @media (max-width: 700px) {
@@ -1104,21 +1224,112 @@ export default function AboutPage() {
             grid-template-columns: 1fr;
           }
 
+          .stats-section {
+            margin-top: 56px;
+            padding: 42px 28px;
+          }
+
+          .stats-section::before {
+            inset: 10px 12px;
+            border-radius: 20px;
+          }
+
+          .stats-intro {
+            display: block;
+            margin-bottom: 22px;
+          }
+
+          .stats-intro p {
+            margin-top: 12px;
+          }
+
+          .stats-grid {
+            grid-template-columns: 1fr 1fr;
+          }
+
+          .stat-card {
+            padding: 20px 14px;
+          }
+
+          .stat-card + .stat-card {
+            border-left: 0;
+          }
+
+          .stat-card:nth-child(even) {
+            border-left: 1px solid rgba(239, 204, 108, 0.18);
+          }
+
+          .stat-card:nth-child(n + 3) {
+            border-top: 1px solid rgba(239, 204, 108, 0.18);
+          }
+
+          .commitment-section {
+            width: calc(100% - 20px);
+            margin: 36px auto 54px;
+            padding: 48px 20px 22px;
+            border-radius: 24px;
+          }
+
+          .commitment-header {
+            margin-bottom: 28px;
+          }
+
+          .commitment-card {
+            min-height: 0;
+          }
+
           .timeline {
             width: calc(100% - 18px);
           }
 
           .timeline-item {
-            grid-template-columns: 1fr;
-            gap: 12px;
+            grid-template-columns: 96px minmax(0, 1fr);
+            gap: 14px;
+            align-items: start;
+            min-height: 0;
+            padding-bottom: 24px;
           }
 
           .timeline:before {
-            left: 30px;
+            left: 58px;
+            top: 34px;
+            bottom: 34px;
+          }
+
+          .timeline-marker {
+            width: 96px;
+            min-height: 82px;
+          }
+
+          .timeline-index {
+            top: -3px;
+            left: 0;
+            min-width: 30px;
+            height: 25px;
+            font-size: 0.61rem;
           }
 
           .timeline-year {
             margin-left: 0;
+            width: 66px;
+            height: 66px;
+            font-size: 0.84rem;
+          }
+
+          .timeline-card {
+            min-width: 0;
+            padding: 15px 16px;
+            border-radius: 16px;
+          }
+
+          .timeline-card h3 {
+            margin-bottom: 5px;
+            font-size: 1.45rem;
+          }
+
+          .timeline-card p {
+            font-size: 0.88rem;
+            line-height: 1.65;
           }
 
           .story-visual {
@@ -1255,9 +1466,12 @@ export default function AboutPage() {
         </div>
 
         <div className="timeline reveal">
-          {timeline.map((item) => (
+          {timeline.map((item, index) => (
             <div key={item.year} className="timeline-item">
-              <div className="timeline-year">{item.year}</div>
+              <div className="timeline-marker">
+                <span className="timeline-index" aria-label={`Mốc số ${index + 1}`}>{String(index + 1).padStart(2, "0")}</span>
+                <div className="timeline-year">{item.year}</div>
+              </div>
               <div className="timeline-card">
                 <h3>{item.title}</h3>
                 <p>{item.desc}</p>
@@ -1268,6 +1482,13 @@ export default function AboutPage() {
       </section>
 
       <section className="stats-section reveal">
+        <div className="stats-intro">
+          <div>
+            <span>Những con số đáng tin cậy</span>
+            <h2>Đồng hành cùng bữa cơm Việt</h2>
+          </div>
+          <p>Hành trình của Vigen Food được xây dựng từ chất lượng sản phẩm và sự tin tưởng của khách hàng.</p>
+        </div>
         <div className="stats-grid">
           {stats.map((stat) => (
             <div key={stat.label} className="stat-card">

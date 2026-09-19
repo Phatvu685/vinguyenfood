@@ -1,5 +1,6 @@
 import './globals.css'
-import RiceParticles from './components/RiceParticles'
+import ScrollAnimator from './components/ScrollAnimator'
+import SupportChat from './components/SupportChat'
 
 export const metadata = {
   title: 'Gạo Ngon',
@@ -14,8 +15,9 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <body>
-        <RiceParticles />
+        <ScrollAnimator />
         {children}
+        <SupportChat />
       </body>
     </html>
   )

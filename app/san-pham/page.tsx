@@ -128,7 +128,7 @@ export default function ProductsPage() {
   const [catalogVersion, setCatalogVersion] = useState(0);
   const [catalogProducts, setCatalogProducts] = useState<Product[]>(defaultProducts);
   useEffect(() => {
-    const timer = window.setTimeout(() => setDebouncedQuery(query), 1000);
+    const timer = window.setTimeout(() => setDebouncedQuery(query), 350);
     return () => window.clearTimeout(timer);
   }, [query]);
   useEffect(() => {
@@ -420,6 +420,7 @@ export default function ProductsPage() {
                     onWish={() => toggleWish(product.id)}
                     onQuickAdd={() => setQuickProduct(product)}
                     onDetails={() => router.push(`/san-pham/${product.id}`)}
+                    onReviews={() => router.push(`/san-pham/${product.id}#reviews`)}
                     onAddToCart={(p, qty) => addToCart(p, qty, p.weight)}
                   />
                 ))}

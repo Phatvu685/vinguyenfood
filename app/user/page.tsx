@@ -7,10 +7,16 @@ import SiteFooter from "../components/SiteFooter";
 import BrandLogo from "../components/BrandLogo";
 import SiteHeader from "../components/SiteHeader";
 import styles from "./page.module.css";
-import "./userpage.css";
 
 type User = { name: string; phone: string; avatar?: string; password?: string; role?: "user" | "admin" };
 type Tab = "overview" | "orders" | "address" | "vouchers";
+
+function getGreeting(): string {
+  const h = new Date().getHours();
+  if (h < 12) return "Chào buổi sáng";
+  if (h < 18) return "Chào buổi chiều";
+  return "Chào buổi tối";
+}
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "overview",  label: "Tổng quan" },
@@ -18,6 +24,17 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "address",   label: "Địa chỉ giao hàng" },
   { id: "vouchers",  label: "Ưu đãi hội viên" },
 ];
+
+function UserNavIcon({ type }: { type: Tab }) {
+  const paths = {
+    overview: <><path d="M3 10.5 12 3l9 7.5v9a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 19.5v-9Z" /><path d="M9 21v-6h6v6" /></>,
+    orders: <><rect x="4" y="5" width="16" height="16" rx="2" /><path d="M8 3v4M16 3v4M8 11h8M8 15h5" /></>,
+    address: <><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" /><circle cx="12" cy="10" r="2.5" /></>,
+    vouchers: <><path d="M20 13a2 2 0 0 0 0-4V5H4v4a2 2 0 0 0 0 4v4h16v-4Z" /><path d="M12 5v12" /></>,
+  };
+
+  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{paths[type]}</svg>;
+}
 
 export default function UserPage() {
   const router = useRouter();
@@ -110,7 +127,12 @@ export default function UserPage() {
         {!user ? (
           /* ── Guest ── */
           <div className="user-guest">
-            <div className="user-guest-icon">♙</div>
+            <div className="user-guest-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:'36px',height:'36px'}}>
+                <path d="M12 2C8 6 4 10 4 14a8 8 0 0 0 16 0c0-4-4-8-8-12Z" />
+                <path d="M12 2v20" opacity=".5" />
+              </svg>
+            </div>
             <h2>Bạn chưa đăng nhập</h2>
             <p>Đăng nhập để trải nghiệm đầy đủ quyền lợi từ Gạo Ngon.</p>
             <button className="auth-submit" onClick={() => setAuthOpen(true)}>
@@ -121,11 +143,7 @@ export default function UserPage() {
           /* ── Dashboard ── */
           <div className="user-dashboard">
             <aside className="user-menu">
-              <div className="user-intro">
-                <span className="section-kicker">KHÔNG GIAN CỦA BẠN</span>
-                <h1>Xin chào, {user.name}</h1>
-                <p>Quản lý thông tin và theo dõi những bữa cơm sắp tới.</p>
-              </div>
+              <div className="user-profile-card">
               <label className="user-avatar-upload" aria-label="Tải ảnh đại diện">
                 <div className="user-avatar">
                   {user.avatar ? <img src={user.avatar} alt="Ảnh đại diện" /> : user.name.charAt(0).toUpperCase()}
@@ -133,22 +151,27 @@ export default function UserPage() {
                 <span aria-hidden="true">✎</span>
                 <input type="file" accept="image/*" onChange={uploadAvatar} />
               </label>
-              <strong>{user.name}</strong>
-              <span>{user.phone}</span>
-              <button className="profile-edit" type="button" onClick={() => { startEditingProfile(); setProfileModal("profile"); }}>Chỉnh sửa thông tin</button>
-              <button className="profile-edit" type="button" onClick={() => { setPasswordError(""); setProfileModal("password"); }}>Đổi mật khẩu</button>
+                <div className="user-profile-copy"><small>TÀI KHOẢN THÀNH VIÊN</small><strong>{user.name}</strong><span className="user-greeting">{getGreeting()}, {user.name.split(' ').pop()}! ✦</span><span>{user.phone}</span></div>
+                <button className="profile-edit" type="button" onClick={() => { startEditingProfile(); setProfileModal("profile"); }}>Chỉnh sửa hồ sơ <span>→</span></button>
+              </div>
 
-              {TABS.map((tab) => (
+              <nav className="user-navigation" aria-label="Điều hướng tài khoản">
+                <p>QUẢN LÝ TÀI KHOẢN</p>
+                {TABS.map((tab) => (
                 <button
                   key={tab.id}
                   className={activeTab === tab.id ? "menu-active" : ""}
                   onClick={() => setActiveTab(tab.id)}
                 >
-                  {tab.label}
+                  <span className="user-nav-icon" aria-hidden="true"><UserNavIcon type={tab.id} /></span>{tab.label}
                 </button>
-              ))}
+                ))}
+              </nav>
 
-              <button className="logout" onClick={logout}>Đăng xuất</button>
+              <div className="user-menu-actions">
+                <button className="profile-edit" type="button" onClick={() => { setPasswordError(""); setProfileModal("password"); }}>Bảo mật tài khoản</button>
+                <button className="logout" onClick={logout}>Đăng xuất <span>→</span></button>
+              </div>
             </aside>
 
             <div className="user-content">
@@ -215,7 +238,12 @@ function TabOverview({ user, router }: { user: { name: string; phone: string }; 
         <div><span>MÃ ƯU ĐÃI</span><strong>03</strong><small>Ưu đãi đang chờ bạn</small></div>
       </div>
       <div className="user-empty">
-        <span>⌁</span>
+        <span className="user-empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:'40px',height:'40px'}}>
+            <path d="M12 2C8 6 4 10 4 14a8 8 0 0 0 16 0c0-4-4-8-8-12Z" />
+            <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+          </svg>
+        </span>
         <h3>Bữa cơm đầu tiên đang chờ bạn</h3>
         <p>Khám phá những hạt gạo được tuyển chọn cho gia đình.</p>
         <button className="gold-button" onClick={() => router.push("/san-pham")}>KHÁM PHÁ SẢN PHẨM　→</button>
@@ -235,7 +263,12 @@ function TabOrders({ router }: { router: ReturnType<typeof useRouter> }) {
         </div>
       </div>
       <div className="user-empty">
-        <span>◻</span>
+        <span className="user-empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:'40px',height:'40px'}}>
+            <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+            <path d="m3.3 7 8.7 5 8.7-5M12 22V12" />
+          </svg>
+        </span>
         <h3>Chưa có đơn hàng nào</h3>
         <p>Những đơn hàng bạn đặt sẽ xuất hiện ở đây để bạn dễ dàng theo dõi.</p>
         <button className="gold-button" onClick={() => router.push("/san-pham")}>MUA NGAY →</button>
@@ -256,7 +289,12 @@ function TabAddress() {
         <button className="user-shop">+ Thêm địa chỉ</button>
       </div>
       <div className="user-empty">
-        <span>◎</span>
+        <span className="user-empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:'40px',height:'40px'}}>
+            <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
+        </span>
         <h3>Chưa có địa chỉ nào</h3>
         <p>Thêm địa chỉ giao hàng để đặt hàng nhanh hơn trong lần sau.</p>
         <button className="gold-button">THÊM ĐỊA CHỈ MỚI →</button>
@@ -456,7 +494,12 @@ function TabVouchers({ router, userPhone }: { router: ReturnType<typeof useRoute
 
       {publicVouchers.length === 0 && rewardVouchers.length === 0 && (
         <div className="user-empty">
-          <span>⌁</span>
+          <span className="user-empty-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:'40px',height:'40px'}}>
+              <path d="M20 12a2 2 0 0 0 0-4V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v3a2 2 0 0 0 0 4v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5Z" />
+              <path d="M12 5v14" strokeDasharray="2 2" />
+            </svg>
+          </span>
           <h3>Chưa có ưu đãi nào</h3>
           <p>Admin chưa tạo mã giảm giá nào. Hãy quay lại sau!</p>
         </div>
@@ -464,4 +507,3 @@ function TabVouchers({ router, userPhone }: { router: ReturnType<typeof useRoute
     </>
   );
 }
-

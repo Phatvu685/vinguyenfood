@@ -113,7 +113,7 @@
     padding: 9px 14px; /* Khoảng đệm nút tab */
     border: 1px solid rgba(224, 190, 91, .42); /* Viền nút tab */
     border-radius: 20px; /* Bo tròn viền nút */
-    color: rgba(255, 255, 255, .68); /* Màu chữ tab chưa chọn */
+    color: #D4AF37; /* Màu vàng kim cho tab chưa chọn */
     background: transparent; /* Nền trong suốt */
     font-size: 12px; /* Kích thước phông chữ 12px */
     cursor: pointer; /* Hiển thị con trỏ bàn tay */
@@ -150,28 +150,35 @@
     width: 100%; /* Ô nhập chiếm full chiều rộng */
     border: 0; /* Xóa bỏ đường viền mặc định */
     outline: 0; /* Xóa đường viền focus mặc định */
-    color: var(--white, #f8f6ee); /* Màu chữ nhập trắng ngà */
+    color: #D4AF37; /* Màu vàng kim cho chữ nhập */
     background: transparent; /* Nền ô nhập trong suốt */
     font-size: 12px; /* Kích thước chữ 12px */
 }
 
 .catalog-search input::placeholder {
-    color: rgba(255, 255, 255, .5); /* Màu chữ gợi ý mờ */
+    color: #D4AF37; /* Màu vàng kim cho chữ gợi ý */
 }
 
 .catalog-actions select {
     padding: 8px 12px; /* Khoảng đệm danh sách chọn */
     border: 1px solid rgba(221, 211, 163, .3); /* Viền danh sách chọn */
     border-radius: 8px; /* Bo góc 8px */
-    color: var(--white, #f8f6ee); /* Màu chữ trắng ngà */
-    background: rgba(8, 24, 14, .38); /* Nền xanh tối mờ */
+    color: #D4AF37; /* Màu vàng kim cho lựa chọn */
+    background: #102d1c; /* Nền xanh đồng bộ với giao diện */
     font-size: 12px; /* Cỡ chữ 12px */
     outline: none; /* Xóa nét viền khi chọn */
+    color-scheme: dark;
 }
 
 .catalog-actions select option {
-    color: #17291d; /* Màu chữ tùy chọn tối */
-    background: #f8f6ee; /* Nền tùy chọn sáng ngà */
+    color: #D4AF37; /* Chữ vàng kim trong danh sách */
+    background: #102d1c; /* Nền xanh đậm trong danh sách */
+}
+
+.catalog-actions select option:checked,
+.catalog-actions select option:hover {
+    color: #17291d;
+    background: #e8dba8;
 }
 
 /* ── 4. LƯỚI HIỂN THỊ SẢN PHẨM (CATALOG GRID) ── */
@@ -197,7 +204,7 @@
     display: flex; /* Sử dụng Flexbox căn chỉnh */
     align-items: center; /* Căn giữa chiều dọc */
     gap: 28px; /* Khoảng cách các thành phần 28px */
-    color: #f5f1df; /* Màu chữ sáng ngà */
+    color: #FFD700; /* Màu vàng kim cho chữ trong khối */
     background: #1a3a27; /* Nền xanh lục bảo đậm */
     border-radius: 18px; /* Bo góc 18px */
     border: 1px solid rgba(216, 180, 90, .3); /* Viền màu vàng ánh kim mờ */
@@ -222,9 +229,141 @@
 .catalog-promise p {
     max-width: 370px; /* Chiều rộng chữ tối đa 370px */
     margin-left: auto; /* Đẩy chữ về bên phải */
-    color: rgba(255, 255, 255, .7); /* Màu chữ trắng mờ nhẹ */
+    color: #FFD700; /* Màu vàng kim cho nội dung */
     font-size: 12px; /* Kích thước chữ 12px */
     line-height: 1.6; /* Chiều cao dòng 1.6 */
+}
+
+.catalog-promise .section-kicker,
+.catalog-promise h2,
+.catalog-promise h2 em,
+.catalog-promise p {
+    color: #FFD700;
+}
+
+/* Editorial promise banner: photography and restrained gold replace the empty green slab. */
+.catalog-promise {
+    position: relative;
+    isolation: isolate;
+    width: min(1360px, calc(100% - 48px));
+    min-height: 250px;
+    margin: 64px auto 70px;
+    padding: 42px 8%;
+    display: grid;
+    grid-template-columns: 54px minmax(300px, 1fr) minmax(280px, .7fr);
+    gap: 24px;
+    overflow: hidden;
+    border: 1px solid rgba(232, 203, 109, .28);
+    border-radius: 24px 84px 24px 84px;
+    background:
+        linear-gradient(90deg, #062b19 0%, rgba(5, 38, 22, .95) 43%, rgba(5, 35, 20, .57) 66%, rgba(4, 25, 14, .16) 100%),
+        url("/images/rice-landscape.png") 82% center / cover;
+    box-shadow: 0 24px 54px rgba(0, 0, 0, .24), inset 0 1px rgba(255, 246, 202, .09);
+}
+
+.catalog-promise::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: 24px;
+    bottom: 24px;
+    left: 9.4%;
+    width: 1px;
+    background: linear-gradient(transparent, rgba(238, 207, 111, .72), transparent);
+}
+
+.catalog-promise .promise-icon {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    align-self: center;
+    border: 1px solid rgba(243, 215, 122, .68);
+    border-radius: 50%;
+    color: #f1d77d;
+    background: rgba(4, 31, 18, .38);
+    font-size: 19px;
+    box-shadow: 0 0 0 8px rgba(216, 180, 90, .05);
+}
+
+.catalog-promise > div {
+    align-self: center;
+}
+
+.catalog-promise .section-kicker {
+    color: #e7cd75 !important;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .18em !important;
+}
+
+.catalog-promise h2 {
+    margin-top: 12px;
+    color: #fff8df !important;
+    font: 600 clamp(36px, 3.4vw, 54px) / .85 "Cormorant Garamond", serif;
+    letter-spacing: -.02em;
+}
+
+.catalog-promise h2 em {
+    color: #e7ca69 !important;
+    font-size: .98em;
+}
+
+.catalog-promise > p {
+    position: relative;
+    align-self: center;
+    max-width: 330px;
+    margin: 0 0 0 auto;
+    padding: 19px 0 19px 25px;
+    border-left: 1px solid rgba(238, 207, 111, .52);
+    color: rgba(255, 250, 229, .88) !important;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.75;
+    text-shadow: 0 1px 10px rgba(0, 0, 0, .6);
+}
+
+@media (max-width: 700px) {
+    .catalog-promise {
+        width: calc(100% - 30px);
+        min-height: 0;
+        margin: 48px auto 52px;
+        padding: 34px 26px;
+        grid-template-columns: 44px 1fr;
+        gap: 18px;
+        border-radius: 20px 45px 20px 45px;
+        background:
+            linear-gradient(135deg, rgba(4, 30, 17, .97), rgba(5, 38, 22, .76)),
+            url("/images/rice-landscape.png") center / cover;
+    }
+
+    .catalog-promise::after {
+        left: 48px;
+        top: 20px;
+        bottom: auto;
+        height: 1px;
+        width: 52%;
+    }
+
+    .catalog-promise .promise-icon {
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+    }
+
+    .catalog-promise h2 {
+        font-size: 38px;
+    }
+
+    .catalog-promise > p {
+        grid-column: 1 / -1;
+        max-width: none;
+        margin: 3px 0 0;
+        padding: 15px 0 0;
+        border-top: 1px solid rgba(238, 207, 111, .27);
+        border-left: 0;
+        font-size: 12px;
+    }
 }
 
 /* ── 6. RESPONSIVE GIAO DIỆN ── */
@@ -247,3 +386,220 @@
     }
 }
 
+/* Giữ card gọn và đồng đều dù ảnh sản phẩm có tỉ lệ khác nhau. */
+.catalog-results .catalog-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 280px));
+    justify-content: start;
+    align-items: stretch;
+}
+
+.catalog-results .catalog-card {
+    width: 100%;
+    height: 100%;
+    border: 1.5px solid #e6c768 !important;
+    border-radius: 18px !important;
+    box-shadow:
+        0 0 0 0.5px rgba(255, 232, 144, .28),
+        0 10px 24px rgba(3, 14, 8, .3) !important;
+}
+
+.catalog-results .catalog-image {
+    height: auto;
+    aspect-ratio: 4 / 5;
+    background: rgba(239, 232, 198, .08);
+    border-radius: 16px 16px 0 0 !important;
+    overflow: hidden;
+}
+
+.catalog-results .catalog-image img {
+    position: absolute !important;
+    object-fit: cover !important;
+    object-position: center;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    padding: 0;
+    border-radius: 15px 15px 0 0;
+    transform: none !important;
+    transform-origin: center;
+}
+
+/* Grid responsive thay vì ép cứng kích thước */
+.catalog-results .catalog-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    justify-content: start;
+    align-items: stretch;
+    grid-auto-rows: auto;
+    overflow-x: visible;
+    padding-bottom: 8px;
+}
+
+.catalog-results .catalog-card {
+    width: 100% !important;
+    min-width: 200px !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    flex: 1;
+    box-sizing: border-box;
+}
+
+.catalog-results .catalog-image {
+    flex: 0 0 auto;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.catalog-results .catalog-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+    box-sizing: border-box;
+    max-height: 290px;
+    box-sizing: border-box;
+    overflow: visible;
+}
+
+.catalog-results .catalog-buy-section {
+    margin-top: auto !important;
+}
+
+.catalog-results .product-title-row {
+    height: 44px;
+    min-height: 44px;
+    max-height: 44px;
+}
+
+.catalog-results .product-title-row h3 {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-height: 1.05;
+    font-size: 21px;
+}
+
+.catalog-results .product-note {
+    height: 36px;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+}
+
+.catalog-results .catalog-review {
+    height: 19px;
+    min-height: 19px;
+    overflow: hidden;
+}
+
+/* Match the homepage ProductCard geometry exactly. */
+.catalog-results .shared-product-card {
+    width: 240px !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
+    height: 565px !important;
+    min-height: 565px !important;
+    max-height: 565px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+.catalog-results .catalog-grid {
+    grid-auto-rows: 565px !important;
+}
+
+.catalog-results .shared-product-card .catalog-image {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    flex: 0 0 auto !important;
+    aspect-ratio: 3 / 4 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+.catalog-results .shared-product-card .catalog-image img {
+    position: absolute !important;
+    inset: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    padding: 0 !important;
+    transform: none !important;
+    margin: 0 auto !important;
+}
+
+.catalog-results .shared-product-card .catalog-info {
+    display: flex !important;
+    flex: 1 1 auto !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    padding: 14px 14px 10px !important;
+    overflow: hidden !important;
+}
+
+.catalog-results .shared-product-card .product-note {
+    height: 36px !important;
+    min-height: 36px !important;
+    max-height: 36px !important;
+    margin: 5px 0 0 !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    line-height: 1.4 !important;
+}
+
+.catalog-results .shared-product-card .catalog-review {
+    height: 19px !important;
+    min-height: 19px !important;
+    max-height: 19px !important;
+    margin: 7px 0 0 !important;
+}
+
+.catalog-results .shared-product-card .catalog-buy-section {
+    flex: 0 0 auto !important;
+    margin-top: 3px !important;
+    padding-top: 5px !important;
+    gap: 6px !important;
+}
+
+.catalog-results .shared-product-card .product-title-row h3 {
+    display: -webkit-box !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+    line-height: 1.05 !important;
+    font-size: 21px !important;
+}
+
+.catalog-results .shared-product-card .catalog-review {
+    white-space: nowrap !important;
+}
+
+.catalog-results .shared-product-card .catalog-review button,
+.catalog-results .shared-product-card .catalog-review .review-label {
+    white-space: nowrap !important;
+}

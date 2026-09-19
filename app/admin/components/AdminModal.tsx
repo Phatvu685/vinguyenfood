@@ -65,13 +65,20 @@ export default function AdminModal({ open, onClose, title, subtitle, size = "md"
       onMouseDown={(e) => { if (e.target === overlayRef.current) onClose(); }}
     >
       <div className={`vg-modal vg-modal-${size} ${className || ""}`.trim()} role="dialog" aria-modal="true" onMouseDown={(e) => e.stopPropagation()}>
-        <div className="vg-modal-header">
-          <div className="vg-modal-header-info">
-            <h2 className="vg-modal-title">{title}</h2>
-            {subtitle && <p className="vg-modal-subtitle">{subtitle}</p>}
+        {(title || subtitle) && (
+          <div className="vg-modal-header">
+            <div className="vg-modal-header-info">
+              {title && <h2 className="vg-modal-title">{title}</h2>}
+              {subtitle && <p className="vg-modal-subtitle">{subtitle}</p>}
+            </div>
+            <button className="vg-modal-close" type="button" onClick={onClose} aria-label="Đóng">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M1 1l12 12M13 1L1 13" />
+              </svg>
+            </button>
           </div>
-          <button className="vg-modal-close" type="button" onClick={onClose} aria-label="Đóng">×</button>
-        </div>
+        )}
+
         <div className="vg-modal-body">
           {children}
         </div>

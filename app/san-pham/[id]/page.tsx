@@ -11,6 +11,11 @@ import styles from "./page.module.css";
 
 const formatPrice = (price: number) => `${price.toLocaleString("vi-VN")}đ`;
 
+type SubmittedReview = {
+  rating: number;
+  comment: string;
+};
+
 function Stars({ rating }: { rating: number }) {
   return (
     <span className="vigen-stars" aria-label={`${rating} trên 5 sao`}>
@@ -59,6 +64,7 @@ export default function ProductLandingPage() {
   const [selectedImage, setSelectedImage] = useState(product.image);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
+  const [submittedReview, setSubmittedReview] = useState<SubmittedReview | null>(null);
   const images = [product.image].filter(Boolean);
   const price = getPricePerKg(product);
   const hasRealOriginalPrice = Boolean(product.originalPrice && product.originalPrice > product.price);
@@ -253,7 +259,7 @@ export default function ProductLandingPage() {
           <div className="vigen-choice vigen-rice-type">
             <label>Loại gạo</label>
             <div>
-              {[product.category, "Nguyên cám", "Gạo lứt"].map((item) => (
+              {[...new Set([product.category, "Nguyên cám", "Gạo lứt"])].map((item) => (
                 <button key={item} className={riceType === item ? "selected" : ""} onClick={() => setRiceType(item)}>{item}</button>
               ))}
             </div>
@@ -302,109 +308,214 @@ export default function ProductLandingPage() {
         </div>
       </section>
       <div className="vigen-detail-panels">
-      <section className="vigen-section vigen-info-panel">
-        <div className="vigen-section-heading">
-          <span>02 · Thông tin minh bạch</span>
-          <h2>Thông số & dinh dưỡng</h2>
-        </div>
-        <div className="vigen-data-grid">
-          <div className="vigen-spec-card">
-            <h3>Thông số sản phẩm</h3>
-            <dl>
-              <dt>Loại gạo</dt>
-              <dd>{product.category}</dd>
-              <dt>Khối lượng</dt>
-              <dd>2kg / 5kg / 10kg / 20kg</dd>
-              <dt>Xuất xứ</dt>
-              <dd>Việt Nam</dd>
-              <dt>Hạn sử dụng</dt>
-              <dd>12 tháng từ ngày đóng gói</dd>
-            </dl>
+        <section className="vigen-section vigen-info-panel">
+          <div className="vigen-section-heading">
+            <span>02 · Thông tin minh bạch</span>
+            <h2>Thông số & dinh dưỡng</h2>
           </div>
-          <div className="vigen-spec-card">
-            <h3>
-              Bảng dinh dưỡng <small>trong 100g</small>
-            </h3>
-            <div className="vigen-nutrition">
-              <span>
-                <b>350</b>
-                <small>kcal</small>
-              </span>
-              <span>
-                <b>7.5g</b>
-                <small>đạm</small>
-              </span>
-              <span>
-                <b>3.2g</b>
-                <small>chất xơ</small>
-              </span>
-              <span>
-                <b>0.9g</b>
-                <small>chất béo</small>
-              </span>
+          <div className="vigen-data-grid">
+            <div className="vigen-spec-card">
+              <h3>Thông số sản phẩm</h3>
+              <dl>
+                <dt>Loại gạo</dt>
+                <dd>{product.category}</dd>
+                <dt>Khối lượng</dt>
+                <dd>2kg / 5kg / 10kg / 20kg</dd>
+                <dt>Xuất xứ</dt>
+                <dd>Việt Nam</dd>
+                <dt>Hạn sử dụng</dt>
+                <dd>12 tháng từ ngày đóng gói</dd>
+              </dl>
+            </div>
+            <div className="vigen-spec-card">
+              <h3>
+                Bảng dinh dưỡng <small>trong 100g</small>
+              </h3>
+              <div className="vigen-nutrition">
+                <span>
+                  <b>350</b>
+                  <small>kcal</small>
+                </span>
+                <span>
+                  <b>7.5g</b>
+                  <small>đạm</small>
+                </span>
+                <span>
+                  <b>3.2g</b>
+                  <small>chất xơ</small>
+                </span>
+                <span>
+                  <b>0.9g</b>
+                  <small>chất béo</small>
+                </span>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
-      <section className="vigen-section vigen-guide-panel" id="process">
-        <div className="vigen-section-heading">
-          <span>03 · Hướng dẫn</span>
-          <h2>Nấu ngon và bảo quản đúng cách</h2>
-        </div>
-        <div className="vigen-guide-grid">
-          <div>
-            <span>🍚</span>
-            <h3>Cách nấu</h3>
-            <p>Vo nhẹ 1 lần, ngâm 20 phút, thêm nước theo tỷ lệ 1:1.2.</p>
+        </section>
+        <section className="vigen-section vigen-guide-panel" id="process">
+          <div className="vigen-section-heading">
+            <span>03 · Hướng dẫn</span>
+            <h2>Nấu ngon và bảo quản đúng cách</h2>
           </div>
-          <div>
-            <span>◌</span>
-            <h3>Bảo quản</h3>
-            <p>Đậy kín miệng túi, đặt nơi khô ráo, thoáng mát.</p>
+          <div className="vigen-guide-grid">
+            <div>
+              <span>🍚</span>
+              <h3>Cách nấu</h3>
+              <p>Vo nhẹ 1 lần, ngâm 20 phút, thêm nước theo tỷ lệ 1:1.2.</p>
+            </div>
+            <div>
+              <span>◌</span>
+              <h3>Bảo quản</h3>
+              <p>Đậy kín miệng túi, đặt nơi khô ráo, thoáng mát.</p>
+            </div>
+            <div>
+              <span>♡</span>
+              <h3>An tâm sử dụng</h3>
+              <p>Chọn gạo mới, nguyên chất cho bữa cơm mỗi ngày.</p>
+            </div>
           </div>
-          <div>
-            <span>♡</span>
-            <h3>An tâm sử dụng</h3>
-            <p>Chọn gạo mới, nguyên chất cho bữa cơm mỗi ngày.</p>
-          </div>
-        </div>
-      </section>
+        </section>
       </div>
-      <section className="vigen-faq vigen-review-section" id="reviews">
-        <div className="vigen-section-heading">
-          <span>Đánh giá khách hàng</span>
-          <h2>Khách hàng nói gì về sản phẩm?</h2>
+      <section className="prv-section" id="reviews">
+        {/* ── Header ── */}
+        <div className="prv-header">
+          <span className="prv-kicker">⭐ ĐÁNH GIÁ KHÁCH HÀNG</span>
+          <h2 className="prv-title">
+            Khách hàng nói gì<br /><em>về sản phẩm?</em>
+          </h2>
         </div>
-        <div className="vigen-review-head">
-          <div><strong>{product.rating.toFixed(1)}/5</strong><span>★ ★ ★ ★ ★ · {product.reviews} đánh giá</span></div>
-          <div className="vigen-review-bars">
-            <span><b>5 sao</b><i><em style={{ width: "82%" }} /></i><strong>82%</strong></span>
-            <span><b>4 sao</b><i><em style={{ width: "14%" }} /></i><strong>14%</strong></span>
-            <span><b>3 sao</b><i><em style={{ width: "4%" }} /></i><strong>4%</strong></span>
-            <span><b>2 sao</b><i><em style={{ width: "0%" }} /></i><strong>0%</strong></span>
-            <span><b>1 sao</b><i><em style={{ width: "0%" }} /></i><strong>0%</strong></span>
+
+        <div className="prv-body">
+          {/* ── LEFT: Score + Bars + Form ── */}
+          <div className="prv-left">
+
+            {/* Score Overview */}
+            <div className="prv-score-card">
+              <div className="prv-score-main">
+                <span className="prv-score-num">{product.rating.toFixed(1)}</span>
+                <span className="prv-score-den">/5</span>
+              </div>
+              <div className="prv-stars">★★★★★</div>
+              <p className="prv-score-sub">{product.reviews} đánh giá</p>
+              <div className="prv-bars">
+                {[{ s: 5, p: 82 }, { s: 4, p: 14 }, { s: 3, p: 4 }, { s: 2, p: 0 }, { s: 1, p: 0 }].map(({ s, p }) => (
+                  <div key={s} className="prv-bar-row">
+                    <span className="prv-bar-lbl">{s} sao</span>
+                    <div className="prv-bar-track"><div className="prv-bar-fill" style={{ width: `${p}%` }} /></div>
+                    <span className="prv-bar-pct">{p}%</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Write Review */}
+            <div className="prv-write-card">
+              <p className="prv-write-title">✍️ Viết đánh giá của bạn</p>
+              {reviewOpen ? (
+                <form
+                  className="prv-form"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.currentTarget);
+                    setSubmittedReview({
+                      rating: Number(formData.get("rating") || 5),
+                      comment: String(formData.get("comment") || "").trim(),
+                    });
+                    setReviewOpen(false);
+                    setReviewSubmitted(true);
+                  }}
+                >
+                  <div className="prv-field">
+                    <label className="prv-label">Đánh giá của bạn</label>
+                    <select className="prv-select" name="rating" defaultValue="5">
+                      <option value="5">★★★★★ · Rất hài lòng</option>
+                      <option value="4">★★★★ · Hài lòng</option>
+                      <option value="3">★★★ · Bình thường</option>
+                      <option value="2">★★ · Không hài lòng</option>
+                      <option value="1">★ · Rất tệ</option>
+                    </select>
+                  </div>
+                  <div className="prv-field">
+                    <label className="prv-label">Chia sẻ cảm nhận</label>
+                    <textarea className="prv-textarea" name="comment" placeholder="Gạo có hợp khẩu vị của bạn không?..." minLength={10} required rows={3} />
+                  </div>
+                  <div className="prv-form-actions">
+                    <button type="button" className="prv-btn-ghost" onClick={() => setReviewOpen(false)}>Hủy</button>
+                    <button type="submit" className="prv-btn-gold">Gửi đánh giá →</button>
+                  </div>
+                </form>
+              ) : (
+                <button
+                  type="button"
+                  className="prv-open-btn"
+                  onClick={() => { setReviewOpen(true); setReviewSubmitted(false); }}
+                >
+                  + Viết đánh giá ngay
+                </button>
+              )}
+              {reviewSubmitted && (
+                <div className="prv-success">
+                  🎉 Cảm ơn bạn! Bình luận đã được hiển thị ngay.
+                </div>
+              )}
+            </div>
           </div>
-          <button type="button" aria-expanded={reviewOpen} aria-controls="review-form" onClick={() => { setReviewOpen((open) => !open); setReviewSubmitted(false); }}>Viết đánh giá</button>
-        </div>
-        {reviewOpen && (
-          <form
-            id="review-form"
-            className="vigen-review-form"
-            onSubmit={(event) => {
-              event.preventDefault();
-              setReviewOpen(false);
-              setReviewSubmitted(true);
-            }}
-          >
-            <label>Đánh giá của bạn<select name="rating" defaultValue="5"><option value="5">★★★★★ · Rất hài lòng</option><option value="4">★★★★ · Hài lòng</option><option value="3">★★★ · Bình thường</option></select></label>
-            <label>Chia sẻ cảm nhận<textarea name="comment" placeholder="Gạo có hợp khẩu vị của bạn không?" minLength={10} required /></label>
-            <div><button type="button" onClick={() => setReviewOpen(false)}>Hủy</button><button type="submit">Gửi đánh giá →</button></div>
-          </form>
-        )}
-        {reviewSubmitted && <p className="vigen-review-success">✓ Cảm ơn bạn! Đánh giá đã được gửi để duyệt.</p>}
-        <div className="vigen-reviews">
-          <blockquote><div><span>★★★★★</span><time>12/08/2025</time></div><p>“Gạo thơm, hạt đều và cơm dẻo. Gia đình mình ăn rất hợp, sẽ mua lại.”</p><footer><i>MA</i><b>Minh Anh</b><small>✓ Đã mua hàng</small></footer></blockquote>
-          <blockquote><div><span>★★★★★</span><time>08/08/2025</time></div><p>“Đóng gói cẩn thận, giao nhanh. Cơm để nguội vẫn mềm và thơm.”</p><footer><i>TH</i><b>Thanh Hương</b><small>✓ Đã mua hàng</small></footer></blockquote>
+
+          {/* ── RIGHT: Review Cards ── */}
+          <div className="prv-right">
+            <div className="prv-cards">
+              <article className="prv-card">
+                <header className="prv-card-header">
+                  <div className="prv-avatar" style={{ background: "#4f7c5a" }}>MA</div>
+                  <div className="prv-card-meta">
+                    <strong>Minh Anh</strong>
+                    <span>12/08/2025</span>
+                  </div>
+                  <div className="prv-card-stars">★★★★★</div>
+                </header>
+                <p className="prv-card-comment">"Gạo thơm, hạt đều và cơm dẻo. Gia đình mình ăn rất hợp, sẽ mua lại."</p>
+                <span className="prv-verified">✔ Đã mua hàng</span>
+              </article>
+              <article className="prv-card">
+                <header className="prv-card-header">
+                  <div className="prv-avatar" style={{ background: "#7a5f3a" }}>TH</div>
+                  <div className="prv-card-meta">
+                    <strong>Thanh Hương</strong>
+                    <span>08/08/2025</span>
+                  </div>
+                  <div className="prv-card-stars">★★★★★</div>
+                </header>
+                <p className="prv-card-comment">"Đóng gói cẩn thận, giao nhanh. Cơm để nguội vẫn mềm và thơm."</p>
+                <span className="prv-verified">✔ Đã mua hàng</span>
+              </article>
+              <article className="prv-card">
+                <header className="prv-card-header">
+                  <div className="prv-avatar" style={{ background: "#3a6878" }}>HN</div>
+                  <div className="prv-card-meta">
+                    <strong>Hoàng Nam</strong>
+                    <span>01/08/2025</span>
+                  </div>
+                  <div className="prv-card-stars">★★★★★</div>
+                </header>
+                <p className="prv-card-comment">"Mình đã mua lại ST25 lần thứ ba rồi. Chất lượng ổn định, không bao giờ thất vọng."</p>
+                <span className="prv-verified">✔ Đã mua hàng</span>
+              </article>
+              {submittedReview && (
+                <article className="prv-card">
+                  <header className="prv-card-header">
+                    <div className="prv-avatar" style={{ background: "#b8903a" }}>BẠN</div>
+                    <div className="prv-card-meta">
+                      <strong>Khách hàng mới</strong>
+                      <span>Vừa đăng</span>
+                    </div>
+                    <div className="prv-card-stars">{"★".repeat(submittedReview.rating)}</div>
+                  </header>
+                  <p className="prv-card-comment">&quot;{submittedReview.comment}&quot;</p>
+                  <span className="prv-verified">✔ Hiển thị ngay</span>
+                </article>
+              )}
+            </div>
+          </div>
         </div>
       </section>
       {notice && <div className="vigen-toast" role="status">✓ {notice}<button onClick={() => setNotice("")} aria-label="Đóng thông báo">×</button></div>}
